@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XML_DIZ_INFO>
+  <MASTER_PAD_INFO>
+    <Spec_Version>4.0</Spec_Version>
+    <PAD_Version>4.0</PAD_Version>
+    <PAD_URL>https://raw.githubusercontent.com/mkb-fcb/pdf-editor-pro/main/pad.xml</PAD_URL>
+    <PAD_Filename>pad.xml</PAD_Filename>
+    <PAD_Alternate_Name></PAD_Alternate_Name>
+    <PAD_File_ID></PAD_File_ID>
+  </MASTER_PAD_INFO>
+  <COMPANY_INFO>
+    <Company_Name>MKBSoft</Company_Name>
+    <Address_1>Istanbul</Address_1>
+    <Address_2></Address_2>
+    <City_Town>Istanbul</City_Town>
+    <State_Province></State_Province>
+    <Zip_Postal_Code></Zip_Postal_Code>
+    <Country>Turkey</Country>
+    <Company_WebSite_URL>https://mkbsoft.net</Company_WebSite_URL>
+    <Contact_Info>
+      <Author_First_Name>Kamil</Author_First_Name>
+      <Author_Last_Name>Bilir</Author_Last_Name>
+      <Author_Email>destek@mkbsoft.net</Author_Email>
+      <Support_URL>https://mkbsoft.net</Support_URL>
+      <Sales_URL>https://mkbsoft.net/#pricing</Sales_URL>
+    </Contact_Info>
+  </COMPANY_INFO>
+  <PROGRAM_INFO>
+    <Program_Name>PDF Editor Pro</Program_Name>
+    <Program_Version>1.0.0</Program_Version>
+    <Program_Release_Month>10</Program_Release_Month>
+    <Program_Release_Day>01</Program_Release_Day>
+    <Program_Release_Year>2026</Program_Release_Year>
+    <Program_Cost_Dollars>19</Program_Cost_Dollars>
+    <Program_Cost_Other_Code></Program_Cost_Other_Code>
+    <Program_Cost_Other></Program_Cost_Other>
+    <Program_Type>Shareware</Program_Type>
+    <Program_Release_Status>Major Update</Program_Release_Status>
+    <Program_Install_Support>Install and Uninstall</Program_Install_Support>
+    <Program_OS_Support>Win11,Win10,Win8,Win7</Program_OS_Support>
+    <Program_Language>English,Turkish,German,French,Spanish,Italian,Arabic,Russian</Program_Language>
+    <File_Info>
+      <File_Size_Bytes>85648928</File_Size_Bytes>
+      <File_Size_K>83641</File_Size_K>
+      <File_Size_MB>81.72</File_Size_MB>
+    </File_Info>
+    <Expire_Info>
+      <Has_Expire_Info>Y</Has_Expire_Info>
+      <Expire_Type>Page limit</Expire_Type>
+      <Expire_Count>3</Expire_Count>
+      <Expire_Based_On>Pages</Expire_Based_On>
+      <Expire_Other_Info>Demo limited to 3 pages; saved files include watermark</Expire_Other_Info>
+      <Expire_Month></Expire_Month>
+      <Expire_Day></Expire_Day>
+      <Expire_Year></Expire_Year>
+    </Expire_Info>
+  </PROGRAM_INFO>
+  <PROGRAM_DESCRIPTIONS>
+    <Language>
+      <English>
+        <Keywords>PDF editor, PDF merge, PDF split, PDF compress, PDF rotate, PDF encrypt, PDF password, Windows PDF tool</Keywords>
+        <Char_Desc_45>Professional PDF editor for Windows — merge, split, compress</Char_Desc_45>
+        <Char_Desc_80>PDF Editor Pro: merge, split, rotate, compress and encrypt PDF files on Windows.</Char_Desc_80>
+        <Char_Desc_250>PDF Editor Pro is a lightweight yet powerful PDF editing tool for Windows. Merge multiple PDFs, split by page range, rotate pages, compress file size, add or remove password protection, and reorder pages — all from a clean native interface without subscriptions.</Char_Desc_250>
+        <Char_Desc_450>PDF Editor Pro is a lightweight yet powerful PDF editing tool for Windows. Merge multiple PDFs, split by page range, rotate pages, compress file size, add or remove password protection, and reorder pages — all from a clean native interface. No subscription, no cloud upload required. Supports 8 languages: English, Turkish, German, French, Spanish, Italian, Arabic, Russian. Works on Windows 10 and 11. Demo version allows up to 3 pages; full version is $19 (individual) or $80 (corporate, 5 PCs).</Char_Desc_450>
+        <Char_Desc_2000>PDF Editor Pro is a fast, lightweight PDF editing application built specifically for Windows. It requires no internet connection for core features and does not upload your documents to any cloud service — everything runs locally on your machine.
+
+Key Features:
+- Merge: Combine multiple PDF files into one with drag-and-drop page ordering
+- Split: Extract specific pages or page ranges from any PDF
+- Rotate: Rotate individual pages or entire documents (90°, 180°, 270°)
+- Compress: Reduce PDF file size with adjustable quality settings
+- Encrypt / Decrypt: Add or remove password protection (user and owner passwords)
+- Page management: Insert blank pages, delete pages, reorder via thumbnail view
+- Metadata editing: Edit document title, author, subject, and keywords
+- Multilingual: Full interface in English, Turkish, German, French, Spanish, Italian, Arabic, Russian
+
+Technical details:
+- Built with Python + PyMuPDF for high-quality PDF processing
+- Native Windows window via WebView2 (no Electron)
+- Installer size: ~82 MB (includes all dependencies, no separate Python install needed)
+- Supports Windows 10 and Windows 11 (64-bit)
+
+Licensing:
+- Demo: Free, up to 3 pages, watermark on save
+- Individual: $19 one-time, 1 PC
+- Corporate: $80 one-time, up to 5 PCs
+- License delivered by email instantly after purchase (Gumroad)
+
+Website: https://mkbsoft.net</Char_Desc_2000>
+      </English>
+    </Language>
+  </PROGRAM_DESCRIPTIONS>
+  <WEB_INFO>
+    <Application_URLs>
+      <Application_Info_URL>https://mkbsoft.net</Application_Info_URL>
+      <Application_Order_URL>https://mkbsoft.net/#pricing</Application_Order_URL>
+      <Application_Screenshot_URL>https://mkbsoft.net/screenshot.png</Application_Screenshot_URL>
+      <Application_Icon_URL>https://mkbsoft.net/icon.png</Application_Icon_URL>
+      <Application_XML_File_URL>https://raw.githubusercontent.com/mkb-fcb/pdf-editor-pro/main/pad.xml</Application_XML_File_URL>
+    </Application_URLs>
+    <Download_URLs>
+      <Primary_Download_URL>https://github.com/mkb-fcb/pdf-editor-pro/releases/download/v1.0.0/PDFEditorPro_Demo_v1.0.0.exe</Primary_Download_URL>
+      <Secondary_Download_URL>https://mkbsoft.net</Secondary_Download_URL>
+      <Additional_Download_URL_1></Additional_Download_URL_1>
+      <Additional_Download_URL_2></Additional_Download_URL_2>
+    </Download_URLs>
+  </WEB_INFO>
+</XML_DIZ_INFO>
