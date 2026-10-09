@@ -27,22 +27,22 @@
   </COMPANY_INFO>
   <PROGRAM_INFO>
     <Program_Name>PDF Editor Pro</Program_Name>
-    <Program_Version>1.0.0</Program_Version>
+    <Program_Version>1.0.1</Program_Version>
     <Program_Release_Month>10</Program_Release_Month>
-    <Program_Release_Day>01</Program_Release_Day>
+    <Program_Release_Day>09</Program_Release_Day>
     <Program_Release_Year>2026</Program_Release_Year>
     <Program_Cost_Dollars>19</Program_Cost_Dollars>
     <Program_Cost_Other_Code></Program_Cost_Other_Code>
     <Program_Cost_Other></Program_Cost_Other>
     <Program_Type>Shareware</Program_Type>
-    <Program_Release_Status>Major Update</Program_Release_Status>
+    <Program_Release_Status>Minor Update</Program_Release_Status>
     <Program_Install_Support>Install and Uninstall</Program_Install_Support>
     <Program_OS_Support>Win11,Win10,Win8,Win7</Program_OS_Support>
     <Program_Language>English,Turkish,German,French,Spanish,Italian,Arabic,Russian</Program_Language>
     <File_Info>
-      <File_Size_Bytes>85648928</File_Size_Bytes>
-      <File_Size_K>83641</File_Size_K>
-      <File_Size_MB>81.72</File_Size_MB>
+      <File_Size_Bytes>85645438</File_Size_Bytes>
+      <File_Size_K>83638</File_Size_K>
+      <File_Size_MB>81.68</File_Size_MB>
     </File_Info>
     <Expire_Info>
       <Has_Expire_Info>Y</Has_Expire_Info>
@@ -100,7 +100,7 @@ Website: https://mkbsoft.net</Char_Desc_2000>
       <Application_XML_File_URL>https://raw.githubusercontent.com/mkb-fcb/pdf-editor-pro/main/pad.xml</Application_XML_File_URL>
     </Application_URLs>
     <Download_URLs>
-      <Primary_Download_URL>https://github.com/mkb-fcb/pdf-editor-pro/releases/download/v1.0.0/PDFEditorPro_Demo_v1.0.0.exe</Primary_Download_URL>
+      <Primary_Download_URL>https://github.com/mkb-fcb/pdf-editor-pro/releases/download/v1.0.1/PDFEditorPro_Demo_v1.0.1.exe</Primary_Download_URL>
       <Secondary_Download_URL>https://mkbsoft.net</Secondary_Download_URL>
       <Additional_Download_URL_1></Additional_Download_URL_1>
       <Additional_Download_URL_2></Additional_Download_URL_2>
