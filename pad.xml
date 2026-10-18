@@ -38,7 +38,7 @@
     <Program_Release_Status>Minor Update</Program_Release_Status>
     <Program_Install_Support>Install and Uninstall</Program_Install_Support>
     <Program_OS_Support>Win11,Win10,Win8,Win7</Program_OS_Support>
-    <Program_Language>English,Turkish,German,French,Spanish,Italian,Arabic,Russian</Program_Language>
+    <Program_Language>English,Turkish,German,French,Spanish,Italian,Portuguese,Russian</Program_Language>
     <File_Info>
       <File_Size_Bytes>85648468</File_Size_Bytes>
       <File_Size_K>83641</File_Size_K>
@@ -62,7 +62,7 @@
         <Char_Desc_45>Professional PDF editor for Windows — merge, split, compress</Char_Desc_45>
         <Char_Desc_80>PDF Editor Pro: merge, split, rotate, compress and encrypt PDF files on Windows.</Char_Desc_80>
         <Char_Desc_250>PDF Editor Pro is a lightweight yet powerful PDF editing tool for Windows. Merge multiple PDFs, split by page range, rotate pages, compress file size, add or remove password protection, and reorder pages — all from a clean native interface without subscriptions.</Char_Desc_250>
-        <Char_Desc_450>PDF Editor Pro is a lightweight yet powerful PDF editing tool for Windows. Merge multiple PDFs, split by page range, rotate pages, compress file size, add or remove password protection, and reorder pages — all from a clean native interface. No subscription, no cloud upload required. Supports 8 languages: English, Turkish, German, French, Spanish, Italian, Arabic, Russian. Works on Windows 10 and 11. Demo version allows up to 3 pages; full version is $19 (individual) or $80 (corporate, 5 PCs).</Char_Desc_450>
+        <Char_Desc_450>PDF Editor Pro is a lightweight yet powerful PDF editing tool for Windows. Merge multiple PDFs, split by page range, rotate pages, compress file size, add or remove password protection, and reorder pages — all from a clean native interface. No subscription, no cloud upload required. Supports 8 languages: English, Turkish, German, French, Spanish, Italian, Portuguese, Russian. Works on Windows 10 and 11. Demo version allows up to 3 pages; full version is $19 (individual) or $80 (corporate, 5 PCs).</Char_Desc_450>
         <Char_Desc_2000>PDF Editor Pro is a fast, lightweight PDF editing application built specifically for Windows. It requires no internet connection for core features and does not upload your documents to any cloud service — everything runs locally on your machine.
 
 Key Features:
@@ -73,7 +73,7 @@ Key Features:
 - Encrypt / Decrypt: Add or remove password protection (user and owner passwords)
 - Page management: Insert blank pages, delete pages, reorder via thumbnail view
 - Metadata editing: Edit document title, author, subject, and keywords
-- Multilingual: Full interface in English, Turkish, German, French, Spanish, Italian, Arabic, Russian
+- Multilingual: Full interface in English, Turkish, German, French, Spanish, Italian, Portuguese, Russian
 
 Technical details:
 - Built with Python + PyMuPDF for high-quality PDF processing
