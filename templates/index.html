@@ -1,0 +1,3728 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>PDF Editör</title>
+<link rel="manifest" href="/static/manifest.json">
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<link rel="icon" type="image/png" sizes="512x512" href="/static/icon-512.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/static/icon-192.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/static/favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16.png">
+<meta name="theme-color" content="#0891b2">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #0891b2;
+  --primary-dark: #0369a1;
+  --primary-light: #f0f9ff;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --toolbar-bg: #ffffff;
+  --sidebar-bg: #1e1e2e;
+  --sidebar-hover: #2d2d40;
+  --sidebar-selected: #0891b222;
+  --viewer-bg: #525659;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --radius: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--viewer-bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── TOOLBAR ── */
+#toolbar {
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--border);
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 10px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
+  z-index: 10;
+}
+/* Toolbar butonları kompakt */
+#toolbar button { padding: 5px 9px; font-size: 12px; }
+
+/* Dosya yüklenmemişken pasif butonları gizle */
+body:not(.has-file) #toolbar button:disabled { display: none; }
+body:not(.has-file) #toolbar .tb-sep { display: none; }
+body:not(.has-file) #toolbar .tb-dropdown:has(button:disabled) { display: none; }
+
+.tb-logo {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--primary);
+  margin-right: 8px;
+  letter-spacing: -.3px;
+}
+
+.tb-sep { width: 1px; height: 28px; background: var(--border); margin: 0 6px; }
+
+.tb-filename {
+  flex: 0 1 140px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 8px;
+}
+
+.tb-info {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  transition: background .15s, color .15s, border-color .15s, opacity .15s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border: 1.5px solid var(--primary);
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) { background: #0369a1; border-color: #0369a1; }
+
+.btn-secondary {
+  background: #f8fafc;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+.btn-secondary:hover:not(:disabled) { background: #e0f9ff; border-color: var(--primary); color: #0369a1; }
+
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid transparent;
+}
+.btn-danger:hover { background: #fef2f2; border-color: #fecaca; }
+
+.btn-toggle {
+  background: #f8fafc;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+.btn-toggle:hover:not(:disabled):not(.active) { background: #e0f9ff; border-color: var(--primary); color: #0369a1; }
+.btn-toggle.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+button:disabled { opacity: .38; cursor: not-allowed; }
+
+/* ── DEMO BANNER ── */
+#demo-banner {
+  background: linear-gradient(90deg, #fff7ed, #fef3c7);
+  border-bottom: 1px solid #fbbf24;
+  padding: 5px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: #92400e;
+  z-index: 9;
+}
+#demo-banner strong { font-weight: 700; }
+#demo-banner a {
+  background: #d97706;
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 11px;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+#demo-banner a:hover { background: #b45309; }
+
+/* ── LAYOUT ── */
+#main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+#sidebar {
+  width: 200px;
+  background: #dff6fb;
+  flex-shrink: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+  transition: background .3s;
+}
+body.has-file #sidebar {
+  background: var(--sidebar-bg);
+}
+
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-track { background: transparent; }
+#sidebar::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+
+.thumb-item {
+  padding: 6px 8px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background .1s;
+}
+.thumb-item:hover { background: var(--sidebar-hover); }
+.thumb-item.selected {
+  background: var(--sidebar-selected);
+  border-left-color: var(--primary);
+}
+
+.thumb-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.page-num {
+  font-size: 11px;
+  color: #999;
+  min-width: 20px;
+}
+
+.thumb-ops {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.thumb-ops button {
+  padding: 2px 5px;
+  font-size: 12px;
+  background: transparent;
+  color: #aaa;
+  border-radius: 3px;
+}
+.thumb-ops button:hover { background: #444; color: #fff; }
+.thumb-ops .del-btn:hover { background: var(--danger); color: #fff; }
+
+.thumb-img-wrap {
+  background: #fff;
+  border-radius: 3px;
+  overflow: hidden;
+  line-height: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+.thumb-img-wrap img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── VIEWER ── */
+#viewer {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
+}
+
+#viewer::-webkit-scrollbar { width: 8px; height: 8px; }
+#viewer::-webkit-scrollbar-track { background: #444; }
+#viewer::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+
+#page-wrap {
+  position: relative;
+  display: inline-block;
+  box-shadow: 0 4px 20px rgba(0,0,0,.5);
+  cursor: default;
+}
+
+
+#page-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#viewer { position: relative; }
+
+#empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #ecfeff 0%, #cffafe 100%);
+  z-index: 5;
+  padding: 24px;
+}
+
+.upload-card {
+  background: #fff;
+  border: 2px dashed #67e8f9;
+  border-radius: 20px;
+  padding: 52px 72px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+  max-width: 480px;
+  width: 100%;
+  user-select: none;
+}
+.upload-card:hover {
+  border-color: #0891b2;
+  background: #f0fdff;
+  box-shadow: 0 8px 32px rgba(8,145,178,.12);
+}
+.upload-card-icon {
+  color: #0891b2;
+  margin-bottom: 20px;
+  opacity: .85;
+}
+.upload-card h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0891b2;
+  margin-bottom: 8px;
+}
+.upload-card p {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.upload-card .btn-primary {
+  font-size: 14px;
+  padding: 10px 28px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+/* ── MODALS ── */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+
+.modal-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  width: 420px;
+  max-width: 90vw;
+  box-shadow: var(--shadow-md);
+}
+.modal-card h3 { font-size: 16px; margin-bottom: 16px; }
+
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .15s;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px #0891b218;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.toast-msg {
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #fff;
+  box-shadow: var(--shadow-md);
+  animation: fadeIn .2s ease;
+  pointer-events: none;
+}
+.toast-msg.ok { background: var(--success); }
+.toast-msg.err { background: var(--danger); }
+.toast-msg.info { background: var(--primary); }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SPINNER ── */
+#spinner {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.25);
+  z-index: 90;
+  align-items: center;
+  justify-content: center;
+}
+#spinner.show { display: flex; }
+.spin {
+  width: 40px; height: 40px;
+  border: 4px solid #fff3;
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.note { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+/* ── TEXT OVERLAY ── */
+#page-wrap { position: relative; }
+
+#text-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.text-block {
+  position: absolute;
+  cursor: grab;
+  pointer-events: all;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+.text-block:hover {
+  background: rgba(8, 145, 178, 0.12);
+  outline: 1px solid rgba(8, 145, 178, 0.45);
+}
+.text-block.dragging { cursor: grabbing; opacity: 0.35; }
+
+#text-overlay.sel-active .text-block,
+#text-overlay.annot-active .text-block {
+  pointer-events: none !important;
+  background: transparent !important;
+  outline: none !important;
+  cursor: default !important;
+}
+#text-overlay.sel-active .tb-del-btn,
+#text-overlay.annot-active .tb-del-btn { display: none !important; }
+
+.tb-del-btn {
+  position: absolute;
+  top: -7px; right: -7px;
+  width: 16px; height: 16px;
+  background: #dc2626; color: #fff;
+  border-radius: 50%;
+  font-size: 11px; line-height: 16px; text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .12s;
+  z-index: 25;
+  pointer-events: all;
+  user-select: none;
+}
+.text-block:hover .tb-del-btn { opacity: 1; }
+
+.addtext-ghost {
+  position: absolute;
+  border: 2px dashed var(--primary);
+  background: rgba(8,145,178,0.08);
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 24;
+}
+
+.addtext-widget {
+  position: absolute;
+  background: #fff;
+  border: 1.5px solid #bbb;
+  border-radius: 4px;
+  padding: 0;
+  box-shadow: 0 3px 12px rgba(0,0,0,.18);
+  z-index: 30;
+  min-width: 180px;
+  cursor: default;
+  user-select: none;
+}
+.addtext-widget textarea {
+  width: 100%;
+  display: block;
+  font-size: 13px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 4px 4px 0 0;
+  outline: none;
+  box-sizing: border-box;
+  cursor: text;
+  user-select: text;
+  resize: both;
+  min-height: 38px;
+  font-family: inherit;
+  line-height: 1.4;
+  background: #fff;
+}
+.addtext-widget textarea:focus { background: #fafeff; }
+.addtext-footer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px;
+  border-top: 1px solid #eee;
+  background: #f8f9fa;
+  border-radius: 0 0 4px 4px;
+}
+.addtext-footer label { font-size: 11px; color: #666; }
+.addtext-size-inp {
+  width: 44px;
+  font-size: 11px;
+  padding: 2px 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  outline: none;
+  text-align: center;
+  cursor: text;
+  user-select: text;
+}
+.addtext-size-inp:focus { border-color: var(--primary); }
+
+.font-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: #166534;
+  cursor: default;
+  white-space: nowrap;
+}
+.font-badge .clear-font {
+  cursor: pointer;
+  font-weight: bold;
+  color: #dc2626;
+  padding: 0 2px;
+}
+.font-badge .clear-font:hover { opacity: .7; }
+
+.block-input {
+  position: absolute;
+  background: #fff;
+  border: 2px solid #333;
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-family: inherit;
+  outline: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,.22);
+  z-index: 20;
+  pointer-events: all;
+  min-width: 60px;
+}
+
+#select-rect {
+  position: absolute;
+  border: 2px dashed #dc2626;
+  background: rgba(220,38,38,0.10);
+  pointer-events: none;
+  z-index: 25;
+  display: none;
+}
+
+#select-toolbar {
+  position: absolute;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  box-shadow: var(--shadow-md);
+  z-index: 26;
+  white-space: nowrap;
+  pointer-events: all;
+}
+
+/* ── EXPORT DROPDOWN ── */
+.tb-dropdown { position: relative; display: inline-flex; }
+.tb-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  min-width: 180px;
+  z-index: 50;
+  padding: 4px 0;
+}
+.tb-dropdown-menu.open { display: block; }
+.tb-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  font-size: 13px;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 0;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tb-dropdown-item:hover { background: #f1f5f9; }
+
+/* ── LANG SWITCH ── */
+#dd-lang { position: relative; flex-shrink: 0; margin-left: 2px; }
+
+/* ── TOOLBAR 2 ── */
+#toolbar2 {
+  background: #f1f5f9;
+  border-bottom: 1px solid var(--border);
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 12px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.tb2-icon {
+  width: 34px; height: 30px;
+  padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 5px;
+}
+
+/* ── DOC BANNERS ── */
+#doc-banners { display: flex; flex-direction: column; flex-shrink: 0; }
+.doc-banner {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 16px; font-size: 13px;
+  border-bottom: 1px solid transparent;
+  animation: bannerIn .2s ease;
+}
+@keyframes bannerIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+.doc-banner.info  { background:#eff6ff; border-color:#bfdbfe; color:#1e40af; }
+.doc-banner.warn  { background:#fff7ed; border-color:#fed7aa; color:#92400e; }
+.doc-banner.error { background:#fef2f2; border-color:#fecaca; color:#991b1b; }
+.doc-banner-icon  { font-size:15px; flex-shrink:0; }
+.doc-banner-text  { flex:1; }
+.doc-banner-action {
+  font-size:12px; font-weight:600; text-decoration:none; cursor:pointer;
+  background:none; border:none; padding:2px 8px; border-radius:4px;
+  white-space:nowrap;
+}
+.doc-banner.info  .doc-banner-action { color:#1d4ed8; }
+.doc-banner.warn  .doc-banner-action { color:#b45309; }
+.doc-banner.error .doc-banner-action { color:#dc2626; }
+.doc-banner-action:hover { text-decoration:underline; }
+.doc-banner-close {
+  background:none; border:none; font-size:16px; cursor:pointer; opacity:.5;
+  padding:0 2px; line-height:1; border-radius:3px;
+}
+.doc-banner-close:hover { opacity:1; }
+
+/* ── ANNOT PREVIEW ── */
+#annot-preview {
+  position: absolute;
+  pointer-events: none;
+  z-index: 27;
+  display: none;
+  border-radius: 2px;
+}
+
+/* ── COLOR DOTS ── */
+.color-dot {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,.18);
+  cursor: pointer;
+  vertical-align: middle;
+  transition: transform .1s;
+  flex-shrink: 0;
+}
+.color-dot:hover { transform: scale(1.25); }
+.color-dot.active { border-color: #333; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #333; }
+
+/* ── STAMP DROPDOWN ── */
+.stamp-dd { position: relative; display: inline-flex; }
+.stamp-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  min-width: 170px;
+  z-index: 50;
+  padding: 4px 0;
+}
+.stamp-menu.open { display: block; }
+.stamp-item {
+  display: block; width: 100%;
+  padding: 7px 14px; font-size: 13px;
+  text-align: left; background: none; border: none;
+  border-radius: 0; color: var(--text); cursor: pointer;
+}
+.stamp-item:hover { background: #f1f5f9; }
+
+/* ── FORMAT BAR ── */
+#format-bar {
+  background: var(--primary-light);
+  border-bottom: 2px solid var(--primary);
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 12px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(8,145,178,.12);
+}
+#fmt-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  flex: 1;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+}
+#fmt-controls {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+}
+#fmt-edit-actions {
+  display: none;
+  align-items: center;
+  gap: 5px;
+}
+#format-bar.selected #fmt-hint,
+#format-bar.editing  #fmt-hint  { display: none; }
+#format-bar.selected #fmt-controls,
+#format-bar.editing  #fmt-controls { display: flex; }
+#format-bar.editing  #fmt-edit-actions { display: flex; }
+.text-block.selected {
+  background: rgba(8,145,178,0.15) !important;
+  outline: 2px solid var(--primary) !important;
+}
+.block-pencil {
+  position: absolute;
+  width: 48px; height: 48px;
+  background: transparent;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  z-index: 30;
+  pointer-events: all;
+  transform: translateY(-50%);
+  user-select: none;
+  transition: transform .1s;
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,.6));
+}
+.block-pencil:hover { transform: translateY(-50%) scale(1.15); }
+#text-overlay.sel-active .block-pencil,
+#text-overlay.annot-active .block-pencil { display: none !important; }
+.fmt-font-label {
+  font-size: 12px;
+  color: #0369a1;
+  font-weight: 600;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: #e0f2fe;
+  border: 1px solid #7dd3fc;
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+.fmt-btn {
+  width: 32px; height: 30px;
+  padding: 0;
+  font-size: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 5px;
+  background: #fff;
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: background .12s, border-color .12s;
+}
+.fmt-btn:hover { background: #e0f2fe; border-color: var(--primary); }
+.fmt-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+#fmt-size {
+  width: 50px;
+  font-size: 13px;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+  outline: none;
+}
+#fmt-size:focus { border-color: var(--primary); box-shadow: 0 0 0 2px #0891b220; }
+#fmt-color {
+  width: 28px; height: 28px;
+  border-radius: 5px;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  padding: 1px;
+  background: none;
+}
+#fmt-color:hover { border-color: var(--primary); }
+
+/* ── DEMO MODE ── */
+#demo-panel {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(8, 20, 30, 0.96);
+  color: #fff;
+  padding: 14px 20px;
+  align-items: center;
+  gap: 16px;
+  z-index: 9999;
+  border-top: 2px solid #0891b2;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.5);
+}
+#demo-section-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #22d3ee;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 220px;
+}
+#demo-text {
+  font-size: 13px;
+  line-height: 1.55;
+  flex: 1;
+  color: #cbd5e1;
+}
+#demo-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.demo-nav { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); color: #fff; padding: 5px 13px; border-radius: 5px; cursor: pointer; font-size: 13px; transition: background .15s; }
+.demo-nav:hover:not(:disabled) { background: rgba(255,255,255,.22); }
+.demo-nav:disabled { opacity: .35; cursor: not-allowed; }
+#demo-counter { font-size: 12px; color: #64748b; white-space: nowrap; min-width: 40px; text-align: center; }
+#demo-exit { background: transparent; border: 1px solid rgba(220,38,38,.5); color: #f87171; padding: 5px 11px; border-radius: 5px; cursor: pointer; font-size: 12px; transition: background .15s; }
+#demo-exit:hover { background: rgba(220,38,38,.18); }
+.demo-ring {
+  position: fixed;
+  border: 2.5px solid #fbbf24;
+  border-radius: 8px;
+  box-shadow: 0 0 0 4px rgba(251,191,36,.25), 0 0 18px rgba(251,191,36,.45);
+  pointer-events: none;
+  z-index: 9998;
+  animation: demoRingPulse 1.6s ease-in-out infinite;
+}
+@keyframes demoRingPulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(251,191,36,.25), 0 0 18px rgba(251,191,36,.45); }
+  50%       { box-shadow: 0 0 0 8px rgba(251,191,36,.12), 0 0 28px rgba(251,191,36,.7); }
+}
+</style>
+</head>
+<body>
+
+{% if demo_mode %}
+<div id="demo-banner">
+  <span>
+    🎯 <strong data-i18n="demoBannerTitle">DEMO SÜRÜMÜ</strong>
+    <span data-i18n="demoBannerDesc"> — Maksimum 3 sayfa açılabilir, kaydedilen dosyalara filigran eklenir.</span>
+  </span>
+  <span style="display:flex;gap:6px">
+    {% if can_activate %}<a href="/activate" style="background:#0891b2" data-i18n="demoBannerActivate">🔑 Lisans Gir</a>{% endif %}
+    <a href="https://mkbsoft.net/#pricing" target="_blank" data-i18n="demoBannerBuy">Tam Sürümü Satın Al — $19</a>
+  </span>
+</div>
+{% endif %}
+
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <span class="tb-logo" data-i18n="appName">PDF Editör</span>
+  <div class="tb-dropdown" id="dd-lang" style="margin-right:4px">
+    <button class="btn-secondary" id="btn-lang-current" onclick="toggleLangMenu(event)" style="padding:4px 10px;font-size:12px;font-weight:700;gap:3px">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16A8 8 0 0010 2zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.559-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.559.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z" clip-rule="evenodd"/></svg>
+      <span id="lang-label">TR</span>
+      <svg viewBox="0 0 20 20" fill="currentColor" width="10" height="10"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+    </button>
+    <div class="tb-dropdown-menu" id="lang-menu" style="left:0;right:auto;min-width:140px">
+      <button class="tb-dropdown-item" onclick="setLang('tr')">🇹🇷 Türkçe</button>
+      <button class="tb-dropdown-item" onclick="setLang('en')">🇬🇧 English</button>
+      <button class="tb-dropdown-item" onclick="setLang('de')">🇩🇪 Deutsch</button>
+      <button class="tb-dropdown-item" onclick="setLang('es')">🇪🇸 Español</button>
+      <button class="tb-dropdown-item" onclick="setLang('fr')">🇫🇷 Français</button>
+      <button class="tb-dropdown-item" onclick="setLang('it')">🇮🇹 Italiano</button>
+      <button class="tb-dropdown-item" onclick="setLang('pt')">🇵🇹 Português</button>
+      <button class="tb-dropdown-item" onclick="setLang('ru')">🇷🇺 Русский</button>
+    </div>
+  </div>
+  <div class="tb-sep"></div>
+
+  <button class="btn-primary" onclick="browseFile()">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
+    <span data-i18n="open">Aç</span>
+  </button>
+
+  <button class="btn-secondary" id="btn-undo" onclick="doUndo()" disabled>
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+    <span data-i18n="undo">Geri Al</span>
+  </button>
+
+  <button class="btn-secondary" id="btn-save" onclick="doSave()" disabled>
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M5 4a2 2 0 00-2 2v8a2 2 0 002 2h10a2 2 0 002-2V8.828a2 2 0 00-.586-1.414l-2.828-2.828A2 2 0 0012.172 4H5zm5 9a2 2 0 100-4 2 2 0 000 4zm3-9v3H7V4h6z"/></svg>
+    <span data-i18n="save">Kaydet</span>
+  </button>
+
+  <button class="btn-secondary" id="btn-print" onclick="doPrint()" disabled title="Yazdır">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a1 1 0 001 1h8a1 1 0 001-1v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a1 1 0 00-1-1H6a1 1 0 00-1 1zm2 0h6v3H7V4zm-1 9v-2h8v2H6zm7-6a1 1 0 110 2 1 1 0 010-2z" clip-rule="evenodd"/></svg>
+    <span data-i18n="printBtn">Yazdır</span>
+  </button>
+
+  <button class="btn-secondary" id="btn-copy-text" onclick="doCopyText()" disabled title="Tüm sayfaların metnini panoya kopyala">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/></svg>
+    <span data-i18n="copyTextBtn">Metni Kopyala</span>
+  </button>
+
+  <div class="tb-sep"></div>
+
+  <button class="btn-secondary" id="btn-merge" onclick="openModal('m-merge')" disabled>
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z" clip-rule="evenodd"/></svg>
+    <span data-i18n="merge">Birleştir</span>
+  </button>
+
+  <button class="btn-secondary" id="btn-split" onclick="openModal('m-split')" disabled>
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L15 13.586V12a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+    <span data-i18n="split">Böl</span>
+  </button>
+
+  <div class="tb-sep"></div>
+
+  <button class="btn-secondary" onclick="doConvertToPdf()">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
+    <span data-i18n="convertBtn">PDF'e Çevir</span>
+  </button>
+
+  <button class="btn-secondary" id="btn-fr" onclick="openModal('m-fr')" disabled>
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+    <span data-i18n="findReplace">Bul & Değiştir</span>
+  </button>
+
+  <button class="btn-secondary" id="btn-addtext" onclick="openAddText()" disabled>
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+    <span data-i18n="addText">Metin Ekle</span>
+  </button>
+
+  <div class="tb-dropdown" id="dd-shape">
+    <button class="btn-toggle" id="btn-shape-dd" onclick="toggleShapeMenu(event)" disabled>
+      <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+      Şekil Çiz
+      <svg viewBox="0 0 20 20" fill="currentColor" width="11" height="11"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+    </button>
+    <div class="tb-dropdown-menu" id="shape-menu">
+      <button class="tb-dropdown-item" onclick="pickShape('rect')">▭ &nbsp;Dikdörtgen</button>
+      <button class="tb-dropdown-item" onclick="pickShape('circle')">◯ &nbsp;Daire</button>
+      <div style="padding:5px 14px 7px;border-top:1px solid #eee;margin-top:4px;display:flex;align-items:center;gap:6px;font-size:12px;color:#555">
+        Renk:
+        <span class="color-dot active" style="background:#E53E3E" data-color="#E53E3E" id="sc-0" onclick="setShapeColorDot(this)"></span>
+        <span class="color-dot"        style="background:#1D4ED8" data-color="#1D4ED8" id="sc-1" onclick="setShapeColorDot(this)"></span>
+        <span class="color-dot"        style="background:#047857" data-color="#047857" id="sc-2" onclick="setShapeColorDot(this)"></span>
+        <span class="color-dot"        style="background:#7C3AED" data-color="#7C3AED" id="sc-3" onclick="setShapeColorDot(this)"></span>
+        <span class="color-dot"        style="background:#000000" data-color="#000000" id="sc-4" onclick="setShapeColorDot(this)"></span>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-toggle" id="btn-select" onclick="toggleSelectMode()" disabled>
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L15 13.586V12a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+    <span data-i18n="deleteArea">Alan Sil</span>
+  </button>
+
+  <div class="tb-sep"></div>
+
+  <div class="tb-dropdown" id="dd-export">
+    <button class="btn-secondary" id="btn-export" onclick="toggleExportMenu(event)" disabled>
+      <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      <span data-i18n="exportBtn">Dışa Aktar</span>
+      <svg viewBox="0 0 20 20" fill="currentColor" width="11" height="11"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+    </button>
+    <div class="tb-dropdown-menu" id="export-menu">
+      <button class="tb-dropdown-item" onclick="doExport('docx')"   data-i18n="exportDocx">Word (.docx)</button>
+      <button class="tb-dropdown-item" onclick="doExport('excel')"  data-i18n="exportExcel">Excel (.xlsx)</button>
+      <button class="tb-dropdown-item" onclick="doExport('pptx')">PowerPoint (.pptx)</button>
+      <button class="tb-dropdown-item" onclick="doExport('images')" data-i18n="exportImages">PNG</button>
+      <button class="tb-dropdown-item" onclick="doExport('jpg')">JPG</button>
+      <button class="tb-dropdown-item" onclick="doExport('txt')"    data-i18n="exportTxt">Metin (.txt)</button>
+    </div>
+  </div>
+
+  <span class="font-badge" id="tb-font" style="display:none" title="Aktif font — temizlemek için × tıkla">
+    <span id="tb-font-label"></span>
+    <span class="clear-font" onclick="clearLearnedFont()">×</span>
+  </span>
+  <span class="tb-filename" id="tb-filename">Dosya açılmadı</span>
+  <span class="tb-info" id="tb-info"></span>
+</div>
+
+<!-- TOOLBAR 2: Annotation & Page Tools -->
+<div id="toolbar2">
+  <!-- Vurgulama -->
+  <button class="btn-toggle tb2-icon" id="btn-hl" onclick="toggleAnnotMode('highlight')" disabled title="Vurgula">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M13.586 3.586a2 2 0 112.828 2.828l-8 8a2 2 0 01-.828.514l-4 1a1 1 0 01-1.213-1.213l1-4a2 2 0 01.514-.828l8-8z"/></svg>
+  </button>
+  <span class="color-dot active" style="background:#FFD700" data-color="#FFD700" onclick="setAnnotColor(this)" title="Sarı"></span>
+  <span class="color-dot" style="background:#90EE90" data-color="#90EE90" onclick="setAnnotColor(this)" title="Yeşil"></span>
+  <span class="color-dot" style="background:#ADD8E6" data-color="#ADD8E6" onclick="setAnnotColor(this)" title="Mavi"></span>
+  <div class="tb-sep"></div>
+  <!-- Damga -->
+  <div class="stamp-dd" id="dd-stamp">
+    <button class="btn-secondary tb2-icon" id="btn-stamp" onclick="toggleStampMenu(event)" disabled title="Damga">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+    </button>
+    <div class="stamp-menu" id="stamp-menu">
+      <button class="stamp-item" onclick="activateStamp('check')">✓ &nbsp;Onay (yeşil)</button>
+      <button class="stamp-item" onclick="activateStamp('cross')">✗ &nbsp;İptal (kırmızı)</button>
+      <button class="stamp-item" onclick="activateStamp('circle')">○ &nbsp;Daire (mavi)</button>
+      <button class="stamp-item" onclick="activateStamp('date')">📅 Tarih</button>
+    </div>
+  </div>
+  <div class="tb-sep"></div>
+  <!-- Sayfa araçları -->
+  <button class="btn-secondary tb2-icon" id="btn-watermark" onclick="openModal('m-watermark')" disabled title="Filigran ekle / kaldır">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+  </button>
+  <button class="btn-secondary tb2-icon" id="btn-addimg" onclick="openModal('m-addimg')" disabled title="Sayfaya görsel ekle">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>
+  </button>
+  <button class="btn-secondary tb2-icon" id="btn-reverse" onclick="doReverse()" disabled title="Sayfa sırasını ters çevir">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M5 12a1 1 0 102 0V6.414l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L5 6.414V12zm10-4a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z"/></svg>
+  </button>
+  <button class="btn-secondary tb2-icon" id="btn-addblank" onclick="openAddBlankModal()" disabled title="Boş sayfa ekle">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+  </button>
+  <button class="btn-secondary tb2-icon" id="btn-encrypt" onclick="openModal('m-encrypt')" disabled title="Şifre ekle / kaldır">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+  </button>
+  <button class="btn-secondary tb2-icon" id="btn-compress" onclick="doCompress()" disabled title="PDF'i sıkıştır">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+  </button>
+  <button class="btn-secondary tb2-icon" id="btn-signature" onclick="openSignatureModal()" disabled title="İmza ekle">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+  </button>
+  <!-- Araç etiketi -->
+  <span id="tb2-label" style="margin-left:8px;font-size:12px;color:var(--text-muted);display:none"></span>
+</div>
+
+<!-- FORMAT BAR: Her zaman görünür — boşken ipucu gösterir, seçimde/düzenlemede kontroller açılır -->
+<div id="format-bar">
+  <span id="fmt-hint" data-i18n="editHint">✏️ Düzenlemek için bir metin bloğuna tıklayın</span>
+  <div id="fmt-controls">
+    <span id="fmt-font-label" class="fmt-font-label">—</span>
+    <div class="tb-sep"></div>
+    <button id="fmt-bold"      class="fmt-btn" onclick="toggleFmtStyle('bold')"      title="Kalın (B)"><b>B</b></button>
+    <button id="fmt-italic"    class="fmt-btn" onclick="toggleFmtStyle('italic')"    title="İtalik (I)" style="font-style:italic">I</button>
+    <button id="fmt-underline" class="fmt-btn" onclick="toggleFmtStyle('underline')" title="Alt çizgi (U)" style="text-decoration:underline">U</button>
+    <div class="tb-sep"></div>
+    <input id="fmt-size" type="number" min="4" max="200" step="0.5" value="12" title="Font boyutu (pt)">
+    <span style="font-size:12px;color:var(--text-muted);flex-shrink:0">pt</span>
+    <div class="tb-sep"></div>
+    <input type="color" id="fmt-color" value="#000000" title="Metin rengi">
+    <div class="tb-sep"></div>
+    <button class="btn-secondary" style="font-size:12px;padding:4px 10px;flex-shrink:0" onclick="saveFmtFont()">🔤 Fontu Kaydet</button>
+  </div>
+  <div id="fmt-edit-actions">
+    <button class="btn-secondary" style="font-size:12px;padding:4px 12px" onclick="cancelActiveEdit()">✕ İptal</button>
+    <button class="btn-primary"   style="font-size:12px;padding:4px 14px" onclick="applyActiveEdit()">✓ Uygula</button>
+  </div>
+</div>
+
+<!-- DOC INFO BANNERS -->
+<div id="doc-banners"></div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="sidebar"></div>
+  <div id="viewer">
+    <div id="empty-state">
+      <div class="upload-card" onclick="browseFile()">
+        <div class="upload-card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" fill="none">
+            <rect x="10" y="6" width="44" height="56" rx="5" fill="#cffafe" stroke="#0891b2" stroke-width="2"/>
+            <path d="M10 44h44" stroke="#a5f3fc" stroke-width="1.5"/>
+            <path d="M20 18h24M20 26h24M20 34h16" stroke="#7dd3e8" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="56" cy="52" r="18" fill="#0891b2"/>
+            <path d="M56 44v16M49 51l7-7 7 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 data-i18n="emptyTitle">PDF dosyası açın</h2>
+        <p data-i18n="emptyDesc">Dosyayı buraya sürükleyip bırakın<br>veya aşağıdaki butona tıklayın</p>
+        <button class="btn-primary">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
+          <span data-i18n="open">Dosya Seç</span>
+        </button>
+      </div>
+    </div>
+    <div id="page-wrap" style="display:none">
+      <img id="page-img" alt="Sayfa">
+      <div id="text-overlay"></div>
+      <div id="annot-preview"></div>
+      <div id="select-rect"></div>
+      <div id="select-toolbar">
+        <span style="font-size:12px;color:#555" data-i18n="selConfirm">Seçili alanı sil?</span>
+        <button class="btn-danger" style="font-size:12px;padding:3px 10px;" onclick="applyRedact()" data-i18n="selDel">Sil</button>
+        <button class="btn-secondary" style="font-size:12px;padding:3px 10px;" onclick="cancelSelection()" data-i18n="selCancel">İptal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- MODAL: Birleştir -->
+<div class="modal-backdrop" id="m-merge">
+  <div class="modal-card">
+    <h3 data-i18n="mergeTitle">⊕ PDF Birleştir</h3>
+    <div class="form-group">
+      <label data-i18n="mergeLabelPath">Eklenecek PDF yolu</label>
+      <input type="text" id="merge-path" data-i18n-ph="mergePlaceholder" placeholder='C:\Belgeler\diger.pdf'>
+    </div>
+    <div class="form-group">
+      <label data-i18n="mergeLabelPos">Ekleme konumu</label>
+      <select id="merge-pos">
+        <option value="end" data-i18n="mergeOptEnd">Sona ekle</option>
+        <option value="start" data-i18n="mergeOptStart">Başa ekle</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('m-merge')" data-i18n="btnCancel">İptal</button>
+      <button class="btn-primary" onclick="doMerge()" data-i18n="btnMerge">Birleştir</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Böl -->
+<div class="modal-backdrop" id="m-pdfpw">
+  <div class="modal-card">
+    <h3 data-i18n="pdfPwTitle">🔒 Şifreli PDF</h3>
+    <p class="note" style="margin-bottom:14px" data-i18n="pdfPwDesc">Bu PDF şifreli. Açmak için şifreyi girin.</p>
+    <div class="form-group">
+      <input type="password" id="pdfpw-input" autocomplete="off" onkeydown="if(event.key==='Enter')submitPdfPassword()">
+      <div id="pdfpw-err" style="color:#dc2626;font-size:12px;margin-top:6px"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('m-pdfpw')" data-i18n="btnCancel">İptal</button>
+      <button class="btn-primary" onclick="submitPdfPassword()" data-i18n="pdfPwOpen">Aç</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="m-split">
+  <div class="modal-card">
+    <h3 data-i18n="splitTitle">✂ PDF Böl</h3>
+    <p class="note" style="margin-bottom:14px" data-i18n="splitDesc">Seçilen sayfa aralığını yeni bir dosya olarak kaydeder. Açık belge değişmez.</p>
+    <div class="form-group">
+      <label data-i18n="splitLabelStart">Başlangıç sayfası</label>
+      <input type="number" id="split-start" min="1" value="1">
+    </div>
+    <div class="form-group">
+      <label data-i18n="splitLabelEnd">Bitiş sayfası</label>
+      <input type="number" id="split-end" min="1">
+    </div>
+    <div class="form-group">
+      <label data-i18n="splitLabel">Kayıt yolu <small>(boş = otomatik)</small></label>
+      <input type="text" id="split-path" data-i18n-ph="splitPlaceholder" placeholder='Boş bırakabilirsin'>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('m-split')" data-i18n="btnCancel">İptal</button>
+      <button class="btn-primary" onclick="doSplit()" data-i18n="btnSplitSave">Böl ve Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Bul & Değiştir -->
+<div class="modal-backdrop" id="m-fr">
+  <div class="modal-card">
+    <h3 data-i18n="frTitle">🔍 Bul & Değiştir</h3>
+    <div class="form-group">
+      <label data-i18n="frLabelFind">Aranan metin</label>
+      <input type="text" id="fr-find" data-i18n-ph="frPlaceholderFind" placeholder='Aranan...'>
+    </div>
+    <div class="form-group">
+      <label data-i18n="frLabelReplace">Yeni metin <small>(boş bırakırsan bulunan metin silinir)</small></label>
+      <input type="text" id="fr-replace" data-i18n-ph="frPlaceholderReplace" placeholder='Yeni metin...'>
+    </div>
+    <p class="note" data-i18n="frNote">⚠ Font değişimi mümkün olabilir — değiştirilen metin orijinaline yakın ama aynı olmayabilir.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('m-fr')" data-i18n="btnCancel">İptal</button>
+      <button class="btn-primary" onclick="doFindReplace()" data-i18n="btnReplace">Değiştir</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Dijital İmza Uyarısı -->
+<div class="modal-backdrop" id="m-sig-warning">
+  <div class="modal-card" style="max-width:480px;text-align:center;">
+    <div style="font-size:52px;margin-bottom:8px;">🔏</div>
+    <h3 style="font-size:18px;color:#b45309;margin-bottom:12px;">Dijital İmzalı Belge</h3>
+    <p style="font-size:14px;line-height:1.6;margin-bottom:10px;">
+      Bu belgede <strong id="sig-count" style="color:#b45309">?</strong> dijital imza bulunuyor.
+    </p>
+    <p style="font-size:13px;color:#555;line-height:1.6;background:#fef9c3;border:1px solid #fde047;border-radius:6px;padding:10px 14px;margin-bottom:18px;">
+      ⚠️ Herhangi bir değişiklik yapıp kaydettiğinizde bu imzalar <strong>otomatik olarak kaldırılacaktır</strong>.
+      Yeni dosyada Adobe gibi programların gösterdiği mavi sertifika rozeti ya da "imza geçersiz" uyarısı <strong>yer almayacaktır</strong>.
+    </p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn-secondary" style="min-width:110px;" onclick="sigCancel()">İptal</button>
+      <button class="btn-primary"   style="min-width:160px;background:#b45309;" onclick="sigContinue()">Anladım, Devam Et</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Şifre -->
+<div class="modal-backdrop" id="m-encrypt">
+  <div class="modal-card">
+    <h3>🔒 <span data-i18n="encryptTitle">Şifre Ekle / Kaldır</span></h3>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn-secondary" id="enc-tab-add" onclick="encTab('add')" style="flex:1;font-weight:600">Şifre Ekle</button>
+      <button class="btn-secondary" id="enc-tab-rm" onclick="encTab('rm')" style="flex:1">Şifre Kaldır</button>
+    </div>
+
+    <!-- Şifre Ekle -->
+    <div id="enc-panel-add">
+      <div class="form-row" style="margin-bottom:10px">
+        <label style="font-size:13px;color:var(--text-muted);display:block;margin-bottom:4px">Açma Şifresi (Zorunlu)</label>
+        <input type="password" id="enc-user-pw" placeholder="PDF'i açmak için şifre" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px">
+      </div>
+      <div class="form-row" style="margin-bottom:10px">
+        <label style="font-size:13px;color:var(--text-muted);display:block;margin-bottom:4px">Düzenleme Şifresi (Opsiyonel)</label>
+        <input type="password" id="enc-owner-pw" placeholder="Düzenleme/yazdırma kısıtlaması için" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:8px">İzinler</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px;cursor:pointer">
+          <input type="checkbox" id="enc-allow-print" checked> Yazdırmaya izin ver
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="enc-allow-copy"> Kopyalamaya izin ver
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal('m-encrypt')">İptal</button>
+        <button class="btn-primary" onclick="doEncrypt()">🔒 Şifrele ve Kaydet</button>
+      </div>
+    </div>
+
+    <!-- Şifre Kaldır -->
+    <div id="enc-panel-rm" style="display:none">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Şifreli bir PDF'in şifresini kaldırmak için mevcut şifreyi girin.</p>
+      <div class="form-row" style="margin-bottom:14px">
+        <label style="font-size:13px;color:var(--text-muted);display:block;margin-bottom:4px">Mevcut Şifre</label>
+        <input type="password" id="enc-cur-pw" placeholder="Mevcut açma şifresi" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal('m-encrypt')">İptal</button>
+        <button class="btn-danger" style="background:var(--danger);color:#fff;padding:6px 14px;border-radius:var(--radius)" onclick="doDecrypt()">🔓 Şifreyi Kaldır</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Filigran -->
+<div class="modal-backdrop" id="m-watermark">
+  <div class="modal-card">
+    <h3>💧 Filigran</h3>
+    <!-- Tab bar -->
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px;">
+      <button id="wm-tab-add" onclick="wmTab('add')" style="padding:6px 18px;font-size:13px;border:none;border-bottom:2px solid var(--primary);margin-bottom:-2px;background:transparent;color:var(--primary);font-weight:600;cursor:pointer;">Ekle</button>
+      <button id="wm-tab-rm"  onclick="wmTab('rm')"  style="padding:6px 18px;font-size:13px;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;background:transparent;color:var(--text-muted);cursor:pointer;">Kaldır</button>
+    </div>
+    <!-- Add panel -->
+    <div id="wm-panel-add">
+      <div class="form-group">
+        <label>Filigran metni</label>
+        <input type="text" id="wm-text" value="GİZLİ">
+      </div>
+      <div class="form-group">
+        <label>Opaklık (0.05 – 0.5)</label>
+        <input type="number" id="wm-opacity" value="0.15" min="0.05" max="0.5" step="0.05">
+      </div>
+      <div class="form-group">
+        <label>Font boyutu (pt)</label>
+        <input type="number" id="wm-size" value="52" min="12" max="120" step="4">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal('m-watermark')">İptal</button>
+        <button class="btn-primary" onclick="doWatermark()">Tüm Sayfalara Ekle</button>
+      </div>
+    </div>
+    <!-- Remove panel -->
+    <div id="wm-panel-rm" style="display:none">
+      <div class="form-group">
+        <label>Kaldırılacak filigran metni</label>
+        <input type="text" id="wm-rm-text" placeholder="örn: GİZLİ">
+      </div>
+      <p class="note" style="margin-bottom:14px">Tüm sayfalarda bu metni arar ve üzerini beyazla örter.</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal('m-watermark')">İptal</button>
+        <button class="btn-danger" style="background:var(--danger);color:#fff;padding:6px 14px;border-radius:var(--radius);" onclick="doRemoveWatermark()">Filigranı Kaldır</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Görsel Ekle -->
+<div class="modal-backdrop" id="m-addimg">
+  <div class="modal-card">
+    <h3>🖼 Görseli Sayfaya Ekle</h3>
+    <p class="note" style="margin-bottom:12px">Görseli seçin — ardından sayfada istediğiniz alana sürükleyip bırakın.</p>
+    <div class="form-group">
+      <label>Görsel dosyası (PNG / JPG / BMP)</label>
+      <input type="file" id="img-file" accept="image/*" onchange="previewImage(this)">
+    </div>
+    <div id="img-preview-wrap" style="margin-top:8px;display:none">
+      <img id="img-preview-el" style="max-width:100%;max-height:120px;border:1px solid #ddd;border-radius:4px;" alt="Önizleme">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('m-addimg')">İptal</button>
+      <button class="btn-primary" id="btn-place-img" onclick="startImagePlace()" disabled>Sayfaya Yerleştir</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Boş Sayfa Ekle -->
+<div class="modal-backdrop" id="m-addblank">
+  <div class="modal-card">
+    <h3>+ Boş Sayfa Ekle</h3>
+    <div class="form-group">
+      <label>Ekleme konumu (kaçıncı sayfadan sonra)</label>
+      <input type="number" id="blank-pos" value="1" min="0">
+    </div>
+    <p class="note">0 = başa ekle · <span id="blank-max"></span> = sona ekle</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('m-addblank')">İptal</button>
+      <button class="btn-primary" onclick="doAddBlank()">Ekle</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: İmza Oluştur -->
+<div class="modal-backdrop" id="m-signature">
+  <div class="modal-card" style="max-width:520px">
+    <h3>✍️ İmza Oluştur</h3>
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px;">
+      <button id="sig-tab-yaz"   onclick="sigTab('yaz')"   style="padding:6px 20px;font-size:13px;border:none;border-bottom:2px solid var(--primary);margin-bottom:-2px;background:transparent;color:var(--primary);font-weight:600;cursor:pointer;">Yaz</button>
+      <button id="sig-tab-ciz"   onclick="sigTab('ciz')"   style="padding:6px 20px;font-size:13px;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;background:transparent;color:var(--text-muted);cursor:pointer;">Çiz</button>
+      <button id="sig-tab-resim" onclick="sigTab('resim')" style="padding:6px 20px;font-size:13px;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;background:transparent;color:var(--text-muted);cursor:pointer;">Resim</button>
+    </div>
+    <!-- Yaz panel -->
+    <div id="sig-panel-yaz">
+      <input type="text" id="sig-text-input" placeholder="Adınızı yazın…" oninput="updateSigTextCanvas()"
+             style="width:100%;padding:7px 10px;font-size:14px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;box-sizing:border-box">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <select id="sig-font" onchange="updateSigTextCanvas()" style="padding:4px 8px;font-size:13px;border:1px solid var(--border);border-radius:var(--radius)">
+          <option value="'Segoe Script'">Segoe Script</option>
+          <option value="'Segoe Print'">Segoe Print</option>
+          <option value="'Comic Sans MS'">Comic Sans</option>
+          <option value="cursive">Cursive</option>
+        </select>
+        <span class="color-dot active" id="sig-yaz-c1" style="background:#000000" data-color="#000000" onclick="setSigColor('yaz',this)"></span>
+        <span class="color-dot"        id="sig-yaz-c2" style="background:#1D4ED8" data-color="#1D4ED8" onclick="setSigColor('yaz',this)"></span>
+        <span class="color-dot"        id="sig-yaz-c3" style="background:#E53E3E" data-color="#E53E3E" onclick="setSigColor('yaz',this)"></span>
+        <span class="color-dot"        id="sig-yaz-c4" style="background:#7C3AED" data-color="#7C3AED" onclick="setSigColor('yaz',this)"></span>
+      </div>
+      <canvas id="sig-text-canvas" width="470" height="130" style="width:100%;background:#fafafa;border:1px solid #ddd;border-radius:4px;display:block"></canvas>
+    </div>
+    <!-- Çiz panel -->
+    <div id="sig-panel-ciz" style="display:none">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span class="color-dot active" id="sig-ciz-c1" style="background:#000000" data-color="#000000" onclick="setSigColor('ciz',this)"></span>
+        <span class="color-dot"        id="sig-ciz-c2" style="background:#1D4ED8" data-color="#1D4ED8" onclick="setSigColor('ciz',this)"></span>
+        <span class="color-dot"        id="sig-ciz-c3" style="background:#E53E3E" data-color="#E53E3E" onclick="setSigColor('ciz',this)"></span>
+        <span class="color-dot"        id="sig-ciz-c4" style="background:#7C3AED" data-color="#7C3AED" onclick="setSigColor('ciz',this)"></span>
+        <button onclick="clearSigDraw()" style="margin-left:auto;font-size:12px;padding:3px 12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;cursor:pointer">Temizle</button>
+      </div>
+      <canvas id="sig-draw-canvas" width="470" height="130" style="width:100%;background:#fafafa;border:1px solid #ddd;border-radius:4px;cursor:crosshair;display:block;touch-action:none"></canvas>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:4px">Fare ile yukarıdaki alana imzanızı çizin.</p>
+    </div>
+    <!-- Resim panel -->
+    <div id="sig-panel-resim" style="display:none">
+      <div class="form-group">
+        <label>İmza görseli (PNG / JPG / GIF)</label>
+        <input type="file" id="sig-img-file" accept="image/*" onchange="sigPreviewImg(this)">
+      </div>
+      <div id="sig-img-preview" style="margin-top:8px;display:none">
+        <img id="sig-img-el" style="max-width:100%;max-height:130px;border:1px solid #ddd;border-radius:4px" alt="İmza önizleme">
+      </div>
+    </div>
+    <!-- Actions -->
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn-secondary" onclick="closeModal('m-signature')">İptal</button>
+      <button class="btn-primary"   onclick="createSignature()">Oluştur &amp; Yerleştir</button>
+    </div>
+  </div>
+</div>
+
+<!-- SPINNER -->
+<div id="spinner"><div class="spin"></div></div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- DEMO MODE PANEL -->
+<div id="demo-panel" style="flex-direction:column;padding:0">
+  <div id="demo-progress-bar" style="height:3px;background:#0891b2;width:100%;transition:width 12s linear;flex-shrink:0"></div>
+  <div style="display:flex;align-items:center;gap:16px;padding:12px 20px;width:100%">
+    <div id="demo-section-label">BÖLÜM 1 — GİRİŞ</div>
+    <div id="demo-text"></div>
+    <div id="demo-controls">
+      <button class="demo-nav" id="demo-prev-btn" onclick="demoPrev()">‹ Önceki</button>
+      <span id="demo-counter">1 / 9</span>
+      <button class="demo-nav" id="demo-next-btn" onclick="demoNext()">Sonraki ›</button>
+      <button id="demo-exit" onclick="demoStop()">✕ Çıkış</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const S = {
+  pageCount: 0,
+  currentPage: 0,
+  ts: Date.now(),
+  learnedFont: null   // {pdf_font, flags, size, color, is_bold, is_italic, display}
+};
+let activeDrag = null;
+let justDragged = false;
+let selectMode = false;
+let activeEdit = null;    // {block, div, input, applyFn, done}
+let selectedBlock = null; // {block, div, pencilBtn}
+let selDrag = null;
+let hoveredBlock = null;
+let annotMode = null;  // 'highlight' | 'rect' | 'circle' | 'stamp:TYPE' | 'image' | null
+let annotDrag = null;
+let annotColor = '#FFD700';
+let shapeColor = '#E53E3E';
+const SHAPE_COLORS = ['#E53E3E','#1D4ED8','#047857','#7C3AED','#EA580C','#000000'];
+let shapeColorIdx = 0;
+let _imgData = null;
+
+// ── format bar ───────────────────────────────────────────
+
+function _colorToHex(c) {
+  if (!c) return '#000000';
+  if (typeof c === 'string') return c.startsWith('#') ? c : '#000000';
+  return '#' + Math.max(0, c).toString(16).padStart(6, '0');
+}
+
+function _populateFormatBar(block) {
+  document.getElementById('fmt-font-label').textContent =
+    block.font ? '🔤 ' + fontDisplayName(block.font, block.flags || 0) : '🔤 Bilinmeyen';
+  const isBold      = !!(block.flags & 16) || /bold/i.test(block.font || '');
+  const isItalic    = !!(block.flags & 2)  || /italic|oblique/i.test(block.font || '');
+  const isUnderline = !!(block.underline);
+  document.getElementById('fmt-bold').classList.toggle('active', isBold);
+  document.getElementById('fmt-italic').classList.toggle('active', isItalic);
+  document.getElementById('fmt-underline').classList.toggle('active', isUnderline);
+  document.getElementById('fmt-size').value  = Math.round(_defaultSz(block) * 10) / 10;
+  document.getElementById('fmt-color').value = _colorToHex(block.color);
+}
+
+function showFormatBar(block, state) {
+  const bar = document.getElementById('format-bar');
+  bar.classList.remove('selected', 'editing');
+  bar.classList.add(state);
+  _populateFormatBar(block);
+}
+
+function hideFormatBar() {
+  const bar = document.getElementById('format-bar');
+  bar.classList.remove('selected', 'editing');
+  activeEdit = null;
+}
+
+function selectBlock(div, block) {
+  if (activeEdit && !activeEdit.done) {
+    activeEdit.done = true;
+    if (activeEdit.input) activeEdit.input.remove();
+    if (activeEdit.div)   activeEdit.div.style.visibility = '';
+    activeEdit = null;
+  }
+  deselectBlock();
+  div.classList.add('selected');
+  const overlay = document.getElementById('text-overlay');
+  const pencilBtn = document.createElement('button');
+  pencilBtn.className = 'block-pencil';
+  pencilBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="46" height="46">
+    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="#f97316"/>
+    <path d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="#ea580c"/>
+    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="none" stroke="#fff" stroke-width="0.3" opacity="0.4"/>
+  </svg>`;
+  pencilBtn.title = 'Metni düzenle';
+  pencilBtn.style.left = Math.min(block.x1 * 100 + 0.8, 97) + '%';
+  pencilBtn.style.top  = ((block.y0 + block.y1) / 2 * 100) + '%';
+  pencilBtn.addEventListener('mousedown', e => e.stopPropagation());
+  pencilBtn.addEventListener('click', e => { e.stopPropagation(); startEdit(div, block, null); });
+  overlay.appendChild(pencilBtn);
+  selectedBlock = {block, div, pencilBtn};
+  showFormatBar(block, 'selected');
+}
+
+function deselectBlock() {
+  if (!selectedBlock) return;
+  selectedBlock.div.classList.remove('selected');
+  if (selectedBlock.pencilBtn) selectedBlock.pencilBtn.remove();
+  selectedBlock = null;
+  if (!activeEdit) hideFormatBar();
+}
+
+function toggleFmtStyle(style) {
+  if (selectedBlock && (!activeEdit || activeEdit.done)) {
+    startEdit(selectedBlock.div, selectedBlock.block, null);
+  }
+  if (!activeEdit || activeEdit.done) return;
+  const btn = document.getElementById(`fmt-${style}`);
+  btn.classList.toggle('active');
+  if (activeEdit.input) activeEdit.input.focus();
+}
+
+function applyActiveEdit() {
+  if (activeEdit && !activeEdit.done) activeEdit.applyFn();
+}
+
+function cancelActiveEdit() {
+  if (!activeEdit || activeEdit.done) return;
+  activeEdit.done = true;
+  if (activeEdit.input)  activeEdit.input.remove();
+  if (activeEdit.div)    activeEdit.div.style.visibility = '';
+  activeEdit = null;
+  hideFormatBar();
+}
+
+function saveFmtFont() {
+  if (selectedBlock && (!activeEdit || activeEdit.done)) {
+    startEdit(selectedBlock.div, selectedBlock.block, null);
+  }
+  if (!activeEdit) return;
+  const block = activeEdit.block;
+  const dname = fontDisplayName(block.font, block.flags || 0);
+  S.learnedFont = {
+    pdf_font:  block.font,
+    flags:     block.flags  || 0,
+    size:      _defaultSz(block),
+    color:     block.color,
+    is_bold:   !!(block.flags & 16) || /bold/i.test(block.font || ''),
+    is_italic: !!(block.flags & 2)  || /italic|oblique/i.test(block.font || ''),
+    display:   dname + ' ' + Math.round(_defaultSz(block)) + 'pt',
+  };
+  updateLearnedFontDisplay();
+  toast('Font kaydedildi: ' + S.learnedFont.display, 'ok');
+  if (activeEdit.input) activeEdit.input.focus();
+}
+
+document.addEventListener('click', e => {
+  if (activeEdit && !activeEdit.done) return;
+  if (e.target.closest('#text-overlay') || e.target.closest('#format-bar')) return;
+  deselectBlock();
+});
+
+// ── doc banners ──────────────────────────────────────────
+
+function clearBanners() {
+  document.getElementById('doc-banners').innerHTML = '';
+}
+
+function addBanner(type, icon, text, actionLabel, actionFn) {
+  const bar = document.getElementById('doc-banners');
+  const el = document.createElement('div');
+  el.className = `doc-banner ${type}`;
+  el.innerHTML = `
+    <span class="doc-banner-icon">${icon}</span>
+    <span class="doc-banner-text">${text}</span>
+    ${actionLabel ? `<button class="doc-banner-action" onclick="(${actionFn})()">${actionLabel}</button>` : ''}
+    <button class="doc-banner-close" onclick="this.closest('.doc-banner').remove()" title="Kapat">×</button>
+  `;
+  bar.appendChild(el);
+}
+
+// ── i18n ─────────────────────────────────────────────────
+
+const LANGS = {
+  tr: {
+    appName: 'PDF Editör',
+    open: 'Aç', undo: 'Geri Al', save: 'Kaydet',
+    merge: 'Birleştir', split: 'Böl',
+    convertBtn: 'PDF\'e Çevir',
+    findReplace: 'Bul & Değiştir', addText: 'Metin Ekle',
+    deleteArea: 'Alan Sil', exportBtn: 'Dışa Aktar',
+    exportDocx: 'Word (.docx)', exportImages: 'PNG', exportTxt: 'Metin (.txt)',
+    noFile: 'Dosya açılmadı',
+    editHint: '✏️ Düzenlemek için bir metin bloğuna tıklayın',
+    emptyTitle: 'PDF dosyası açın', emptyDesc: 'Dosyayı buraya sürükleyip bırakın<br>veya aşağıdaki butona tıklayın',
+    saveTitle: '💾 Kaydet',
+    saveLabel: 'Kayıt yolu <small>(boş bırakırsan orijinal klasörüne _duzenlendi eki ile kaydedilir)</small>',
+    savePlaceholder: 'Boş bırakabilirsin',
+    mergeTitle: '⊕ PDF Birleştir', mergeLabelPath: 'Eklenecek PDF yolu',
+    mergePlaceholder: 'C:\\Belgeler\\diger.pdf',
+    mergeLabelPos: 'Ekleme konumu', mergeOptEnd: 'Sona ekle', mergeOptStart: 'Başa ekle',
+    splitTitle: '✂ PDF Böl',
+    splitDesc: 'Seçilen sayfa aralığını yeni bir dosya olarak kaydeder. Açık belge değişmez.',
+    splitLabelStart: 'Başlangıç sayfası', splitLabelEnd: 'Bitiş sayfası',
+    splitLabel: 'Kayıt yolu <small>(boş = otomatik)</small>', splitPlaceholder: 'Boş bırakabilirsin',
+    frTitle: '🔍 Bul & Değiştir', frLabelFind: 'Aranan metin', frPlaceholderFind: 'Aranan...',
+    frLabelReplace: 'Yeni metin <small>(boş bırakırsan bulunan metin silinir)</small>',
+    frPlaceholderReplace: 'Yeni metin...',
+    frNote: '⚠ Font değişimi mümkün olabilir — değiştirilen metin orijinaline yakın ama aynı olmayabilir.',
+    selConfirm: 'Seçili alanı sil?', selDel: 'Sil', selCancel: 'İptal',
+    btnCancel: 'İptal', btnSave: 'Kaydet', btnMerge: 'Birleştir',
+    btnSplitSave: 'Böl ve Kaydet', btnReplace: 'Değiştir',
+    exportExcel: 'Excel (.xlsx)',
+    exportDone: 'İndirildi', exportErr: 'Dışa aktarma hatası', noDocErr: 'Önce bir PDF açın',
+    dragPdfOnly: 'Sadece PDF dosyası',
+    demoBannerTitle: 'DEMO SÜRÜMÜ',
+    demoBannerDesc: ' — Maksimum 3 sayfa açılabilir, kaydedilen dosyalara filigran eklenir.',
+    demoBannerBuy: 'Tam Sürümü Satın Al — $19',
+    demoBannerActivate: '🔑 Lisans Gir',
+    demoTruncated: 'Bu dosya 3 sayfadan fazla. Demo sürümde yalnızca ilk 3 sayfa açıldı.',
+    pdfPwTitle: '🔒 Şifreli PDF',
+    pdfPwDesc: 'Bu PDF şifreli. Açmak için şifreyi girin.',
+    pdfPwWrong: 'Şifre yanlış, tekrar deneyin.',
+    pdfPwOpen: 'Aç',
+    encryptTitle: 'Şifre Ekle / Kaldır',
+    printBtn: 'Yazdır', copyTextBtn: 'Metni Kopyala',
+  },
+  en: {
+    appName: 'PDF Editor',
+    open: 'Open', undo: 'Undo', save: 'Save',
+    merge: 'Merge', split: 'Split',
+    convertBtn: 'Convert to PDF',
+    findReplace: 'Find & Replace', addText: 'Add Text',
+    deleteArea: 'Delete Area', exportBtn: 'Export',
+    exportDocx: 'Word (.docx)', exportImages: 'PNG', exportTxt: 'Plain Text (.txt)',
+    noFile: 'No file open',
+    editHint: '✏️ Click a text block to edit',
+    emptyTitle: 'Open a PDF file', emptyDesc: 'Drag & drop a file here<br>or click the button below',
+    saveTitle: '💾 Save',
+    saveLabel: 'Save path <small>(blank = save as _edited in original folder)</small>',
+    savePlaceholder: 'Leave blank for auto',
+    mergeTitle: '⊕ Merge PDF', mergeLabelPath: 'Path to PDF to merge',
+    mergePlaceholder: 'C:\\Documents\\other.pdf',
+    mergeLabelPos: 'Insert position', mergeOptEnd: 'Append to end', mergeOptStart: 'Prepend to start',
+    splitTitle: '✂ Split PDF',
+    splitDesc: 'Saves the selected page range as a new file. Open document is unchanged.',
+    splitLabelStart: 'Start page', splitLabelEnd: 'End page',
+    splitLabel: 'Save path <small>(blank = auto)</small>', splitPlaceholder: 'Leave blank for auto',
+    frTitle: '🔍 Find & Replace', frLabelFind: 'Find text', frPlaceholderFind: 'Search...',
+    frLabelReplace: 'Replace with <small>(blank = delete found text)</small>',
+    frPlaceholderReplace: 'Replacement text...',
+    frNote: '⚠ Font may change — replaced text will be similar but not identical to original.',
+    selConfirm: 'Delete selected area?', selDel: 'Delete', selCancel: 'Cancel',
+    btnCancel: 'Cancel', btnSave: 'Save', btnMerge: 'Merge',
+    btnSplitSave: 'Split & Save', btnReplace: 'Replace',
+    exportExcel: 'Excel (.xlsx)',
+    exportDone: 'Downloaded', exportErr: 'Export error', noDocErr: 'Open a PDF first',
+    dragPdfOnly: 'PDF files only',
+    demoBannerTitle: 'DEMO VERSION',
+    demoBannerDesc: ' — Max 3 pages can be opened. Saved files will have a watermark.',
+    demoBannerBuy: 'Buy Full Version — $19',
+    demoBannerActivate: '🔑 Enter License',
+    demoTruncated: 'This file has more than 3 pages. Only the first 3 pages were opened in demo mode.',
+    pdfPwTitle: '🔒 Password-protected PDF',
+    pdfPwDesc: 'This PDF is password-protected. Enter the password to open it.',
+    pdfPwWrong: 'Wrong password, please try again.',
+    pdfPwOpen: 'Open',
+    encryptTitle: 'Add / Remove Password',
+    printBtn: 'Print', copyTextBtn: 'Copy Text',
+  },
+  de: {
+    appName: 'PDF Editor',
+    open: 'Öffnen', undo: 'Rückgängig', save: 'Speichern',
+    merge: 'Zusammenführen', split: 'Aufteilen',
+    convertBtn: 'In PDF umwandeln',
+    findReplace: 'Suchen & Ersetzen', addText: 'Text einfügen',
+    deleteArea: 'Bereich löschen', exportBtn: 'Exportieren',
+    exportDocx: 'Word (.docx)', exportImages: 'PNG', exportTxt: 'Text (.txt)',
+    noFile: 'Keine Datei geöffnet',
+    editHint: '✏️ Auf einen Textblock klicken zum Bearbeiten',
+    emptyTitle: 'PDF-Datei öffnen', emptyDesc: 'Datei hier ablegen<br>oder unten auf den Button klicken',
+    saveTitle: '💾 Speichern',
+    saveLabel: 'Speicherpfad <small>(leer = automatisch im Originalordner als _bearbeitet)</small>',
+    savePlaceholder: 'Leer lassen für automatisch',
+    mergeTitle: '⊕ PDF zusammenführen', mergeLabelPath: 'Pfad zum zusammenzuführenden PDF',
+    mergePlaceholder: 'C:\\Dokumente\\andere.pdf',
+    mergeLabelPos: 'Einfügeposition', mergeOptEnd: 'Am Ende anhängen', mergeOptStart: 'Am Anfang einfügen',
+    splitTitle: '✂ PDF aufteilen',
+    splitDesc: 'Speichert den ausgewählten Seitenbereich als neue Datei. Das geöffnete Dokument bleibt unverändert.',
+    splitLabelStart: 'Startseite', splitLabelEnd: 'Endseite',
+    splitLabel: 'Speicherpfad <small>(leer = automatisch)</small>', splitPlaceholder: 'Leer lassen für automatisch',
+    frTitle: '🔍 Suchen & Ersetzen', frLabelFind: 'Suchtext', frPlaceholderFind: 'Suche...',
+    frLabelReplace: 'Ersetzen mit <small>(leer = gefundenen Text löschen)</small>',
+    frPlaceholderReplace: 'Ersatztext...',
+    frNote: '⚠ Die Schriftart kann sich ändern — ersetzter Text ist ähnlich, aber nicht identisch.',
+    selConfirm: 'Ausgewählten Bereich löschen?', selDel: 'Löschen', selCancel: 'Abbrechen',
+    btnCancel: 'Abbrechen', btnSave: 'Speichern', btnMerge: 'Zusammenführen',
+    btnSplitSave: 'Aufteilen & Speichern', btnReplace: 'Ersetzen',
+    exportExcel: 'Excel (.xlsx)',
+    exportDone: 'Heruntergeladen', exportErr: 'Exportfehler', noDocErr: 'Zuerst eine PDF öffnen',
+    dragPdfOnly: 'Nur PDF-Dateien',
+    demoBannerTitle: 'DEMO-VERSION',
+    demoBannerDesc: ' — Max. 3 Seiten können geöffnet werden. Gespeicherte Dateien erhalten ein Wasserzeichen.',
+    demoBannerBuy: 'Vollversion kaufen — $19',
+    demoBannerActivate: '🔑 Lizenz eingeben',
+    demoTruncated: 'Diese Datei hat mehr als 3 Seiten. Im Demo-Modus wurden nur die ersten 3 Seiten geöffnet.',
+    pdfPwTitle: '🔒 Passwortgeschütztes PDF',
+    pdfPwDesc: 'Dieses PDF ist passwortgeschützt. Geben Sie das Passwort zum Öffnen ein.',
+    pdfPwWrong: 'Falsches Passwort, bitte erneut versuchen.',
+    pdfPwOpen: 'Öffnen',
+    encryptTitle: 'Passwort hinzufügen / entfernen',
+    printBtn: 'Drucken', copyTextBtn: 'Text kopieren',
+  },
+  es: {
+    appName: 'PDF Editor',
+    open: 'Abrir', undo: 'Deshacer', save: 'Guardar',
+    merge: 'Combinar', split: 'Dividir',
+    convertBtn: 'Convertir a PDF',
+    findReplace: 'Buscar & Reemplazar', addText: 'Añadir texto',
+    deleteArea: 'Eliminar área', exportBtn: 'Exportar',
+    exportDocx: 'Word (.docx)', exportImages: 'PNG', exportTxt: 'Texto (.txt)',
+    noFile: 'No hay archivo abierto',
+    editHint: '✏️ Haz clic en un bloque de texto para editar',
+    emptyTitle: 'Abrir un archivo PDF', emptyDesc: 'Arrastra un archivo aquí<br>o haz clic en el botón de abajo',
+    saveTitle: '💾 Guardar',
+    saveLabel: 'Ruta de guardado <small>(vacío = automático en carpeta original como _editado)</small>',
+    savePlaceholder: 'Dejar en blanco para automático',
+    mergeTitle: '⊕ Combinar PDF', mergeLabelPath: 'Ruta del PDF a combinar',
+    mergePlaceholder: 'C:\\Documentos\\otro.pdf',
+    mergeLabelPos: 'Posición de inserción', mergeOptEnd: 'Añadir al final', mergeOptStart: 'Añadir al inicio',
+    splitTitle: '✂ Dividir PDF',
+    splitDesc: 'Guarda el rango de páginas seleccionado como nuevo archivo. El documento abierto no cambia.',
+    splitLabelStart: 'Página de inicio', splitLabelEnd: 'Página de fin',
+    splitLabel: 'Ruta de guardado <small>(vacío = automático)</small>', splitPlaceholder: 'Dejar en blanco para automático',
+    frTitle: '🔍 Buscar & Reemplazar', frLabelFind: 'Texto a buscar', frPlaceholderFind: 'Buscar...',
+    frLabelReplace: 'Reemplazar con <small>(vacío = eliminar texto encontrado)</small>',
+    frPlaceholderReplace: 'Texto de reemplazo...',
+    frNote: '⚠ La fuente puede cambiar — el texto reemplazado será similar pero no idéntico al original.',
+    selConfirm: '¿Eliminar área seleccionada?', selDel: 'Eliminar', selCancel: 'Cancelar',
+    btnCancel: 'Cancelar', btnSave: 'Guardar', btnMerge: 'Combinar',
+    btnSplitSave: 'Dividir & Guardar', btnReplace: 'Reemplazar',
+    exportExcel: 'Excel (.xlsx)',
+    exportDone: 'Descargado', exportErr: 'Error de exportación', noDocErr: 'Abra un PDF primero',
+    dragPdfOnly: 'Solo archivos PDF',
+    demoBannerTitle: 'VERSIÓN DEMO',
+    demoBannerDesc: ' — Máx. 3 páginas. Los archivos guardados tendrán marca de agua.',
+    demoBannerBuy: 'Comprar versión completa — $19',
+    demoBannerActivate: '🔑 Introducir licencia',
+    demoTruncated: 'Este archivo tiene más de 3 páginas. Solo se abrieron las primeras 3 en modo demo.',
+    pdfPwTitle: '🔒 PDF protegido con contraseña',
+    pdfPwDesc: 'Este PDF está protegido con contraseña. Introdúzcala para abrirlo.',
+    pdfPwWrong: 'Contraseña incorrecta, inténtelo de nuevo.',
+    pdfPwOpen: 'Abrir',
+    encryptTitle: 'Añadir / quitar contraseña',
+    printBtn: 'Imprimir', copyTextBtn: 'Copiar texto',
+  },
+  fr: {
+    appName: 'PDF Editor',
+    open: 'Ouvrir', undo: 'Annuler', save: 'Enregistrer',
+    merge: 'Fusionner', split: 'Diviser',
+    convertBtn: 'Convertir en PDF',
+    findReplace: 'Chercher & Remplacer', addText: 'Ajouter du texte',
+    deleteArea: 'Supprimer zone', exportBtn: 'Exporter',
+    exportDocx: 'Word (.docx)', exportImages: 'PNG', exportTxt: 'Texte (.txt)',
+    noFile: 'Aucun fichier ouvert',
+    editHint: '✏️ Cliquez sur un bloc de texte pour modifier',
+    emptyTitle: 'Ouvrir un fichier PDF', emptyDesc: 'Déposez un fichier ici<br>ou cliquez sur le bouton ci-dessous',
+    saveTitle: '💾 Enregistrer',
+    saveLabel: "Chemin d'enregistrement <small>(vide = automatique dans dossier d'origine comme _modifié)</small>",
+    savePlaceholder: 'Laisser vide pour automatique',
+    mergeTitle: '⊕ Fusionner PDF', mergeLabelPath: 'Chemin vers le PDF à fusionner',
+    mergePlaceholder: 'C:\\Documents\\autre.pdf',
+    mergeLabelPos: "Position d'insertion", mergeOptEnd: 'Ajouter à la fin', mergeOptStart: 'Ajouter au début',
+    splitTitle: '✂ Diviser PDF',
+    splitDesc: "Enregistre la plage de pages sélectionnée dans un nouveau fichier. Le document ouvert reste inchangé.",
+    splitLabelStart: 'Page de début', splitLabelEnd: 'Page de fin',
+    splitLabel: "Chemin d'enregistrement <small>(vide = automatique)</small>", splitPlaceholder: 'Laisser vide pour automatique',
+    frTitle: '🔍 Chercher & Remplacer', frLabelFind: 'Texte recherché', frPlaceholderFind: 'Rechercher...',
+    frLabelReplace: 'Remplacer par <small>(vide = supprimer le texte trouvé)</small>',
+    frPlaceholderReplace: 'Texte de remplacement...',
+    frNote: "⚠ La police peut changer — le texte remplacé sera similaire mais pas identique à l'original.",
+    selConfirm: 'Supprimer la zone sélectionnée ?', selDel: 'Supprimer', selCancel: 'Annuler',
+    btnCancel: 'Annuler', btnSave: 'Enregistrer', btnMerge: 'Fusionner',
+    btnSplitSave: 'Diviser & Enregistrer', btnReplace: 'Remplacer',
+    exportExcel: 'Excel (.xlsx)',
+    exportDone: 'Téléchargé', exportErr: "Erreur d'exportation", noDocErr: "Ouvrez d'abord un PDF",
+    dragPdfOnly: 'Fichiers PDF uniquement',
+    demoBannerTitle: 'VERSION DÉMO',
+    demoBannerDesc: ' — Max 3 pages. Les fichiers sauvegardés auront un filigrane.',
+    demoBannerBuy: 'Acheter la version complète — $19',
+    demoBannerActivate: '🔑 Saisir la licence',
+    demoTruncated: 'Ce fichier a plus de 3 pages. Seules les 3 premières ont été ouvertes en mode démo.',
+    pdfPwTitle: '🔒 PDF protégé par mot de passe',
+    pdfPwDesc: 'Ce PDF est protégé par un mot de passe. Saisissez-le pour l’ouvrir.',
+    pdfPwWrong: 'Mot de passe incorrect, réessayez.',
+    pdfPwOpen: 'Ouvrir',
+    encryptTitle: 'Ajouter / supprimer le mot de passe',
+    printBtn: 'Imprimer', copyTextBtn: 'Copier le texte',
+  },
+  it: {
+    appName: 'PDF Editor',
+    open: 'Apri', undo: 'Annulla', save: 'Salva',
+    merge: 'Unisci', split: 'Dividi',
+    convertBtn: 'Converti in PDF',
+    findReplace: 'Trova & Sostituisci', addText: 'Aggiungi testo',
+    deleteArea: 'Elimina area', exportBtn: 'Esporta',
+    exportDocx: 'Word (.docx)', exportImages: 'PNG', exportTxt: 'Testo (.txt)',
+    noFile: 'Nessun file aperto',
+    editHint: '✏️ Clicca su un blocco di testo per modificare',
+    emptyTitle: 'Apri un file PDF', emptyDesc: 'Trascina un file qui<br>o clicca il pulsante in basso',
+    saveTitle: '💾 Salva',
+    saveLabel: 'Percorso di salvataggio <small>(vuoto = automatico nella cartella originale come _modificato)</small>',
+    savePlaceholder: 'Lascia vuoto per automatico',
+    mergeTitle: '⊕ Unisci PDF', mergeLabelPath: 'Percorso del PDF da unire',
+    mergePlaceholder: 'C:\\Documenti\\altro.pdf',
+    mergeLabelPos: 'Posizione di inserimento', mergeOptEnd: 'Aggiungi alla fine', mergeOptStart: "Aggiungi all'inizio",
+    splitTitle: '✂ Dividi PDF',
+    splitDesc: "Salva l'intervallo di pagine selezionato come nuovo file. Il documento aperto rimane invariato.",
+    splitLabelStart: 'Pagina iniziale', splitLabelEnd: 'Pagina finale',
+    splitLabel: 'Percorso di salvataggio <small>(vuoto = automatico)</small>', splitPlaceholder: 'Lascia vuoto per automatico',
+    frTitle: '🔍 Trova & Sostituisci', frLabelFind: 'Testo da cercare', frPlaceholderFind: 'Cerca...',
+    frLabelReplace: 'Sostituisci con <small>(vuoto = elimina il testo trovato)</small>',
+    frPlaceholderReplace: 'Testo sostitutivo...',
+    frNote: "⚠ Il font potrebbe cambiare — il testo sostituito sarà simile ma non identico all'originale.",
+    selConfirm: "Eliminare l'area selezionata?", selDel: 'Elimina', selCancel: 'Annulla',
+    btnCancel: 'Annulla', btnSave: 'Salva', btnMerge: 'Unisci',
+    btnSplitSave: 'Dividi & Salva', btnReplace: 'Sostituisci',
+    exportExcel: 'Excel (.xlsx)',
+    exportDone: 'Scaricato', exportErr: 'Errore di esportazione', noDocErr: 'Apri prima un PDF',
+    dragPdfOnly: 'Solo file PDF',
+    demoBannerTitle: 'VERSIONE DEMO',
+    demoBannerDesc: ' — Max 3 pagine. I file salvati avranno una filigrana.',
+    demoBannerBuy: 'Acquista versione completa — $19',
+    demoBannerActivate: '🔑 Inserisci licenza',
+    demoTruncated: 'Questo file ha più di 3 pagine. Solo le prime 3 sono state aperte in modalità demo.',
+    pdfPwTitle: '🔒 PDF protetto da password',
+    pdfPwDesc: 'Questo PDF è protetto da password. Inserisci la password per aprirlo.',
+    pdfPwWrong: 'Password errata, riprova.',
+    pdfPwOpen: 'Apri',
+    encryptTitle: 'Aggiungi / rimuovi password',
+    printBtn: 'Stampa', copyTextBtn: 'Copia testo',
+  },
+  pt: {
+    appName: 'PDF Editor',
+    open: 'Abrir', undo: 'Desfazer', save: 'Salvar',
+    merge: 'Mesclar', split: 'Dividir',
+    convertBtn: 'Converter para PDF',
+    findReplace: 'Localizar & Substituir', addText: 'Adicionar texto',
+    deleteArea: 'Excluir área', exportBtn: 'Exportar',
+    exportDocx: 'Word (.docx)', exportImages: 'PNG', exportTxt: 'Texto (.txt)',
+    noFile: 'Nenhum arquivo aberto',
+    editHint: '✏️ Clique em um bloco de texto para editar',
+    emptyTitle: 'Abrir um arquivo PDF', emptyDesc: 'Arraste um arquivo aqui<br>ou clique no botão abaixo',
+    saveTitle: '💾 Salvar',
+    saveLabel: 'Caminho de salvamento <small>(vazio = automático na pasta original como _editado)</small>',
+    savePlaceholder: 'Deixe em branco para automático',
+    mergeTitle: '⊕ Mesclar PDF', mergeLabelPath: 'Caminho do PDF a mesclar',
+    mergePlaceholder: 'C:\\Documentos\\outro.pdf',
+    mergeLabelPos: 'Posição de inserção', mergeOptEnd: 'Adicionar ao final', mergeOptStart: 'Adicionar ao início',
+    splitTitle: '✂ Dividir PDF',
+    splitDesc: 'Salva o intervalo de páginas selecionado como novo arquivo. O documento aberto permanece inalterado.',
+    splitLabelStart: 'Página inicial', splitLabelEnd: 'Página final',
+    splitLabel: 'Caminho de salvamento <small>(vazio = automático)</small>', splitPlaceholder: 'Deixe em branco para automático',
+    frTitle: '🔍 Localizar & Substituir', frLabelFind: 'Texto a localizar', frPlaceholderFind: 'Localizar...',
+    frLabelReplace: 'Substituir por <small>(vazio = excluir texto encontrado)</small>',
+    frPlaceholderReplace: 'Texto de substituição...',
+    frNote: '⚠ A fonte pode mudar — o texto substituído será semelhante mas não idêntico ao original.',
+    selConfirm: 'Excluir área selecionada?', selDel: 'Excluir', selCancel: 'Cancelar',
+    btnCancel: 'Cancelar', btnSave: 'Salvar', btnMerge: 'Mesclar',
+    btnSplitSave: 'Dividir & Salvar', btnReplace: 'Substituir',
+    exportExcel: 'Excel (.xlsx)',
+    exportDone: 'Baixado', exportErr: 'Erro de exportação', noDocErr: 'Abra um PDF primeiro',
+    dragPdfOnly: 'Somente arquivos PDF',
+    demoBannerTitle: 'VERSÃO DEMO',
+    demoBannerDesc: ' — Máx. 3 páginas. Os arquivos salvos terão marca d\'água.',
+    demoBannerBuy: 'Comprar versão completa — $19',
+    demoBannerActivate: '🔑 Inserir licença',
+    demoTruncated: 'Este arquivo tem mais de 3 páginas. Apenas as 3 primeiras foram abertas no modo demo.',
+    pdfPwTitle: '🔒 PDF protegido por senha',
+    pdfPwDesc: 'Este PDF é protegido por senha. Digite a senha para abri-lo.',
+    pdfPwWrong: 'Senha incorreta, tente novamente.',
+    pdfPwOpen: 'Abrir',
+    encryptTitle: 'Adicionar / remover senha',
+    printBtn: 'Imprimir', copyTextBtn: 'Copiar texto',
+  },
+  ru: {
+    appName: 'PDF Редактор',
+    open: 'Открыть', undo: 'Отменить', save: 'Сохранить',
+    merge: 'Объединить', split: 'Разделить',
+    convertBtn: 'Конвертировать в PDF',
+    findReplace: 'Найти & Заменить', addText: 'Добавить текст',
+    deleteArea: 'Удалить область', exportBtn: 'Экспорт',
+    exportDocx: 'Word (.docx)', exportImages: 'PNG', exportTxt: 'Текст (.txt)',
+    noFile: 'Файл не открыт',
+    editHint: '✏️ Нажмите на текстовый блок для редактирования',
+    emptyTitle: 'Открыть PDF-файл', emptyDesc: 'Перетащите файл сюда<br>или нажмите кнопку ниже',
+    saveTitle: '💾 Сохранить',
+    saveLabel: 'Путь сохранения <small>(пусто = автоматически в исходной папке с суффиксом _edited)</small>',
+    savePlaceholder: 'Оставьте пустым для автоматического',
+    mergeTitle: '⊕ Объединить PDF', mergeLabelPath: 'Путь к PDF для объединения',
+    mergePlaceholder: 'C:\\Документы\\другой.pdf',
+    mergeLabelPos: 'Позиция вставки', mergeOptEnd: 'Добавить в конец', mergeOptStart: 'Добавить в начало',
+    splitTitle: '✂ Разделить PDF',
+    splitDesc: 'Сохраняет выбранный диапазон страниц как новый файл. Открытый документ не изменяется.',
+    splitLabelStart: 'Начальная страница', splitLabelEnd: 'Конечная страница',
+    splitLabel: 'Путь сохранения <small>(пусто = автоматически)</small>', splitPlaceholder: 'Оставьте пустым для автоматического',
+    frTitle: '🔍 Найти & Заменить', frLabelFind: 'Искать текст', frPlaceholderFind: 'Поиск...',
+    frLabelReplace: 'Заменить на <small>(пусто = удалить найденный текст)</small>',
+    frPlaceholderReplace: 'Текст замены...',
+    frNote: '⚠ Шрифт может измениться — замененный текст будет похож на оригинал, но не идентичен.',
+    selConfirm: 'Удалить выбранную область?', selDel: 'Удалить', selCancel: 'Отмена',
+    btnCancel: 'Отмена', btnSave: 'Сохранить', btnMerge: 'Объединить',
+    btnSplitSave: 'Разделить & Сохранить', btnReplace: 'Заменить',
+    exportExcel: 'Excel (.xlsx)',
+    exportDone: 'Загружено', exportErr: 'Ошибка экспорта', noDocErr: 'Сначала откройте PDF',
+    dragPdfOnly: 'Только PDF файлы',
+    demoBannerTitle: 'ДЕМО-ВЕРСИЯ',
+    demoBannerDesc: ' — Макс. 3 страницы. Сохранённые файлы будут с водяным знаком.',
+    demoBannerBuy: 'Купить полную версию — $19',
+    demoBannerActivate: '🔑 Ввести лицензию',
+    demoTruncated: 'Файл содержит больше 3 страниц. В демо-режиме открыты только первые 3.',
+    pdfPwTitle: '🔒 PDF защищён паролем',
+    pdfPwDesc: 'Этот PDF защищён паролем. Введите пароль, чтобы открыть его.',
+    pdfPwWrong: 'Неверный пароль, попробуйте ещё раз.',
+    pdfPwOpen: 'Открыть',
+    encryptTitle: 'Добавить / удалить пароль',
+    printBtn: 'Печать', copyTextBtn: 'Копировать текст',
+  }
+};
+let currentLang = localStorage.getItem('lang') || 'tr';
+
+function t(key) { return (LANGS[currentLang] || LANGS.tr)[key] || LANGS.tr[key] || key; }
+
+function applyI18n() {
+  const dict = LANGS[currentLang] || LANGS.tr;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    if (el.dataset.i18nDef === undefined) el.dataset.i18nDef = el.innerHTML;   // HTML'deki özgün metin
+    const val = dict[el.dataset.i18n] || LANGS.tr[el.dataset.i18n];
+    if (val === undefined) { el.innerHTML = el.dataset.i18nDef; return; }       // çeviri yoksa ham anahtar değil özgün metin
+    if (val.includes('<')) el.innerHTML = val; else el.textContent = val;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    if (el.dataset.i18nPhDef === undefined) el.dataset.i18nPhDef = el.placeholder;
+    const val = dict[el.dataset.i18nPh] || LANGS.tr[el.dataset.i18nPh];
+    el.placeholder = val !== undefined ? val : el.dataset.i18nPhDef;
+  });
+}
+
+function toggleLangMenu(e) {
+  e.stopPropagation();
+  document.getElementById('lang-menu').classList.toggle('open');
+}
+function setLang(code) {
+  currentLang = code;
+  localStorage.setItem('lang', code);
+  const labels = {tr:'TR',en:'EN',de:'DE',es:'ES',fr:'FR',it:'IT',pt:'PT',ru:'RU'};
+  const lbl = document.getElementById('lang-label');
+  if (lbl) lbl.textContent = labels[code] || code.toUpperCase();
+  document.getElementById('lang-menu').classList.remove('open');
+  applyI18n();
+  if (!S.pageCount) document.getElementById('tb-filename').textContent = t('noFile');
+  trxApplyAll();
+}
+
+// ── Sabit metin çeviri katmanı ────────────────────────────
+// data-i18n kullanmayan Türkçe metinler (ipuçları, bildirimler, pencereler) için:
+// sözlükte karşılığı varsa seçili dile çevirir, yoksa özgün metni olduğu gibi bırakır.
+const _TXL = ['en','de','es','fr','it','pt','ru'];
+const TXR = [["Şekil Çiz", "Draw Shape", "Form zeichnen", "Dibujar forma", "Dessiner une forme", "Disegna forma", "Desenhar forma", "Фигура"], ["▭ Dikdörtgen", "▭ Rectangle", "▭ Rechteck", "▭ Rectángulo", "▭ Rectangle", "▭ Rettangolo", "▭ Retângulo", "▭ Прямоугольник"], ["◯ Daire", "◯ Circle", "◯ Kreis", "◯ Círculo", "◯ Cercle", "◯ Cerchio", "◯ Círculo", "◯ Круг"], ["Renk:", "Color:", "Farbe:", "Color:", "Couleur :", "Colore:", "Cor:", "Цвет:"], ["Dosya açılmadı", "No file open", "Keine Datei geöffnet", "Ningún archivo abierto", "Aucun fichier ouvert", "Nessun file aperto", "Nenhum arquivo aberto", "Файл не открыт"], ["✓ Onay (yeşil)", "✓ Approved (green)", "✓ Genehmigt (grün)", "✓ Aprobado (verde)", "✓ Approuvé (vert)", "✓ Approvato (verde)", "✓ Aprovado (verde)", "✓ Одобрено (зелёный)"], ["✗ İptal (kırmızı)", "✗ Rejected (red)", "✗ Abgelehnt (rot)", "✗ Rechazado (rojo)", "✗ Refusé (rouge)", "✗ Rifiutato (rosso)", "✗ Recusado (vermelho)", "✗ Отклонено (красный)"], ["○ Daire (mavi)", "○ Circle (blue)", "○ Kreis (blau)", "○ Círculo (azul)", "○ Cercle (bleu)", "○ Cerchio (blu)", "○ Círculo (azul)", "○ Круг (синий)"], ["📅 Tarih", "📅 Date", "📅 Datum", "📅 Fecha", "📅 Date", "📅 Data", "📅 Data", "📅 Дата"], ["🔤 Fontu Kaydet", "🔤 Save Font", "🔤 Schrift speichern", "🔤 Guardar fuente", "🔤 Enregistrer la police", "🔤 Salva font", "🔤 Salvar fonte", "🔤 Сохранить шрифт"], ["✕ İptal", "✕ Cancel", "✕ Abbrechen", "✕ Cancelar", "✕ Annuler", "✕ Annulla", "✕ Cancelar", "✕ Отмена"], ["✓ Uygula", "✓ Apply", "✓ Anwenden", "✓ Aplicar", "✓ Appliquer", "✓ Applica", "✓ Aplicar", "✓ Применить"], ["Dijital İmzalı Belge", "Digitally Signed Document", "Digital signiertes Dokument", "Documento con firma digital", "Document signé numériquement", "Documento con firma digitale", "Documento com assinatura digital", "Документ с цифровой подписью"], ["Bu belgede", "This document has", "Dieses Dokument enthält", "Este documento tiene", "Ce document contient", "Questo documento contiene", "Este documento tem", "В документе"], ["dijital imza bulunuyor.", "digital signature(s).", "digitale Signatur(en).", "firma(s) digital(es).", "signature(s) numérique(s).", "firma/e digitale/i.", "assinatura(s) digital(is).", "шт. цифровых подписей."], ["⚠️ Herhangi bir değişiklik yapıp kaydettiğinizde bu imzalar", "⚠️ If you make any change and save, these signatures", "⚠️ Wenn Sie etwas ändern und speichern, werden diese Signaturen", "⚠️ Si realiza cualquier cambio y guarda, estas firmas", "⚠️ Si vous modifiez et enregistrez le document, ces signatures", "⚠️ Se apporti modifiche e salvi, queste firme", "⚠️ Se você fizer qualquer alteração e salvar, estas assinaturas", "⚠️ Если вы внесёте изменения и сохраните файл, эти подписи"], ["otomatik olarak kaldırılacaktır", "will be removed automatically", "automatisch entfernt", "se eliminarán automáticamente", "seront supprimées automatiquement", "verranno rimosse automaticamente", "serão removidas automaticamente", "будут удалены автоматически"], [". Yeni dosyada Adobe gibi programların gösterdiği mavi sertifika rozeti ya da \"imza geçersiz\" uyarısı", ". The blue certificate badge or the \"invalid signature\" warning that programs like Adobe show", ". Das blaue Zertifikat-Symbol oder die Warnung „Signatur ungültig“, die Programme wie Adobe anzeigen,", ". La insignia azul de certificado o el aviso de «firma no válida» que muestran programas como Adobe", ". Le badge bleu de certificat ou l’avertissement « signature invalide » affiché par des programmes comme Adobe", ". Il badge blu del certificato o l’avviso «firma non valida» mostrato da programmi come Adobe", ". O selo azul de certificado ou o aviso de «assinatura inválida» exibido por programas como o Adobe", ". Синий значок сертификата или предупреждение «подпись недействительна», которое показывают программы вроде Adobe,"], ["yer almayacaktır", "will not appear in the new file", "erscheinen in der neuen Datei nicht", "no aparecerá en el archivo nuevo", "n’apparaîtra pas dans le nouveau fichier", "non comparirà nel nuovo file", "não aparecerá no novo arquivo", "не появятся в новом файле"], ["İptal", "Cancel", "Abbrechen", "Cancelar", "Annuler", "Annulla", "Cancelar", "Отмена"], ["Anladım, Devam Et", "Got it, continue", "Verstanden, weiter", "Entendido, continuar", "Compris, continuer", "Ho capito, continua", "Entendi, continuar", "Понятно, продолжить"], ["Şifre Ekle", "Add Password", "Passwort hinzufügen", "Añadir contraseña", "Ajouter un mot de passe", "Aggiungi password", "Adicionar senha", "Добавить пароль"], ["Şifre Kaldır", "Remove Password", "Passwort entfernen", "Quitar contraseña", "Supprimer le mot de passe", "Rimuovi password", "Remover senha", "Удалить пароль"], ["Açma Şifresi (Zorunlu)", "Open password (required)", "Öffnungspasswort (erforderlich)", "Contraseña de apertura (obligatoria)", "Mot de passe d’ouverture (obligatoire)", "Password di apertura (obbligatoria)", "Senha de abertura (obrigatória)", "Пароль для открытия (обязательно)"], ["Düzenleme Şifresi (Opsiyonel)", "Edit password (optional)", "Bearbeitungspasswort (optional)", "Contraseña de edición (opcional)", "Mot de passe de modification (facultatif)", "Password di modifica (facoltativa)", "Senha de edição (opcional)", "Пароль для редактирования (необязательно)"], ["İzinler", "Permissions", "Berechtigungen", "Permisos", "Autorisations", "Autorizzazioni", "Permissões", "Разрешения"], ["Yazdırmaya izin ver", "Allow printing", "Drucken erlauben", "Permitir imprimir", "Autoriser l’impression", "Consenti la stampa", "Permitir impressão", "Разрешить печать"], ["Kopyalamaya izin ver", "Allow copying", "Kopieren erlauben", "Permitir copiar", "Autoriser la copie", "Consenti la copia", "Permitir cópia", "Разрешить копирование"], ["🔒 Şifrele ve Kaydet", "🔒 Encrypt and Save", "🔒 Verschlüsseln und speichern", "🔒 Cifrar y guardar", "🔒 Chiffrer et enregistrer", "🔒 Cifra e salva", "🔒 Criptografar e salvar", "🔒 Зашифровать и сохранить"], ["Şifreli bir PDF'in şifresini kaldırmak için mevcut şifreyi girin.", "Enter the current password to remove the password from an encrypted PDF.", "Geben Sie das aktuelle Passwort ein, um den Schutz eines verschlüsselten PDFs zu entfernen.", "Introduzca la contraseña actual para quitar la protección de un PDF cifrado.", "Saisissez le mot de passe actuel pour retirer la protection d’un PDF chiffré.", "Inserisci la password attuale per rimuovere la protezione da un PDF cifrato.", "Digite a senha atual para remover a proteção de um PDF criptografado.", "Введите текущий пароль, чтобы снять защиту с зашифрованного PDF."], ["Mevcut Şifre", "Current password", "Aktuelles Passwort", "Contraseña actual", "Mot de passe actuel", "Password attuale", "Senha atual", "Текущий пароль"], ["🔓 Şifreyi Kaldır", "🔓 Remove Password", "🔓 Passwort entfernen", "🔓 Quitar contraseña", "🔓 Supprimer le mot de passe", "🔓 Rimuovi password", "🔓 Remover senha", "🔓 Удалить пароль"], ["💧 Filigran", "💧 Watermark", "💧 Wasserzeichen", "💧 Marca de agua", "💧 Filigrane", "💧 Filigrana", "💧 Marca d’água", "💧 Водяной знак"], ["Ekle", "Add", "Hinzufügen", "Añadir", "Ajouter", "Aggiungi", "Adicionar", "Добавить"], ["Kaldır", "Remove", "Entfernen", "Quitar", "Supprimer", "Rimuovi", "Remover", "Удалить"], ["Filigran metni", "Watermark text", "Wasserzeichentext", "Texto de la marca de agua", "Texte du filigrane", "Testo della filigrana", "Texto da marca d’água", "Текст водяного знака"], ["Opaklık (0.05 – 0.5)", "Opacity (0.05 – 0.5)", "Deckkraft (0,05 – 0,5)", "Opacidad (0,05 – 0,5)", "Opacité (0,05 – 0,5)", "Opacità (0,05 – 0,5)", "Opacidade (0,05 – 0,5)", "Прозрачность (0,05 – 0,5)"], ["Font boyutu (pt)", "Font size (pt)", "Schriftgröße (pt)", "Tamaño de fuente (pt)", "Taille de police (pt)", "Dimensione font (pt)", "Tamanho da fonte (pt)", "Размер шрифта (пт)"], ["Tüm Sayfalara Ekle", "Add to All Pages", "Auf allen Seiten hinzufügen", "Añadir a todas las páginas", "Ajouter à toutes les pages", "Aggiungi a tutte le pagine", "Adicionar a todas as páginas", "Добавить на все страницы"], ["Kaldırılacak filigran metni", "Watermark text to remove", "Zu entfernender Wasserzeichentext", "Texto de marca de agua a quitar", "Texte du filigrane à supprimer", "Testo della filigrana da rimuovere", "Texto da marca d’água a remover", "Текст водяного знака для удаления"], ["Tüm sayfalarda bu metni arar ve üzerini beyazla örter.", "Searches all pages for this text and covers it with white.", "Sucht diesen Text auf allen Seiten und überdeckt ihn weiß.", "Busca este texto en todas las páginas y lo cubre con blanco.", "Recherche ce texte sur toutes les pages et le recouvre de blanc.", "Cerca questo testo in tutte le pagine e lo copre di bianco.", "Procura este texto em todas as páginas e o cobre de branco.", "Ищет этот текст на всех страницах и закрашивает его белым."], ["Filigranı Kaldır", "Remove Watermark", "Wasserzeichen entfernen", "Quitar marca de agua", "Supprimer le filigrane", "Rimuovi filigrana", "Remover marca d’água", "Удалить водяной знак"], ["🖼 Görseli Sayfaya Ekle", "🖼 Add Image to Page", "🖼 Bild zur Seite hinzufügen", "🖼 Añadir imagen a la página", "🖼 Ajouter une image à la page", "🖼 Aggiungi immagine alla pagina", "🖼 Adicionar imagem à página", "🖼 Добавить изображение на страницу"], ["Görseli seçin — ardından sayfada istediğiniz alana sürükleyip bırakın.", "Choose an image, then drag it onto the area you want on the page.", "Wählen Sie ein Bild und ziehen Sie es auf den gewünschten Bereich der Seite.", "Elija una imagen y arrástrela al área que desee de la página.", "Choisissez une image, puis faites-la glisser vers la zone voulue de la page.", "Scegli un’immagine, poi trascinala nell’area desiderata della pagina.", "Escolha uma imagem e arraste-a para a área desejada da página.", "Выберите изображение и перетащите его в нужную область страницы."], ["Görsel dosyası (PNG / JPG / BMP)", "Image file (PNG / JPG / BMP)", "Bilddatei (PNG / JPG / BMP)", "Archivo de imagen (PNG / JPG / BMP)", "Fichier image (PNG / JPG / BMP)", "File immagine (PNG / JPG / BMP)", "Arquivo de imagem (PNG / JPG / BMP)", "Файл изображения (PNG / JPG / BMP)"], ["Sayfaya Yerleştir", "Place on Page", "Auf Seite platzieren", "Colocar en la página", "Placer sur la page", "Posiziona sulla pagina", "Colocar na página", "Поместить на страницу"], ["+ Boş Sayfa Ekle", "+ Add Blank Page", "+ Leere Seite hinzufügen", "+ Añadir página en blanco", "+ Ajouter une page vierge", "+ Aggiungi pagina vuota", "+ Adicionar página em branco", "+ Добавить пустую страницу"], ["Ekleme konumu (kaçıncı sayfadan sonra)", "Insert position (after which page)", "Einfügeposition (nach welcher Seite)", "Posición de inserción (después de qué página)", "Position d’insertion (après quelle page)", "Posizione di inserimento (dopo quale pagina)", "Posição de inserção (após qual página)", "Позиция вставки (после какой страницы)"], ["0 = başa ekle ·", "0 = at the start ·", "0 = am Anfang ·", "0 = al principio ·", "0 = au début ·", "0 = all’inizio ·", "0 = no início ·", "0 = в начало ·"], ["= sona ekle", "= at the end", "= am Ende", "= al final", "= à la fin", "= alla fine", "= no fim", "= в конец"], ["✍️ İmza Oluştur", "✍️ Create Signature", "✍️ Signatur erstellen", "✍️ Crear firma", "✍️ Créer une signature", "✍️ Crea firma", "✍️ Criar assinatura", "✍️ Создать подпись"], ["Yaz", "Type", "Tippen", "Escribir", "Saisir", "Digita", "Digitar", "Ввод"], ["Çiz", "Draw", "Zeichnen", "Dibujar", "Dessiner", "Disegna", "Desenhar", "Рисовать"], ["Resim", "Image", "Bild", "Imagen", "Image", "Immagine", "Imagem", "Рисунок"], ["Temizle", "Clear", "Löschen", "Borrar", "Effacer", "Cancella", "Limpar", "Очистить"], ["Fare ile yukarıdaki alana imzanızı çizin.", "Draw your signature in the area above with the mouse.", "Zeichnen Sie Ihre Signatur mit der Maus in den Bereich oben.", "Dibuje su firma en el área de arriba con el ratón.", "Dessinez votre signature dans la zone ci-dessus avec la souris.", "Disegna la tua firma nell’area sopra con il mouse.", "Desenhe sua assinatura na área acima com o mouse.", "Нарисуйте подпись мышью в области выше."], ["İmza görseli (PNG / JPG / GIF)", "Signature image (PNG / JPG / GIF)", "Signaturbild (PNG / JPG / GIF)", "Imagen de firma (PNG / JPG / GIF)", "Image de signature (PNG / JPG / GIF)", "Immagine della firma (PNG / JPG / GIF)", "Imagem da assinatura (PNG / JPG / GIF)", "Изображение подписи (PNG / JPG / GIF)"], ["Oluştur & Yerleştir", "Create & Place", "Erstellen & platzieren", "Crear y colocar", "Créer et placer", "Crea e posiziona", "Criar e colocar", "Создать и поместить"], ["Yazdır", "Print", "Drucken", "Imprimir", "Imprimer", "Stampa", "Imprimir", "Печать"], ["Tüm sayfaların metnini panoya kopyala", "Copy the text of all pages to the clipboard", "Text aller Seiten in die Zwischenablage kopieren", "Copiar el texto de todas las páginas al portapapeles", "Copier le texte de toutes les pages dans le presse-papiers", "Copia il testo di tutte le pagine negli appunti", "Copiar o texto de todas as páginas para a área de transferência", "Скопировать текст всех страниц в буфер обмена"], ["Aktif font — temizlemek için × tıkla", "Active font — click × to clear", "Aktive Schrift — zum Löschen × klicken", "Fuente activa — haga clic en × para borrar", "Police active — cliquez sur × pour l’effacer", "Font attivo — clicca × per cancellare", "Fonte ativa — clique em × para limpar", "Активный шрифт — нажмите × для сброса"], ["Vurgula", "Highlight", "Hervorheben", "Resaltar", "Surligner", "Evidenzia", "Destacar", "Выделить"], ["Sarı", "Yellow", "Gelb", "Amarillo", "Jaune", "Giallo", "Amarelo", "Жёлтый"], ["Yeşil", "Green", "Grün", "Verde", "Vert", "Verde", "Verde", "Зелёный"], ["Mavi", "Blue", "Blau", "Azul", "Bleu", "Blu", "Azul", "Синий"], ["Damga", "Stamp", "Stempel", "Sello", "Tampon", "Timbro", "Carimbo", "Штамп"], ["Filigran ekle / kaldır", "Add / remove watermark", "Wasserzeichen hinzufügen / entfernen", "Añadir / quitar marca de agua", "Ajouter / supprimer un filigrane", "Aggiungi / rimuovi filigrana", "Adicionar / remover marca d’água", "Добавить / удалить водяной знак"], ["Sayfaya görsel ekle", "Add image to page", "Bild zur Seite hinzufügen", "Añadir imagen a la página", "Ajouter une image à la page", "Aggiungi immagine alla pagina", "Adicionar imagem à página", "Добавить изображение на страницу"], ["Sayfa sırasını ters çevir", "Reverse page order", "Seitenreihenfolge umkehren", "Invertir el orden de las páginas", "Inverser l’ordre des pages", "Inverti l’ordine delle pagine", "Inverter a ordem das páginas", "Изменить порядок страниц на обратный"], ["Boş sayfa ekle", "Add blank page", "Leere Seite hinzufügen", "Añadir página en blanco", "Ajouter une page vierge", "Aggiungi pagina vuota", "Adicionar página em branco", "Добавить пустую страницу"], ["Şifre ekle / kaldır", "Add / remove password", "Passwort hinzufügen / entfernen", "Añadir / quitar contraseña", "Ajouter / supprimer le mot de passe", "Aggiungi / rimuovi password", "Adicionar / remover senha", "Добавить / удалить пароль"], ["PDF'i sıkıştır", "Compress PDF", "PDF komprimieren", "Comprimir PDF", "Compresser le PDF", "Comprimi PDF", "Comprimir PDF", "Сжать PDF"], ["İmza ekle", "Add signature", "Signatur hinzufügen", "Añadir firma", "Ajouter une signature", "Aggiungi firma", "Adicionar assinatura", "Добавить подпись"], ["Kalın (B)", "Bold (B)", "Fett (B)", "Negrita (B)", "Gras (B)", "Grassetto (B)", "Negrito (B)", "Жирный (B)"], ["İtalik (I)", "Italic (I)", "Kursiv (I)", "Cursiva (I)", "Italique (I)", "Corsivo (I)", "Itálico (I)", "Курсив (I)"], ["Alt çizgi (U)", "Underline (U)", "Unterstrichen (U)", "Subrayado (U)", "Souligné (U)", "Sottolineato (U)", "Sublinhado (U)", "Подчёркнутый (U)"], ["Metin rengi", "Text color", "Textfarbe", "Color del texto", "Couleur du texte", "Colore del testo", "Cor do texto", "Цвет текста"], ["Sayfa", "Page", "Seite", "Página", "Page", "Pagina", "Página", "Страница"], ["PDF'i açmak için şifre", "Password to open the PDF", "Passwort zum Öffnen des PDFs", "Contraseña para abrir el PDF", "Mot de passe pour ouvrir le PDF", "Password per aprire il PDF", "Senha para abrir o PDF", "Пароль для открытия PDF"], ["Düzenleme/yazdırma kısıtlaması için", "For edit/print restrictions", "Für Bearbeitungs-/Druckbeschränkung", "Para restringir edición/impresión", "Pour restreindre modification/impression", "Per limitare modifica/stampa", "Para restringir edição/impressão", "Для ограничения правки/печати"], ["Mevcut açma şifresi", "Current open password", "Aktuelles Öffnungspasswort", "Contraseña de apertura actual", "Mot de passe d’ouverture actuel", "Password di apertura attuale", "Senha de abertura atual", "Текущий пароль для открытия"], ["örn: GİZLİ", "e.g. CONFIDENTIAL", "z. B. VERTRAULICH", "p. ej.: CONFIDENCIAL", "ex. : CONFIDENTIEL", "es.: RISERVATO", "ex.: CONFIDENCIAL", "напр.: КОНФИДЕНЦИАЛЬНО"], ["Önizleme", "Preview", "Vorschau", "Vista previa", "Aperçu", "Anteprima", "Pré-visualização", "Предпросмотр"], ["Adınızı yazın…", "Type your name…", "Namen eingeben…", "Escriba su nombre…", "Saisissez votre nom…", "Scrivi il tuo nome…", "Digite seu nome…", "Введите ваше имя…"], ["İmza önizleme", "Signature preview", "Signaturvorschau", "Vista previa de la firma", "Aperçu de la signature", "Anteprima della firma", "Pré-visualização da assinatura", "Предпросмотр подписи"], ["Metni düzenle", "Edit text", "Text bearbeiten", "Editar texto", "Modifier le texte", "Modifica testo", "Editar texto", "Редактировать текст"], ["Yukarı taşı", "Move up", "Nach oben", "Mover arriba", "Monter", "Sposta su", "Mover para cima", "Вверх"], ["Aşağı taşı", "Move down", "Nach unten", "Mover abajo", "Descendre", "Sposta giù", "Mover para baixo", "Вниз"], ["Sağa döndür", "Rotate right", "Nach rechts drehen", "Girar a la derecha", "Pivoter à droite", "Ruota a destra", "Girar à direita", "Повернуть вправо"], ["Sayfayı sil", "Delete page", "Seite löschen", "Eliminar página", "Supprimer la page", "Elimina pagina", "Excluir página", "Удалить страницу"], ["Kapat", "Close", "Schließen", "Cerrar", "Fermer", "Chiudi", "Fechar", "Закрыть"], ["Metni buraya yazın…", "Type your text here…", "Text hier eingeben…", "Escriba su texto aquí…", "Saisissez votre texte ici…", "Scrivi qui il testo…", "Digite seu texto aqui…", "Введите текст здесь…"], ["Taşımak için sürükle", "Drag to move", "Zum Verschieben ziehen", "Arrastre para mover", "Faites glisser pour déplacer", "Trascina per spostare", "Arraste para mover", "Перетащите, чтобы переместить"], ["Ekle (Enter)", "Add (Enter)", "Hinzufügen (Enter)", "Añadir (Intro)", "Ajouter (Entrée)", "Aggiungi (Invio)", "Adicionar (Enter)", "Добавить (Enter)"], ["İptal (Esc)", "Cancel (Esc)", "Abbrechen (Esc)", "Cancelar (Esc)", "Annuler (Échap)", "Annulla (Esc)", "Cancelar (Esc)", "Отмена (Esc)"], ["İmzalar Hakkında", "About signatures", "Über Signaturen", "Acerca de las firmas", "À propos des signatures", "Informazioni sulle firme", "Sobre as assinaturas", "О подписях"], ["etkileşimli form alanı var.", "interactive form field(s).", "interaktive Formularfeld(er).", "campo(s) de formulario interactivo(s).", "champ(s) de formulaire interactif(s).", "campo/i modulo interattivo/i.", "campo(s) de formulário interativo(s).", "шт. интерактивных полей формы."], ["form alanı var.", "form field(s).", "Formularfeld(er).", "campo(s) de formulario.", "champ(s) de formulaire.", "campo/i modulo.", "campo(s) de formulário.", "шт. полей формы."], ["dijital imza tespit edildi — kaydettiğinizde otomatik kaldırılır.", "digital signature(s) detected — they will be removed automatically when you save.", "digitale Signatur(en) erkannt — beim Speichern werden sie automatisch entfernt.", "firma(s) digital(es) detectada(s): se eliminarán automáticamente al guardar.", "signature(s) numérique(s) détectée(s) — supprimée(s) automatiquement à l’enregistrement.", "firma/e digitale/i rilevata/e — verranno rimosse automaticamente al salvataggio.", "assinatura(s) digital(is) detectada(s) — serão removidas automaticamente ao salvar.", "цифровых подписей обнаружено — при сохранении они будут удалены автоматически."], ["Sayfa yüklenemedi", "Could not load page", "Seite konnte nicht geladen werden", "No se pudo cargar la página", "Impossible de charger la page", "Impossibile caricare la pagina", "Não foi possível carregar a página", "Не удалось загрузить страницу"], ["Döndürme başarısız", "Rotation failed", "Drehen fehlgeschlagen", "Error al girar", "Échec de la rotation", "Rotazione non riuscita", "Falha ao girar", "Не удалось повернуть"], ["Aranan metin boş", "Search text is empty", "Suchtext ist leer", "El texto de búsqueda está vacío", "Le texte recherché est vide", "Il testo da cercare è vuoto", "O texto de busca está vazio", "Строка поиска пуста"], ["Metin bulunamadı", "Text not found", "Text nicht gefunden", "Texto no encontrado", "Texte introuvable", "Testo non trovato", "Texto não encontrado", "Текст не найден"], ["Güncellendi", "Updated", "Aktualisiert", "Actualizado", "Mis à jour", "Aggiornato", "Atualizado", "Обновлено"], ["Silme başarısız", "Delete failed", "Löschen fehlgeschlagen", "Error al eliminar", "Échec de la suppression", "Eliminazione non riuscita", "Falha ao excluir", "Не удалось удалить"], ["Geri alınacak işlem yok", "Nothing to undo", "Nichts rückgängig zu machen", "No hay nada que deshacer", "Rien à annuler", "Niente da annullare", "Nada para desfazer", "Нечего отменять"], ["Geri alındı", "Undone", "Rückgängig gemacht", "Deshecho", "Annulé", "Annullato", "Desfeito", "Отменено"], ["Geçersiz sayfa aralığı", "Invalid page range", "Ungültiger Seitenbereich", "Rango de páginas no válido", "Plage de pages invalide", "Intervallo di pagine non valido", "Intervalo de páginas inválido", "Недопустимый диапазон страниц"], ["Kayıt başarısız", "Save failed", "Speichern fehlgeschlagen", "Error al guardar", "Échec de l’enregistrement", "Salvataggio non riuscito", "Falha ao salvar", "Не удалось сохранить"], ["İşlem başarısız", "Operation failed", "Vorgang fehlgeschlagen", "La operación falló", "Échec de l’opération", "Operazione non riuscita", "A operação falhou", "Операция не удалась"], ["Taşıma başarısız", "Move failed", "Verschieben fehlgeschlagen", "Error al mover", "Échec du déplacement", "Spostamento non riuscito", "Falha ao mover", "Не удалось переместить"], ["Metin taşındı", "Text moved", "Text verschoben", "Texto movido", "Texte déplacé", "Testo spostato", "Texto movido", "Текст перемещён"], ["Filigran metni boş", "Watermark text is empty", "Wasserzeichentext ist leer", "El texto de la marca de agua está vacío", "Le texte du filigrane est vide", "Il testo della filigrana è vuoto", "O texto da marca d’água está vazio", "Текст водяного знака пуст"], ["Filigran bulunamadı", "Watermark not found", "Wasserzeichen nicht gefunden", "Marca de agua no encontrada", "Filigrane introuvable", "Filigrana non trovata", "Marca d’água não encontrada", "Водяной знак не найден"], ["Filigran hatası", "Watermark error", "Wasserzeichenfehler", "Error de marca de agua", "Erreur de filigrane", "Errore filigrana", "Erro de marca d’água", "Ошибка водяного знака"], ["En az bir şifre girilmeli", "Enter at least one password", "Mindestens ein Passwort eingeben", "Introduzca al menos una contraseña", "Saisissez au moins un mot de passe", "Inserisci almeno una password", "Digite pelo menos uma senha", "Введите хотя бы один пароль"], ["Şifreleme başarısız", "Encryption failed", "Verschlüsselung fehlgeschlagen", "Error al cifrar", "Échec du chiffrement", "Cifratura non riuscita", "Falha na criptografia", "Не удалось зашифровать"], ["Şifre kaldırılamadı", "Could not remove password", "Passwort konnte nicht entfernt werden", "No se pudo quitar la contraseña", "Impossible de supprimer le mot de passe", "Impossibile rimuovere la password", "Não foi possível remover a senha", "Не удалось удалить пароль"], ["Boş sayfa eklendi", "Blank page added", "Leere Seite hinzugefügt", "Página en blanco añadida", "Page vierge ajoutée", "Pagina vuota aggiunta", "Página em branco adicionada", "Пустая страница добавлена"], ["Tüm sayfa sırası ters çevrilsin mi?", "Reverse the order of all pages?", "Reihenfolge aller Seiten umkehren?", "¿Invertir el orden de todas las páginas?", "Inverser l’ordre de toutes les pages ?", "Invertire l’ordine di tutte le pagine?", "Inverter a ordem de todas as páginas?", "Изменить порядок всех страниц на обратный?"], ["Ters çevirme başarısız", "Reversal failed", "Umkehren fehlgeschlagen", "Error al invertir", "Échec de l’inversion", "Inversione non riuscita", "Falha ao inverter", "Не удалось изменить порядок"], ["Sayfa sırası ters çevrildi", "Page order reversed", "Seitenreihenfolge umgekehrt", "Orden de páginas invertido", "Ordre des pages inversé", "Ordine delle pagine invertito", "Ordem das páginas invertida", "Порядок страниц изменён"], ["Sıkıştırma başarısız", "Compression failed", "Komprimierung fehlgeschlagen", "Error al comprimir", "Échec de la compression", "Compressione non riuscita", "Falha na compressão", "Не удалось сжать"], ["Görseli yerleştirmek için sayfada alan seçin", "Select an area on the page to place the image", "Wählen Sie einen Bereich auf der Seite für das Bild", "Seleccione un área de la página para colocar la imagen", "Sélectionnez une zone de la page pour placer l’image", "Seleziona un’area della pagina per posizionare l’immagine", "Selecione uma área da página para colocar a imagem", "Выберите область на странице для изображения"], ["Lütfen imza metni girin", "Please enter signature text", "Bitte Signaturtext eingeben", "Introduzca el texto de la firma", "Veuillez saisir le texte de la signature", "Inserisci il testo della firma", "Digite o texto da assinatura", "Введите текст подписи"], ["Lütfen bir görsel seçin", "Please choose an image", "Bitte wählen Sie ein Bild", "Elija una imagen", "Veuillez choisir une image", "Scegli un’immagine", "Escolha uma imagem", "Выберите изображение"], ["İmzayı yerleştirmek için sayfada alan seçin", "Select an area on the page to place the signature", "Wählen Sie einen Bereich auf der Seite für die Signatur", "Seleccione un área de la página para colocar la firma", "Sélectionnez une zone de la page pour placer la signature", "Seleziona un’area della pagina per posizionare la firma", "Selecione uma área da página para colocar a assinatura", "Выберите область на странице для подписи"], ["Belge yazdırmaya gönderildi", "Document sent to printer", "Dokument an den Drucker gesendet", "Documento enviado a la impresora", "Document envoyé à l’imprimante", "Documento inviato alla stampante", "Documento enviado para a impressora", "Документ отправлен на печать"], ["Belgede kopyalanacak metin bulunamadı", "No text to copy in the document", "Kein kopierbarer Text im Dokument", "No hay texto para copiar en el documento", "Aucun texte à copier dans le document", "Nessun testo da copiare nel documento", "Nenhum texto para copiar no documento", "В документе нет текста для копирования"], ["Pano erişimi engellendi — lütfen HTTPS üzerinden açın", "Clipboard access blocked — please open over HTTPS", "Zugriff auf die Zwischenablage blockiert — bitte über HTTPS öffnen", "Acceso al portapapeles bloqueado: abra la página con HTTPS", "Accès au presse-papiers bloqué — ouvrez la page en HTTPS", "Accesso agli appunti bloccato — apri tramite HTTPS", "Acesso à área de transferência bloqueado — abra via HTTPS", "Доступ к буферу обмена заблокирован — откройте через HTTPS"], ["Demo başlatılıyor...", "Starting demo...", "Demo wird gestartet...", "Iniciando demo...", "Démarrage de la démo...", "Avvio della demo...", "Iniciando demonstração...", "Запуск демо..."], ["Demo PDF yüklenemedi", "Could not load demo PDF", "Demo-PDF konnte nicht geladen werden", "No se pudo cargar el PDF de demostración", "Impossible de charger le PDF de démo", "Impossibile caricare il PDF demo", "Não foi possível carregar o PDF de demonstração", "Не удалось загрузить демо-PDF"], ["Bağlantı hatası", "Connection error", "Verbindungsfehler", "Error de conexión", "Erreur de connexion", "Errore di connessione", "Erro de conexão", "Ошибка соединения"], ["Sunucu hatası", "Server error", "Serverfehler", "Error del servidor", "Erreur du serveur", "Errore del server", "Erro do servidor", "Ошибка сервера"], ["Vurgulama eklendi", "Highlight added", "Hervorhebung hinzugefügt", "Resaltado añadido", "Surlignage ajouté", "Evidenziazione aggiunta", "Destaque adicionado", "Выделение добавлено"], ["Dikdörtgen eklendi", "Rectangle added", "Rechteck hinzugefügt", "Rectángulo añadido", "Rectangle ajouté", "Rettangolo aggiunto", "Retângulo adicionado", "Прямоугольник добавлен"], ["Daire eklendi", "Circle added", "Kreis hinzugefügt", "Círculo añadido", "Cercle ajouté", "Cerchio aggiunto", "Círculo adicionado", "Круг добавлен"], ["Görsel eklendi", "Image added", "Bild hinzugefügt", "Imagen añadida", "Image ajoutée", "Immagine aggiunta", "Imagem adicionada", "Изображение добавлено"], ["Vurgulama modu — sayfada alan seç", "Highlight mode — select an area on the page", "Hervorhebungsmodus — Bereich auf der Seite wählen", "Modo resaltado: seleccione un área de la página", "Mode surlignage — sélectionnez une zone de la page", "Modalità evidenziazione — seleziona un’area della pagina", "Modo destaque — selecione uma área da página", "Режим выделения — выберите область на странице"], ["Onay", "Approved", "Genehmigt", "Aprobado", "Approuvé", "Approvato", "Aprovado", "Одобрено"], ["Dikdörtgen", "Rectangle", "Rechteck", "Rectángulo", "Rectangle", "Rettangolo", "Retângulo", "Прямоугольник"], ["Daire", "Circle", "Kreis", "Círculo", "Cercle", "Cerchio", "Círculo", "Круг"], ["Tarih", "Date", "Datum", "Fecha", "Date", "Data", "Data", "Дата"], ["Açık dosya yok", "No file is open", "Keine Datei geöffnet", "No hay ningún archivo abierto", "Aucun fichier ouvert", "Nessun file aperto", "Nenhum arquivo aberto", "Нет открытого файла"], ["Dosya açık değil", "File is not open", "Datei ist nicht geöffnet", "El archivo no está abierto", "Le fichier n’est pas ouvert", "Il file non è aperto", "O arquivo não está aberto", "Файл не открыт"], ["Dosya yok", "No file", "Keine Datei", "Sin archivo", "Aucun fichier", "Nessun file", "Sem arquivo", "Нет файла"], ["Dosya bulunamadı", "File not found", "Datei nicht gefunden", "Archivo no encontrado", "Fichier introuvable", "File non trovato", "Arquivo não encontrado", "Файл не найден"], ["Geçersiz sayfa", "Invalid page", "Ungültige Seite", "Página no válida", "Page invalide", "Pagina non valida", "Página inválida", "Недопустимая страница"], ["Aranacak metin boş", "Search text is empty", "Suchtext ist leer", "El texto de búsqueda está vacío", "Le texte recherché est vide", "Il testo da cercare è vuoto", "O texto de busca está vazio", "Строка поиска пуста"], ["Metin boş", "Text is empty", "Text ist leer", "El texto está vacío", "Le texte est vide", "Il testo è vuoto", "O texto está vazio", "Текст пуст"], ["Silinecek metin boş", "Text to delete is empty", "Zu löschender Text ist leer", "El texto a eliminar está vacío", "Le texte à supprimer est vide", "Il testo da eliminare è vuoto", "O texto a excluir está vazio", "Текст для удаления пуст"], ["Yanlış şifre", "Wrong password", "Falsches Passwort", "Contraseña incorrecta", "Mot de passe incorrect", "Password errata", "Senha incorreta", "Неверный пароль"], ["Şifre yanlış.", "Wrong password.", "Falsches Passwort.", "Contraseña incorrecta.", "Mot de passe incorrect.", "Password errata.", "Senha incorreta.", "Неверный пароль."], ["Yazdırma yalnızca Windows'ta desteklenir", "Printing is only supported on Windows", "Drucken wird nur unter Windows unterstützt", "La impresión solo se admite en Windows", "L’impression n’est prise en charge que sous Windows", "La stampa è supportata solo su Windows", "A impressão só é compatível com o Windows", "Печать поддерживается только в Windows"]];
+const TXP = [["^(.+) açıldı \\((\\d+) sayfa\\)$", ["{1} opened ({2} pages)", "{1} geöffnet ({2} Seiten)", "{1} abierto ({2} páginas)", "{1} ouvert ({2} pages)", "{1} aperto ({2} pagine)", "{1} aberto ({2} páginas)", "{1} открыт ({2} стр.)"]], ["^(\\d+) sayfa$", ["{1} pages", "{1} Seiten", "{1} páginas", "{1} pages", "{1} pagine", "{1} páginas", "{1} стр."]], ["^Sayfa (\\d+) silinsin mi\\?$", ["Delete page {1}?", "Seite {1} löschen?", "¿Eliminar la página {1}?", "Supprimer la page {1} ?", "Eliminare la pagina {1}?", "Excluir a página {1}?", "Удалить страницу {1}?"]], ["^Sayfa (\\d+)$", ["Page {1}", "Seite {1}", "Página {1}", "Page {1}", "Pagina {1}", "Página {1}", "Страница {1}"]], ["^(\\d+) yerde değiştirildi$", ["Replaced in {1} places", "An {1} Stellen ersetzt", "Reemplazado en {1} lugares", "Remplacé à {1} endroits", "Sostituito in {1} punti", "Substituído em {1} locais", "Заменено: {1}"]], ["^Birleştirildi — toplam (\\d+) sayfa$", ["Merged — {1} pages in total", "Zusammengeführt — insgesamt {1} Seiten", "Combinado: {1} páginas en total", "Fusionné — {1} pages au total", "Unito — {1} pagine in totale", "Mesclado — {1} páginas no total", "Объединено — всего страниц: {1}"]], ["^Dönüştürüldü: (.+) \\((\\d+) sayfa\\)$", ["Converted: {1} ({2} pages)", "Konvertiert: {1} ({2} Seiten)", "Convertido: {1} ({2} páginas)", "Converti : {1} ({2} pages)", "Convertito: {1} ({2} pagine)", "Convertido: {1} ({2} páginas)", "Преобразовано: {1} ({2} стр.)"]], ["^Filigran kaldırıldı — (\\d+) alanda temizlendi$", ["Watermark removed — cleared in {1} areas", "Wasserzeichen entfernt — in {1} Bereichen gelöscht", "Marca de agua quitada: limpiada en {1} áreas", "Filigrane supprimé — effacé dans {1} zones", "Filigrana rimossa — eliminata in {1} aree", "Marca d’água removida — limpa em {1} áreas", "Водяной знак удалён — очищено областей: {1}"]], ["^Şifrelendi: (.+)$", ["Encrypted: {1}", "Verschlüsselt: {1}", "Cifrado: {1}", "Chiffré : {1}", "Cifrato: {1}", "Criptografado: {1}", "Зашифровано: {1}"]], ["^Şifre kaldırıldı: (.+)$", ["Password removed: {1}", "Passwort entfernt: {1}", "Contraseña quitada: {1}", "Mot de passe supprimé : {1}", "Password rimossa: {1}", "Senha removida: {1}", "Пароль удалён: {1}"]], ["^Sıkıştırıldı: (.+) \\((.+) KB\\)$", ["Compressed: {1} ({2} KB)", "Komprimiert: {1} ({2} KB)", "Comprimido: {1} ({2} KB)", "Compressé : {1} ({2} Ko)", "Compresso: {1} ({2} KB)", "Comprimido: {1} ({2} KB)", "Сжато: {1} ({2} КБ)"]], ["^Tüm metin panoya kopyalandı \\((\\d+) karakter\\)$", ["All text copied to clipboard ({1} characters)", "Gesamter Text kopiert ({1} Zeichen)", "Todo el texto copiado ({1} caracteres)", "Tout le texte copié ({1} caractères)", "Tutto il testo copiato ({1} caratteri)", "Todo o texto copiado ({1} caracteres)", "Весь текст скопирован ({1} симв.)"]], ["^Yazdırma başlatılamadı: (.+)$", ["Could not start printing: {1}", "Drucken konnte nicht gestartet werden: {1}", "No se pudo iniciar la impresión: {1}", "Impossible de lancer l’impression : {1}", "Impossibile avviare la stampa: {1}", "Não foi possível iniciar a impressão: {1}", "Не удалось начать печать: {1}"]], ["^(.+) damgası — sayfada tıkla$", ["{1} stamp — click on the page", "Stempel „{1}“ — auf die Seite klicken", "Sello «{1}»: haga clic en la página", "Tampon « {1} » — cliquez sur la page", "Timbro «{1}» — clicca sulla pagina", "Carimbo «{1}» — clique na página", "Штамп «{1}» — щёлкните на странице"]], ["^(Dikdörtgen|Daire) — sayfada alan seç$", ["{1} — select an area on the page", "{1} — Bereich auf der Seite wählen", "{1}: seleccione un área de la página", "{1} — sélectionnez une zone de la page", "{1} — seleziona un’area della pagina", "{1} — selecione uma área da página", "{1} — выберите область на странице"]], ["^(Dikdörtgen|Daire) modu — sayfada alan seç$", ["{1} mode — select an area on the page", "{1}-Modus — Bereich auf der Seite wählen", "Modo {1}: seleccione un área de la página", "Mode {1} — sélectionnez une zone de la page", "Modalità {1} — seleziona un’area della pagina", "Modo {1} — selecione uma área da página", "Режим «{1}» — выберите область на странице"]], ["^· (\\d+) dijital imza kaldırıldı$", ["· {1} digital signature(s) removed", "· {1} digitale Signatur(en) entfernt", "· {1} firma(s) digital(es) eliminada(s)", "· {1} signature(s) numérique(s) supprimée(s)", "· {1} firma/e digitale/i rimossa/e", "· {1} assinatura(s) digital(is) removida(s)", "· удалено цифровых подписей: {1}"]], ["^Dosya bulunamadı: (.+)$", ["File not found: {1}", "Datei nicht gefunden: {1}", "Archivo no encontrado: {1}", "Fichier introuvable : {1}", "File non trovato: {1}", "Arquivo não encontrado: {1}", "Файл не найден: {1}"]], ["^Dönüştürme hatası: (.+)$", ["Conversion error: {1}", "Konvertierungsfehler: {1}", "Error de conversión: {1}", "Erreur de conversion : {1}", "Errore di conversione: {1}", "Erro de conversão: {1}", "Ошибка преобразования: {1}"]], ["^\"(.+)\" metni sayfalarda bulunamadı$", ["\"{1}\" was not found on any page", "„{1}“ wurde auf keiner Seite gefunden", "«{1}» no se encontró en ninguna página", "« {1} » est introuvable dans les pages", "«{1}» non trovato in nessuna pagina", "«{1}» não foi encontrado em nenhuma página", "«{1}» не найдено ни на одной странице"]]];
+const TX = {};
+TXR.forEach(r => { TX[r[0]] = r.slice(1); });
+const TXPR = TXP.map(p => [new RegExp(p[0]), p[1]]);
+
+function trx(s) {
+  const i = _TXL.indexOf(currentLang);
+  if (i < 0 || typeof s !== 'string') return s;
+  if (TX[s]) return TX[s][i];
+  for (const [re, tpl] of TXPR) {
+    const m = s.match(re);
+    if (m) return tpl[i].replace(/\{(\d)\}/g, (_, n) => { const g = m[+n]; return TX[g] ? TX[g][i] : g; });
+  }
+  return s;
+}
+function _trxStr(s) {
+  const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/);
+  const core = m[2].replace(/\s+/g, ' ');
+  if (!core) return s;
+  const r = trx(core);
+  return r === core ? s : m[1] + r + m[3];
+}
+function _trxSkipText(el) {
+  // PDF içeriği, düzenleme alanları ve data-i18n ile yönetilen öğeler çevrilmez
+  return !el || !!el.closest('[data-i18n],#text-overlay,[contenteditable],textarea,script,style');
+}
+const _trxText = new WeakMap();
+function _trxTextNode(n) {
+  if (_trxSkipText(n.parentElement)) return;
+  const rec = _trxText.get(n);
+  const orig = (rec && rec.tr === n.nodeValue) ? rec.orig : n.nodeValue;
+  const out = _trxStr(orig);
+  if (out === orig) { if (rec) _trxText.delete(n); if (n.nodeValue !== orig) n.nodeValue = orig; }
+  else { _trxText.set(n, {orig, tr: out}); if (n.nodeValue !== out) n.nodeValue = out; }
+}
+function _trxAttrs(el) {
+  for (const a of ['title', 'placeholder', 'alt']) {
+    if (!el.hasAttribute(a)) continue;
+    if (a === 'placeholder' && el.hasAttribute('data-i18n-ph')) continue;
+    const st = el.__trx || (el.__trx = {});
+    const cur = el.getAttribute(a);
+    const orig = (st[a] && st[a].tr === cur) ? st[a].orig : cur;
+    const out = _trxStr(orig);
+    if (out === orig) { delete st[a]; if (cur !== orig) el.setAttribute(a, orig); }
+    else { st[a] = {orig, tr: out}; if (cur !== out) el.setAttribute(a, out); }
+  }
+}
+function trxTree(root) {
+  if (!root) return;
+  if (root.nodeType === 3) { _trxTextNode(root); return; }
+  if (root.nodeType !== 1) return;
+  _trxAttrs(root);
+  root.querySelectorAll('[title],[placeholder],[alt]').forEach(_trxAttrs);
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = []; let n;
+  while ((n = w.nextNode())) nodes.push(n);
+  nodes.forEach(_trxTextNode);
+}
+function trxApplyAll() { trxTree(document.body); }
+(function () {
+  const nativeConfirm = window.confirm.bind(window);
+  window.confirm = m => nativeConfirm(trx(m));
+  const start = () => new MutationObserver(ms => {
+    if (_TXL.indexOf(currentLang) < 0) return;
+    ms.forEach(m => m.addedNodes.forEach(trxTree));
+  }).observe(document.body, {childList: true, subtree: true});
+  if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+})();
+
+// ── export ────────────────────────────────────────────────
+
+function toggleExportMenu(e) {
+  e.stopPropagation();
+  document.getElementById('export-menu').classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  document.getElementById('export-menu').classList.remove('open');
+  document.getElementById('lang-menu')?.classList.remove('open');
+});
+
+async function doExport(format) {
+  document.getElementById('export-menu').classList.remove('open');
+  if (!S.pageCount) { toast(t('noDocErr'), 'err'); return; }
+  spin(true);
+  try {
+    const r = await fetch(`/api/export/${format}`);
+    const ct = r.headers.get('Content-Type') || '';
+    if (ct.includes('json') || !r.ok) {
+      const data = await r.json().catch(() => ({}));
+      spin(false); toast(data.error || t('exportErr'), 'err'); return;
+    }
+    const blob = await r.blob();
+    const cd = r.headers.get('Content-Disposition') || '';
+    const m = cd.match(/filename[^;=\n]*=["']?([^"'\n;]+)/);
+    const filename = m ? m[1] : `export.${format}`;
+    // Kaydedilecek yeri kullanıcıya sor (Farklı Kaydet penceresi)
+    let dest = null;
+    try {
+      spin(false);
+      dest = await (await fetch('/api/export_dest?name=' + encodeURIComponent(filename))).json();
+    } catch { dest = null; }
+    if (dest && dest.path) {
+      spin(true);
+      const w = await (await fetch('/api/export_write', {method: 'POST', body: blob})).json();
+      spin(false);
+      if (w.ok) toast(t('exportDone') + ': ' + dest.path.split(/[\\/]/).pop(), 'ok');
+      else toast(w.error || t('exportErr'), 'err');
+      return;
+    }
+    if (dest && dest.path === '' && !dest.error) return;   // kullanıcı vazgeçti
+    // Yedek: pencere açılamadıysa tarayıcı indirmesi
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    spin(false); toast(t('exportDone') + ': ' + filename, 'ok');
+  } catch {
+    spin(false); toast(t('exportErr'), 'err');
+  }
+}
+
+// ── font helpers ──────────────────────────────────────────
+
+function _defaultSz(block) {
+  return Math.round((block.span_size || block.sys_size || block.size) * 10) / 10;
+}
+
+function fontDisplayName(pdfFont, flags) {
+  let base = (pdfFont || '')
+    .replace(/bolditalic|bold|italic|oblique|regular|medium|narrow|condensed/gi, '')
+    .replace(/-mt|-ps|-roman|\+[^+]*/gi, '')
+    .replace(/[-_ ]+/g, ' ').trim() || 'Font';
+  const styles = [];
+  if ((flags & 16) || /bold/i.test(pdfFont)) styles.push('Kalın');
+  if ((flags & 2)  || /italic|oblique/i.test(pdfFont)) styles.push('İtalik');
+  return base + (styles.length ? ' · ' + styles.join('+') : '');
+}
+
+function updateLearnedFontDisplay() {
+  const badge = document.getElementById('tb-font');
+  const label = document.getElementById('tb-font-label');
+  if (S.learnedFont) {
+    label.textContent = '🔤 ' + S.learnedFont.display;
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function clearLearnedFont() {
+  S.learnedFont = null;
+  updateLearnedFontDisplay();
+  toast('Font temizlendi', 'info');
+}
+
+// ── helpers ──────────────────────────────────────────────
+
+async function post(url, data) {
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+  });
+  try { return await r.json(); } catch { return {ok: false, error: 'Sunucu hatası'}; }
+}
+
+function spin(on) {
+  document.getElementById('spinner').classList.toggle('show', on);
+}
+
+function toast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast-msg ${type}`;
+  el.textContent = msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-backdrop').forEach(el => {
+  if (el.id === 'm-sig-warning') return; // imza uyarısı backdrop ile kapanmaz
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+function setDocButtons(enabled) {
+  [
+    'btn-undo','btn-save','btn-merge','btn-split','btn-fr','btn-addtext','btn-select','btn-export',
+    'btn-shape-dd','btn-hl','btn-stamp','btn-watermark','btn-addimg',
+    'btn-reverse','btn-addblank','btn-compress','btn-signature','btn-encrypt',
+    'btn-print','btn-copy-text'
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = !enabled;
+  });
+}
+
+// ── open ─────────────────────────────────────────────────
+
+function applyOpenResult(r) {
+  S.pageCount = r.pages;
+  S.currentPage = 0;
+  S.ts = Date.now();
+  S.learnedFont = null;
+  updateLearnedFontDisplay();
+  document.getElementById('tb-filename').textContent = r.name;
+  document.getElementById('tb-info').textContent = `${r.pages} sayfa`;
+  document.getElementById('split-end').value = r.pages;
+  setDocButtons(true);
+  buildSidebar();
+  selectPage(0);
+  toast(`${r.name} açıldı (${r.pages} sayfa)`, 'ok');
+
+  clearBanners();
+  if (r.demo_truncated) {
+    addBanner('info', '🎯', t('demoTruncated') || 'Demo: yalnızca ilk 3 sayfa açıldı.', null, null);
+  }
+  if (r.form_fields > 0) {
+    addBanner('info', 'ℹ️',
+      `Bu belgede <strong>${r.form_fields}</strong> etkileşimli form alanı var.`,
+      null, null);
+  }
+  if (r.signatures > 0) {
+    addBanner('error', '🔏',
+      `<strong>${r.signatures}</strong> dijital imza tespit edildi — kaydettiğinizde otomatik kaldırılır.`,
+      'İmzalar Hakkında', `function(){document.getElementById('sig-count').textContent='${r.signatures}';openModal('m-sig-warning')}`);
+  }
+}
+
+let _pendingOpen = null;
+
+function _checkSigThenOpen(r) {
+  if (r.signatures > 0) {
+    _pendingOpen = r;
+    document.getElementById('sig-count').textContent = r.signatures;
+    openModal('m-sig-warning');
+  } else {
+    applyOpenResult(r);
+  }
+}
+
+function sigContinue() {
+  closeModal('m-sig-warning');
+  if (_pendingOpen) { applyOpenResult(_pendingOpen); _pendingOpen = null; }
+}
+
+function sigCancel() {
+  closeModal('m-sig-warning');
+  _pendingOpen = null;
+}
+
+async function browseFile() {
+  spin(true);
+  const browse = await fetch('/api/browse').then(x => x.json()).catch(() => ({path: ''}));
+  if (!browse.path) { spin(false); return; }
+  const r = await post('/api/open', {path: browse.path});
+  spin(false);
+  if (r.needs_password) { askPdfPassword(browse.path, '', false); return; }
+  if (!r.ok) { toast(r.error, 'err'); return; }
+  _checkSigThenOpen(r);
+}
+
+// ── şifreli PDF aç ────────────────────────────────────────
+let _pwPending = null;   // {path, name}
+
+function askPdfPassword(path, name, wrong) {
+  _pwPending = {path, name};
+  document.getElementById('pdfpw-input').value = '';
+  document.getElementById('pdfpw-err').textContent = wrong ? t('pdfPwWrong') : '';
+  openModal('m-pdfpw');
+  setTimeout(() => document.getElementById('pdfpw-input').focus(), 50);
+}
+
+async function submitPdfPassword() {
+  if (!_pwPending) return;
+  const {path, name} = _pwPending;
+  const password = document.getElementById('pdfpw-input').value;
+  closeModal('m-pdfpw');
+  spin(true);
+  const r = await post('/api/open', {path, password, name});
+  spin(false);
+  if (r.needs_password) { askPdfPassword(path, name, true); return; }
+  if (!r.ok) { toast(r.error, 'err'); return; }
+  _pwPending = null;
+  _checkSigThenOpen(r);
+}
+
+// Drag & drop
+document.addEventListener('DOMContentLoaded', () => {
+  const viewer = document.getElementById('viewer');
+  viewer.addEventListener('dragover', e => { e.preventDefault(); viewer.style.outline = '3px dashed #0891b2'; });
+  viewer.addEventListener('dragleave', () => { viewer.style.outline = ''; });
+  viewer.addEventListener('drop', async e => {
+    e.preventDefault();
+    viewer.style.outline = '';
+    const file = e.dataTransfer.files[0];
+    if (!file || !file.name.toLowerCase().endsWith('.pdf')) { toast(t('dragPdfOnly'), 'err'); return; }
+    const fd = new FormData();
+    fd.append('file', file);
+    spin(true);
+    const r = await fetch('/api/upload', {method: 'POST', body: fd}).then(x => x.json())
+      .catch(() => ({ok: false, error: 'Bağlantı hatası'}));
+    spin(false);
+    if (r.needs_password) { askPdfPassword(r.tmp_path, r.name, false); return; }
+    if (!r.ok) { toast(r.error, 'err'); return; }
+    _checkSigThenOpen(r);
+  });
+});
+
+// ── sidebar ───────────────────────────────────────────────
+
+function buildSidebar(refreshFrom = 0) {
+  const sb = document.getElementById('sidebar');
+  if (refreshFrom === 0) sb.innerHTML = '';
+
+  for (let i = refreshFrom; i < S.pageCount; i++) {
+    if (refreshFrom > 0 && document.getElementById(`th-${i}`)) {
+      refreshThumb(i);
+      continue;
+    }
+    const item = document.createElement('div');
+    item.className = 'thumb-item' + (i === S.currentPage ? ' selected' : '');
+    item.id = `th-${i}`;
+    item.innerHTML = `
+      <div class="thumb-top">
+        <span class="page-num">${i + 1}</span>
+        <div class="thumb-ops">
+          <button title="Yukarı taşı" onclick="movePage(${i},-1,event)">↑</button>
+          <button title="Aşağı taşı" onclick="movePage(${i},1,event)">↓</button>
+          <button title="Sağa döndür" onclick="rotatePage(${i},90,event)">↻</button>
+          <button class="del-btn" title="Sayfayı sil" onclick="deletePage(${i},event)">✕</button>
+        </div>
+      </div>
+      <div class="thumb-img-wrap">
+        <img src="/api/thumb/${i}?t=${S.ts}" alt="Sayfa ${i + 1}" loading="lazy">
+      </div>`;
+    item.addEventListener('click', () => selectPage(i));
+    sb.appendChild(item);
+  }
+}
+
+function refreshThumb(i) {
+  const img = document.querySelector(`#th-${i} img`);
+  if (img) img.src = `/api/thumb/${i}?t=${Date.now()}`;
+  const num = document.querySelector(`#th-${i} .page-num`);
+  if (num) num.textContent = i + 1;
+}
+
+function rebuildSidebarFull() {
+  S.ts = Date.now();
+  buildSidebar(0);
+}
+
+// ── select page ───────────────────────────────────────────
+
+async function selectPage(i) {
+  document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('selected'));
+  const th = document.getElementById(`th-${i}`);
+  if (th) th.classList.add('selected');
+  S.currentPage = i;
+  spin(true);
+  const r = await fetch(`/api/page/${i}?t=${Date.now()}`).then(x => x.json());
+  spin(false);
+  if (!r.ok) { toast('Sayfa yüklenemedi', 'err'); return; }
+  document.getElementById('empty-state').style.display = 'none';
+  document.body.classList.add('has-file');
+  const wrap = document.getElementById('page-wrap');
+  wrap.style.display = 'inline-block';
+  const img = document.getElementById('page-img');
+  img._zoom = r.zoom;
+  img.src = 'data:image/png;base64,' + r.img;
+  img.onload = () => loadTextBlocks(i);
+}
+
+// ── page ops ──────────────────────────────────────────────
+
+async function deletePage(i, e) {
+  e.stopPropagation();
+  if (S.pageCount <= 1) { toast('Son sayfa silinemez', 'err'); return; }
+  if (!confirm(`Sayfa ${i + 1} silinsin mi?`)) return;
+  spin(true);
+  const r = await post('/api/delete', {i});
+  spin(false);
+  if (!r.ok) { toast(r.error, 'err'); return; }
+  S.pageCount = r.pages;
+  document.getElementById('tb-info').textContent = `${r.pages} sayfa`;
+  document.getElementById('split-end').value = r.pages;
+  const next = Math.min(i, r.pages - 1);
+  rebuildSidebarFull();
+  await selectPage(next);
+  toast(`Sayfa ${i + 1} silindi`, 'ok');
+}
+
+async function rotatePage(i, deg, e) {
+  e.stopPropagation();
+  spin(true);
+  const r = await post('/api/rotate', {i, deg});
+  spin(false);
+  if (!r.ok) { toast('Döndürme başarısız', 'err'); return; }
+  S.ts = Date.now();
+  refreshThumb(i);
+  if (S.currentPage === i) await selectPage(i);
+}
+
+async function movePage(i, dir, e) {
+  e.stopPropagation();
+  const to = i + dir;
+  if (to < 0 || to >= S.pageCount) return;
+  spin(true);
+  const r = await post('/api/move', {from: i, to});
+  spin(false);
+  if (!r.ok) return;
+  const newCurrent = S.currentPage === i ? to : S.currentPage;
+  S.ts = Date.now();
+  rebuildSidebarFull();
+  await selectPage(newCurrent);
+}
+
+// ── find & replace ────────────────────────────────────────
+
+async function doFindReplace() {
+  const find = document.getElementById('fr-find').value;
+  const replace = document.getElementById('fr-replace').value;
+  if (!find) { toast('Aranan metin boş', 'err'); return; }
+  closeModal('m-fr');
+  spin(true);
+  const r = await post('/api/findreplace', {find, replace});
+  spin(false);
+  if (!r.ok) { toast(r.error, 'err'); return; }
+  if (r.count === 0) { toast('Metin bulunamadı', 'info'); return; }
+  S.ts = Date.now();
+  rebuildSidebarFull();
+  await selectPage(S.currentPage);
+  toast(`${r.count} yerde değiştirildi`, 'ok');
+}
+
+// ── inline text edit ─────────────────────────────────────
+
+function findChangedWords(original, updated) {
+  if (original === updated) return null;
+  // Ortak önek bul
+  let start = 0;
+  while (start < original.length && start < updated.length &&
+         original[start] === updated[start]) start++;
+  // Ortak sonek bul
+  let endO = original.length, endU = updated.length;
+  while (endO > start && endU > start &&
+         original[endO - 1] === updated[endU - 1]) { endO--; endU--; }
+  // Kelime sınırına genişlet
+  while (start > 0 && original[start - 1] !== ' ') start--;
+  while (endO < original.length && original[endO] !== ' ') endO++;
+  while (endU < updated.length && updated[endU] !== ' ') endU++;
+  const find    = original.slice(start, endO).trim();
+  const replace = updated.slice(start, endU).trim();
+  return (find && find !== replace) ? { find, replace } : null;
+}
+
+async function loadTextBlocks(i) {
+  const overlay = document.getElementById('text-overlay');
+  overlay.innerHTML = '';
+  const r = await fetch(`/api/textblocks/${i}`).then(x => x.json()).catch(() => ({ok: false}));
+  if (!r.ok) return;
+  overlay.style.pointerEvents = 'auto';
+  r.blocks.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'text-block';
+    div.style.left   = (b.x0 * 100) + '%';
+    div.style.top    = (b.y0 * 100) + '%';
+    div.style.width  = Math.max((b.x1 - b.x0) * 100, 1) + '%';
+    div.style.height = Math.max((b.y1 - b.y0) * 100, 0.8) + '%';
+    div.title = b.text;
+
+    // × delete button
+    const delBtn = document.createElement('span');
+    delBtn.className = 'tb-del-btn';
+    delBtn.textContent = '×';
+    delBtn.title = 'Metni sil (Delete)';
+    delBtn.addEventListener('mousedown', e => e.stopPropagation());
+    delBtn.addEventListener('click', e => { e.stopPropagation(); doDeleteBlock(b, div); });
+    div.appendChild(delBtn);
+
+    div.addEventListener('mouseenter', () => { if (!selectMode && !annotMode) hoveredBlock = {block: b, div}; });
+    div.addEventListener('mouseleave', () => { setTimeout(() => { if (hoveredBlock?.div === div) hoveredBlock = null; }, 150); });
+
+    div.addEventListener('mousedown', e => {
+      if (selectMode || annotMode) return;
+      activeDrag = {
+        startX: e.clientX, startY: e.clientY,
+        startLeft: b.x0 * 100, startTop: b.y0 * 100,
+        isDragging: false, dx: 0, dy: 0,
+        block: b, div, ghost: null
+      };
+      e.preventDefault();
+    });
+    div.addEventListener('click', e => {
+      if (justDragged) { justDragged = false; return; }
+      if (selectMode || annotMode) return;
+      selectBlock(div, b);
+    });
+
+    overlay.appendChild(div);
+  });
+}
+
+function startEdit(div, block, clickEvent) {
+  if (S.addTextMode) return;
+
+  deselectBlock();
+  // Onceki editi kapat
+  if (activeEdit && !activeEdit.done) { activeEdit.done = true; }
+  const overlay = document.getElementById('text-overlay');
+  overlay.querySelectorAll('.block-input').forEach(el => el.remove());
+  overlay.querySelectorAll('.text-block').forEach(el => el.style.visibility = '');
+
+  const img  = document.getElementById('page-img');
+  const wrap = document.getElementById('page-wrap');
+  const scaleY = img.clientHeight / img.naturalHeight;
+  const zoom   = img._zoom || 2.0;
+  const pxSize = Math.max(block.size * zoom * scaleY * 0.95, 10);
+
+  let leftPct, topPct;
+  if (clickEvent) {
+    const r = wrap.getBoundingClientRect();
+    leftPct = (clickEvent.clientX - r.left) / r.width  * 100;
+    topPct  = (clickEvent.clientY - r.top)  / r.height * 100;
+  } else {
+    leftPct = block.x0 * 100;
+    topPct  = block.y0 * 100;
+  }
+
+  // Sadece metin input - format kontrolleri ust barda
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "block-input";
+  input.value = block.text;
+  input.style.cssText = [
+    "position:absolute",
+    "left:" + leftPct + "%",
+    "top:" + topPct + "%",
+    "width:" + Math.max((block.x1 - block.x0) * 100, 8) + "%",
+    "font-size:" + pxSize + "px",
+    "line-height:1.2",
+    "box-sizing:border-box",
+    "z-index:20",
+  ].join(";");
+
+  div.style.visibility = "hidden";
+  overlay.appendChild(input);
+
+  const original     = block.text;
+  const origItalic   = !!(block.flags & 2 || /italic|oblique/i.test(block.font || ""));
+  const origUnderline = !!(block.underline);
+  const origBold     = !!(block.flags & 16) || /bold/i.test(block.font || "");
+  let done = false;
+
+  async function apply() {
+    if (done) return;
+    done = true;
+
+    const fmtBold      = document.getElementById("fmt-bold").classList.contains("active");
+    const fmtItalic    = document.getElementById("fmt-italic").classList.contains("active");
+    const fmtUnderline = document.getElementById("fmt-underline").classList.contains("active");
+    const chosenSize   = parseFloat(document.getElementById("fmt-size").value) || _defaultSz(block);
+    const originalSize = _defaultSz(block);
+    const forceBold    = fmtBold !== origBold ? fmtBold : null;
+
+    const newText = input.value;
+    input.remove();
+    div.style.visibility = "";
+    hideFormatBar();
+
+    if (newText === original &&
+        Math.abs(chosenSize - originalSize) < 0.1 &&
+        forceBold === null &&
+        fmtItalic === origItalic &&
+        fmtUnderline === origUnderline) return;
+
+    spin(true);
+    const r = await post("/api/replaceblock", {
+      replace:       newText,
+      original_text: original,
+      page_idx:      S.currentPage,
+      bx0: block.x0, by0: block.y0, bx1: block.x1, by1: block.y1,
+      baseline_y:    block.baseline_y,
+      color:         block.color,
+      pdf_font:      block.font  || null,
+      flags:         block.flags || 0,
+      size:          chosenSize,
+      force_bold:    forceBold,
+      force_italic:  fmtItalic,
+      underline:     fmtUnderline,
+    });
+    spin(false);
+    if (!r.ok) { toast(r.error || "Hata", "err"); return; }
+    S.ts = Date.now();
+    refreshThumb(S.currentPage);
+    await selectPage(S.currentPage);
+    toast('Güncellendi', 'ok');
+  }
+
+  activeEdit = { block, div, input, done: false, applyFn: apply };
+  showFormatBar(block, 'editing');
+  input.focus();
+  input.select();
+
+  input.addEventListener("blur", () => {
+    setTimeout(() => {
+      const active = document.activeElement;
+      const fmtBar = document.getElementById("format-bar");
+      if (fmtBar && fmtBar.contains(active)) return;
+      apply();
+    }, 80);
+  });
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter")  { e.preventDefault(); apply(); }
+    if (e.key === "Escape") {
+      done = true;
+      input.remove();
+      div.style.visibility = "";
+      hideFormatBar();
+    }
+  });
+}
+
+// ── area selection (redact) ───────────────────────────────
+
+function toggleSelectMode() {
+  deselectBlock();
+  selectMode = !selectMode;
+  document.getElementById('btn-select').classList.toggle('active', selectMode);
+  document.getElementById('page-wrap').style.cursor = selectMode ? 'crosshair' : '';
+  document.getElementById('text-overlay').classList.toggle('sel-active', selectMode);
+  if (!selectMode) cancelSelection();
+}
+
+function cancelSelection() {
+  selDrag = null;
+  document.getElementById('select-rect').style.display = 'none';
+  document.getElementById('select-toolbar').style.display = 'none';
+}
+
+function updateSelectRect() {
+  if (!selDrag) return;
+  const x0 = Math.min(selDrag.startX, selDrag.endX);
+  const y0 = Math.min(selDrag.startY, selDrag.endY);
+  const x1 = Math.max(selDrag.startX, selDrag.endX);
+  const y1 = Math.max(selDrag.startY, selDrag.endY);
+  const r = document.getElementById('select-rect');
+  r.style.left   = x0 + '%';
+  r.style.top    = y0 + '%';
+  r.style.width  = (x1 - x0) + '%';
+  r.style.height = (y1 - y0) + '%';
+  r.style.display = 'block';
+}
+
+function showSelectToolbar() {
+  const tb = document.getElementById('select-toolbar');
+  const x1 = Math.max(selDrag.startX, selDrag.endX);
+  const y1 = Math.max(selDrag.startY, selDrag.endY);
+  tb.style.left = Math.min(x1, 80) + '%';
+  tb.style.top  = (y1 + 0.5) + '%';
+  tb.style.display = 'flex';
+}
+
+async function applyRedact() {
+  if (!selDrag) return;
+  const snap = {
+    startX: selDrag.startX, startY: selDrag.startY,
+    endX:   selDrag.endX,   endY:   selDrag.endY
+  };
+  const x0 = Math.min(snap.startX, snap.endX) / 100;
+  const y0 = Math.min(snap.startY, snap.endY) / 100;
+  const x1 = Math.max(snap.startX, snap.endX) / 100;
+  const y1 = Math.max(snap.startY, snap.endY) / 100;
+  cancelSelection();
+  spin(true);
+  const r = await post('/api/redact', {page: S.currentPage, x0, y0, x1, y1});
+  spin(false);
+  if (!r.ok) { toast('Silme başarısız', 'err'); return; }
+  S.ts = Date.now(); refreshThumb(S.currentPage);
+  await selectPage(S.currentPage);
+  toast('Alan silindi', 'ok');
+}
+
+// ── add text ──────────────────────────────────────────────
+
+function openAddText() {
+  // Open widget at a default top-left position; user can drag before confirming.
+  showAddTextWidget(8, 8, document.getElementById('page-img'));
+}
+
+// Clicking on the blank overlay (not on a text block) also opens the widget.
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('page-wrap').addEventListener('mousedown', e => {
+    if (e.target.closest('#select-toolbar')) return;
+    const wr = document.getElementById('page-wrap').getBoundingClientRect();
+    const x = (e.clientX - wr.left) / wr.width  * 100;
+    const y = (e.clientY - wr.top)  / wr.height * 100;
+    if (selectMode) {
+      selDrag = {startX: x, startY: y, endX: x, endY: y};
+      document.getElementById('select-toolbar').style.display = 'none';
+      updateSelectRect();
+      e.preventDefault(); e.stopPropagation();
+    } else if (annotMode && annotMode.startsWith('stamp:')) {
+      const stampType = annotMode.split(':')[1];
+      placeStamp(x / 100, y / 100, stampType);
+      e.preventDefault(); e.stopPropagation();
+    } else if (annotMode) {
+      annotDrag = {startX: x, startY: y, endX: x, endY: y};
+      updateAnnotPreview();
+      e.preventDefault(); e.stopPropagation();
+    }
+  });
+
+  document.getElementById('text-overlay').addEventListener('click', e => {
+    if (selectMode || annotMode) return;
+    if (e.target !== document.getElementById('text-overlay')) return;
+    deselectBlock();
+    const wrap = document.getElementById('page-wrap');
+    const wr   = wrap.getBoundingClientRect();
+    showAddTextWidget(
+      (e.clientX - wr.left) / wr.width  * 100,
+      (e.clientY - wr.top)  / wr.height * 100,
+      document.getElementById('page-img')
+    );
+  });
+});
+
+function showAddTextWidget(leftPct, topPct, img) {
+  const overlay = document.getElementById('text-overlay');
+  overlay.querySelectorAll('.addtext-widget').forEach(el => el.remove());
+
+  const widget = document.createElement('div');
+  widget.className = 'addtext-widget';
+  widget.style.left = leftPct + '%';
+  widget.style.top  = topPct  + '%';
+
+  // Textarea — resizable, multi-line
+  const textarea = document.createElement('textarea');
+  textarea.placeholder = 'Metni buraya yazın…';
+  textarea.rows = 2;
+  if (S.learnedFont) {
+    textarea.style.fontWeight = S.learnedFont.is_bold   ? 'bold'   : 'normal';
+    textarea.style.fontStyle  = S.learnedFont.is_italic ? 'italic' : 'normal';
+  }
+
+  // Footer: size input + drag handle + ok + cancel
+  const footer = document.createElement('div');
+  footer.className = 'addtext-footer';
+
+  const sizeLabel = Object.assign(document.createElement('label'), {textContent: 'pt:'});
+
+  const sizeInp = document.createElement('input');
+  sizeInp.type = 'number';
+  sizeInp.className = 'addtext-size-inp';
+  sizeInp.value = S.learnedFont ? Math.round(S.learnedFont.size * 10) / 10 : '12';
+  sizeInp.min = '6'; sizeInp.max = '120'; sizeInp.step = '0.5';
+
+  const dragHandle = Object.assign(document.createElement('span'), {textContent: '⣿'});
+  dragHandle.style.cssText = 'cursor:move;color:#ccc;font-size:12px;flex:1;text-align:center;user-select:none;';
+  dragHandle.title = 'Taşımak için sürükle';
+
+  const okBtn = Object.assign(document.createElement('button'), {textContent: '✓', className: 'btn-primary'});
+  okBtn.style.cssText = 'font-size:12px;padding:2px 10px;flex-shrink:0;';
+  okBtn.title = 'Ekle (Enter)';
+  const cancelBtn = Object.assign(document.createElement('button'), {textContent: '✕', className: 'btn-secondary'});
+  cancelBtn.style.cssText = 'font-size:12px;padding:2px 8px;flex-shrink:0;';
+  cancelBtn.title = 'İptal (Esc)';
+
+  footer.append(sizeLabel, sizeInp, dragHandle, okBtn, cancelBtn);
+  widget.append(textarea, footer);
+  overlay.appendChild(widget);
+
+  // Drag via handle only
+  let wDown = false, wOx, wOy, wL, wT;
+  dragHandle.addEventListener('mousedown', e => {
+    wDown = true; wOx = e.clientX; wOy = e.clientY;
+    wL = parseFloat(widget.style.left); wT = parseFloat(widget.style.top);
+    e.preventDefault();
+  });
+  const onWMove = e => {
+    if (!wDown) return;
+    const wr = document.getElementById('page-wrap').getBoundingClientRect();
+    widget.style.left = Math.max(0, wL + (e.clientX - wOx) / wr.width  * 100) + '%';
+    widget.style.top  = Math.max(0, wT + (e.clientY - wOy) / wr.height * 100) + '%';
+  };
+  const onWUp = () => { wDown = false; };
+  document.addEventListener('mousemove', onWMove);
+  document.addEventListener('mouseup', onWUp);
+
+  textarea.focus();
+
+  async function confirm() {
+    const text = textarea.value.trim();
+    if (!text) { cleanup(); return; }
+    const size  = parseFloat(sizeInp.value) || 12;
+    const zoom  = img._zoom || 2.0;
+    const pdf_w = img.naturalWidth  / zoom;
+    const pdf_h = img.naturalHeight / zoom;
+    const x_pdf = parseFloat(widget.style.left) / 100 * pdf_w;
+    const y_pdf = parseFloat(widget.style.top)  / 100 * pdf_h + size * 0.8;
+    cleanup();
+    spin(true);
+    const body = {page: S.currentPage, text, size, x: x_pdf, y: y_pdf};
+    if (S.learnedFont) {
+      body.pdf_font = S.learnedFont.pdf_font;
+      body.flags    = S.learnedFont.flags;
+      body.color    = S.learnedFont.color;
+    }
+    const r = await post('/api/addtext', body);
+    spin(false);
+    if (!r.ok) { toast(r.error || 'Hata', 'err'); return; }
+    S.ts = Date.now(); refreshThumb(S.currentPage);
+    await selectPage(S.currentPage);
+    toast('Metin eklendi', 'ok');
+  }
+  function cleanup() {
+    document.removeEventListener('mousemove', onWMove);
+    document.removeEventListener('mouseup', onWUp);
+    widget.remove();
+  }
+  okBtn.addEventListener('click', confirm);
+  cancelBtn.addEventListener('click', cleanup);
+  textarea.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); confirm(); }
+    if (e.key === 'Escape') cleanup();
+  });
+}
+
+// ── delete text block ────────────────────────────────────
+
+async function doDeleteBlock(block, div) {
+  hoveredBlock = null;
+  spin(true);
+  const r = await post('/api/findreplace', {
+    find: block.text, replace: '',
+    page_idx: S.currentPage,
+    bx0: block.x0, by0: block.y0, bx1: block.x1, by1: block.y1,
+    baseline_y: block.baseline_y, color: block.color,
+  });
+  spin(false);
+  if (!r.ok || r.count === 0) { toast('Metin silinemedi', 'err'); return; }
+  S.ts = Date.now(); refreshThumb(S.currentPage);
+  await selectPage(S.currentPage);
+  toast('Metin silindi', 'ok');
+}
+
+// ── undo ─────────────────────────────────────────────────
+
+async function doUndo() {
+  spin(true);
+  const r = await post('/api/undo', {});
+  spin(false);
+  if (!r.ok) { toast(r.error || 'Geri alınacak işlem yok', 'info'); return; }
+  S.pageCount = r.pages;
+  document.getElementById('tb-info').textContent = `${r.pages} sayfa`;
+  document.getElementById('split-end').value = r.pages;
+  S.ts = Date.now();
+  rebuildSidebarFull();
+  await selectPage(Math.min(S.currentPage, r.pages - 1));
+  toast('Geri alındı', 'ok');
+}
+
+// ── merge ─────────────────────────────────────────────────
+
+async function doMerge() {
+  const path = document.getElementById('merge-path').value.trim();
+  const pos = document.getElementById('merge-pos').value;
+  if (!path) { toast('Dosya yolu girin', 'err'); return; }
+  closeModal('m-merge');
+  spin(true);
+  const r = await post('/api/merge', {path, pos});
+  spin(false);
+  if (!r.ok) { toast(r.error, 'err'); return; }
+  S.pageCount = r.pages;
+  document.getElementById('tb-info').textContent = `${r.pages} sayfa`;
+  document.getElementById('split-end').value = r.pages;
+  rebuildSidebarFull();
+  toast(`Birleştirildi — toplam ${r.pages} sayfa`, 'ok');
+}
+
+// ── split ─────────────────────────────────────────────────
+
+async function doSplit() {
+  const start = parseInt(document.getElementById('split-start').value, 10) - 1;
+  const end = parseInt(document.getElementById('split-end').value, 10) - 1;
+  const path = document.getElementById('split-path').value.trim();
+  if (start < 0 || end < start || end >= S.pageCount) {
+    toast('Geçersiz sayfa aralığı', 'err'); return;
+  }
+  closeModal('m-split');
+  spin(true);
+  const r = await post('/api/split', {start, end, path});
+  spin(false);
+  if (!r.ok) { toast(r.error, 'err'); return; }
+  toast(`Kaydedildi: ${r.path}`, 'ok');
+}
+
+// ── save ──────────────────────────────────────────────────
+
+async function doSave() {
+  spin(true);
+  const br = await fetch('/api/browse_save').then(x => x.json()).catch(() => ({path:''}));
+  if (!br.path) { spin(false); return; }
+  const r = await post('/api/save', {path: br.path});
+  spin(false);
+  if (!r.ok) { toast(r.error || 'Kayıt başarısız', 'err'); return; }
+  const sigNote = r.stripped_signatures > 0 ? ` · ${r.stripped_signatures} dijital imza kaldırıldı` : '';
+  toast(`Kaydedildi: ${r.path}${sigNote}`, 'ok');
+}
+
+// ── convert to pdf ───────────────────────────────────────
+
+async function doConvertToPdf() {
+  spin(true);
+  const browse = await fetch('/api/browse_convert').then(x => x.json()).catch(() => ({path:''}));
+  if (!browse.path) { spin(false); return; }
+  const r = await post('/api/convert_to_pdf', {path: browse.path});
+  spin(false);
+  if (!r.ok) { toast(r.error, 'err'); return; }
+  S.pageCount  = r.pages;
+  S.currentPage = 0;
+  S.ts = Date.now();
+  S.learnedFont = null;
+  updateLearnedFontDisplay();
+  document.getElementById('tb-filename').textContent = r.name;
+  document.getElementById('tb-info').textContent = `${r.pages} sayfa`;
+  document.getElementById('split-end').value = r.pages;
+  setDocButtons(true);
+  buildSidebar();
+  selectPage(0);
+  toast(`Dönüştürüldü: ${r.name} (${r.pages} sayfa)`, 'ok');
+  clearBanners();
+  if (r.form_fields > 0) addBanner('info','ℹ️',`Bu belgede <strong>${r.form_fields}</strong> form alanı var.`,null,null);
+  if (r.signatures  > 0) addBanner('error','🔏',`<strong>${r.signatures}</strong> dijital imza tespit edildi.`,null,null);
+}
+
+// ── global drag handlers (text block move) ───────────────
+
+document.addEventListener('mousemove', e => {
+  if (selectMode && selDrag && !selDrag.locked) {
+    const wr = document.getElementById('page-wrap').getBoundingClientRect();
+    selDrag.endX = Math.max(0, Math.min(100, (e.clientX - wr.left) / wr.width  * 100));
+    selDrag.endY = Math.max(0, Math.min(100, (e.clientY - wr.top)  / wr.height * 100));
+    updateSelectRect();
+    return;
+  }
+  if (annotDrag) {
+    const wr = document.getElementById('page-wrap').getBoundingClientRect();
+    annotDrag.endX = Math.max(0, Math.min(100, (e.clientX - wr.left) / wr.width  * 100));
+    annotDrag.endY = Math.max(0, Math.min(100, (e.clientY - wr.top)  / wr.height * 100));
+    updateAnnotPreview();
+    return;
+  }
+  if (!activeDrag) return;
+  const dx = e.clientX - activeDrag.startX;
+  const dy = e.clientY - activeDrag.startY;
+  if (!activeDrag.isDragging && Math.hypot(dx, dy) < 2) return;
+
+  if (!activeDrag.isDragging) {
+    activeDrag.isDragging = true;
+    const ghost = document.createElement('div');
+    ghost.className = 'addtext-ghost';
+    ghost.style.left   = activeDrag.startLeft + '%';
+    ghost.style.top    = activeDrag.startTop  + '%';
+    ghost.style.width  = activeDrag.div.style.width;
+    ghost.style.height = activeDrag.div.style.height;
+    document.getElementById('text-overlay').appendChild(ghost);
+    activeDrag.ghost = ghost;
+    activeDrag.div.classList.add('dragging');
+  }
+
+  const wr = document.getElementById('page-wrap').getBoundingClientRect();
+  activeDrag.dx = dx / wr.width  * 100;
+  activeDrag.dy = dy / wr.height * 100;
+  activeDrag.ghost.style.left = (activeDrag.startLeft + activeDrag.dx) + '%';
+  activeDrag.ghost.style.top  = (activeDrag.startTop  + activeDrag.dy) + '%';
+});
+
+document.addEventListener('mouseup', async e => {
+  if (selectMode && selDrag) {
+    if (selDrag.locked) return;
+    const wr = document.getElementById('page-wrap').getBoundingClientRect();
+    selDrag.endX = Math.max(0, Math.min(100, (e.clientX - wr.left) / wr.width  * 100));
+    selDrag.endY = Math.max(0, Math.min(100, (e.clientY - wr.top)  / wr.height * 100));
+    const w = Math.abs(selDrag.endX - selDrag.startX);
+    const h = Math.abs(selDrag.endY - selDrag.startY);
+    if (w > 0.5 && h > 0.5) {
+      selDrag.locked = true;
+      updateSelectRect();
+      showSelectToolbar();
+    } else {
+      cancelSelection();
+    }
+    return;
+  }
+  if (annotDrag) {
+    const drag = annotDrag;
+    annotDrag = null;
+    const wr = document.getElementById('page-wrap').getBoundingClientRect();
+    drag.endX = Math.max(0, Math.min(100, (e.clientX - wr.left) / wr.width  * 100));
+    drag.endY = Math.max(0, Math.min(100, (e.clientY - wr.top)  / wr.height * 100));
+    document.getElementById('annot-preview').style.display = 'none';
+    const w = Math.abs(drag.endX - drag.startX);
+    const h = Math.abs(drag.endY - drag.startY);
+    if (w < 0.5 || h < 0.5) return;
+    const x0 = Math.min(drag.startX, drag.endX) / 100;
+    const y0 = Math.min(drag.startY, drag.endY) / 100;
+    const x1 = Math.max(drag.startX, drag.endX) / 100;
+    const y1 = Math.max(drag.startY, drag.endY) / 100;
+    spin(true);
+    let r;
+    if (annotMode === 'highlight') {
+      r = await post('/api/highlight', {page: S.currentPage, x0, y0, x1, y1, color: annotColor});
+    } else if (annotMode === 'rect' || annotMode === 'circle') {
+      r = await post('/api/shape', {page: S.currentPage, x0, y0, x1, y1, type: annotMode, color: shapeColor});
+    } else if (annotMode === 'image' && _imgData) {
+      r = await post('/api/addimage', {page: S.currentPage, x0, y0, x1, y1, image: _imgData});
+      deactivateAnnotMode();
+    }
+    spin(false);
+    if (!r || !r.ok) { toast('İşlem başarısız', 'err'); return; }
+    S.ts = Date.now(); refreshThumb(S.currentPage);
+    await selectPage(S.currentPage);
+    const labels = {highlight:'Vurgulama eklendi', rect:'Dikdörtgen eklendi', circle:'Daire eklendi', image:'Görsel eklendi'};
+    toast(labels[annotMode] || 'Eklendi', 'ok');
+    return;
+  }
+  if (!activeDrag) return;
+  const drag = activeDrag;
+  activeDrag = null;
+  if (!drag.isDragging) return;
+
+  drag.ghost.remove();
+  drag.div.classList.remove('dragging');
+  justDragged = true;
+
+  const img   = document.getElementById('page-img');
+  const zoom  = img._zoom || 2.0;
+  const pdf_w = img.naturalWidth  / zoom;
+  const pdf_h = img.naturalHeight / zoom;
+
+  const newL = drag.startLeft + drag.dx;
+  const newT = drag.startTop  + drag.dy;
+  const new_x          = newL / 100 * pdf_w;
+  const baseline_offset = drag.block.baseline_y - drag.block.y0 * pdf_h;
+  const new_baseline_y  = newT / 100 * pdf_h + baseline_offset;
+
+  spin(true);
+  const r = await post('/api/movetext', {
+    page: S.currentPage,
+    bx0: drag.block.x0, by0: drag.block.y0,
+    bx1: drag.block.x1, by1: drag.block.y1,
+    new_x, new_baseline_y,
+    text: drag.block.text,
+    size: _defaultSz(drag.block),
+    color: drag.block.color || [0,0,0]
+  });
+  spin(false);
+  if (!r.ok) { toast('Taşıma başarısız', 'err'); return; }
+  S.ts = Date.now(); refreshThumb(S.currentPage);
+  await selectPage(S.currentPage);
+  toast('Metin taşındı', 'ok');
+});
+
+// ── keyboard shortcuts ────────────────────────────────────
+
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); doUndo(); return; }
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    if (selectMode && selDrag?.locked) { e.preventDefault(); applyRedact(); return; }
+    if (hoveredBlock) { e.preventDefault(); doDeleteBlock(hoveredBlock.block, hoveredBlock.div); return; }
+  }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    if (S.currentPage > 0) selectPage(S.currentPage - 1);
+  } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    if (S.currentPage < S.pageCount - 1) selectPage(S.currentPage + 1);
+  } else if (e.key === 'Escape') {
+    if (selectMode) { cancelSelection(); toggleSelectMode(); }
+    if (annotMode) {
+      deactivateAnnotMode();
+      document.getElementById('annot-preview').style.display = 'none';
+    }
+    document.getElementById('shape-menu')?.classList.remove('open');
+    document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+    deselectBlock();
+  }
+});
+
+// ── annotation mode management ────────────────────────────
+
+const ANNOT_BTNS = {highlight:'btn-hl'};
+
+function _setTb2Label(text) {
+  const el = document.getElementById('tb2-label');
+  if (!el) return;
+  if (text) { el.textContent = '← ' + text; el.style.display = ''; }
+  else el.style.display = 'none';
+}
+
+function deactivateAnnotMode() {
+  annotMode = null;
+  annotDrag = null;
+  document.getElementById('page-wrap').style.cursor = '';
+  document.getElementById('text-overlay').classList.remove('annot-active');
+  Object.values(ANNOT_BTNS).forEach(id => { document.getElementById(id)?.classList.remove('active'); });
+  document.getElementById('btn-stamp')?.classList.remove('active');
+  document.getElementById('btn-shape-dd')?.classList.remove('active');
+  _setTb2Label('');
+}
+
+function toggleAnnotMode(mode) {
+  deselectBlock();
+  if (selectMode) { cancelSelection(); toggleSelectMode(); }
+  if (annotMode === mode) {
+    deactivateAnnotMode();
+  } else {
+    deactivateAnnotMode();
+    annotMode = mode;
+    const btnId = ANNOT_BTNS[mode];
+    if (btnId) document.getElementById(btnId).classList.add('active');
+    document.getElementById('page-wrap').style.cursor = 'crosshair';
+    document.getElementById('text-overlay').classList.add('annot-active');
+    if (mode === 'highlight') _setTb2Label('Vurgulama modu — sayfada alan seç');
+  }
+}
+
+// ── shape dropdown ────────────────────────────────────────
+
+function toggleShapeMenu(e) {
+  e.stopPropagation();
+  // Şekil modu açıksa butona tekrar basmak modu kapatır
+  if (annotMode === 'rect' || annotMode === 'circle') {
+    deactivateAnnotMode();
+    document.getElementById('shape-menu').classList.remove('open');
+    return;
+  }
+  document.getElementById('shape-menu').classList.toggle('open');
+}
+document.addEventListener('click', () => document.getElementById('shape-menu')?.classList.remove('open'));
+
+function setShapeColorDot(dot) {
+  shapeColor = dot.dataset.color;
+  document.querySelectorAll('#shape-menu .color-dot').forEach(d => d.classList.remove('active'));
+  dot.classList.add('active');
+}
+
+function pickShape(type) {
+  document.getElementById('shape-menu').classList.remove('open');
+  if (selectMode) { cancelSelection(); toggleSelectMode(); }
+  if (annotMode === type) {
+    deactivateAnnotMode();
+  } else {
+    deactivateAnnotMode();
+    annotMode = type;
+    document.getElementById('btn-shape-dd').classList.add('active');
+    document.getElementById('page-wrap').style.cursor = 'crosshair';
+    document.getElementById('text-overlay').classList.add('annot-active');
+    _setTb2Label((type === 'rect' ? 'Dikdörtgen' : 'Daire') + ' modu — sayfada alan seç');
+    toast((type === 'rect' ? 'Dikdörtgen' : 'Daire') + ' — sayfada alan seç', 'info');
+  }
+}
+
+function setAnnotColor(dot) {
+  annotColor = dot.dataset.color;
+  document.querySelectorAll('#toolbar2 .color-dot:not(#shape-dot)').forEach(d => d.classList.remove('active'));
+  dot.classList.add('active');
+}
+
+function cycleShapeColor(dot) {
+  shapeColorIdx = (shapeColorIdx + 1) % SHAPE_COLORS.length;
+  shapeColor = SHAPE_COLORS[shapeColorIdx];
+  dot.style.background = shapeColor;
+  dot.dataset.color = shapeColor;
+}
+
+function updateAnnotPreview() {
+  if (!annotDrag) return;
+  const p = document.getElementById('annot-preview');
+  const x0 = Math.min(annotDrag.startX, annotDrag.endX);
+  const y0 = Math.min(annotDrag.startY, annotDrag.endY);
+  const x1 = Math.max(annotDrag.startX, annotDrag.endX);
+  const y1 = Math.max(annotDrag.startY, annotDrag.endY);
+  p.style.cssText = `position:absolute; left:${x0}%; top:${y0}%; width:${x1-x0}%; height:${y1-y0}%; pointer-events:none; z-index:27; display:block;`;
+  if (annotMode === 'highlight') {
+    p.style.background = annotColor + '55';
+    p.style.border = 'none';
+    p.style.borderRadius = '2px';
+  } else if (annotMode === 'rect') {
+    p.style.background = 'transparent';
+    p.style.border = `2px dashed ${shapeColor}`;
+    p.style.borderRadius = '2px';
+  } else if (annotMode === 'circle') {
+    p.style.background = 'transparent';
+    p.style.border = `2px dashed ${shapeColor}`;
+    p.style.borderRadius = '50%';
+  } else if (annotMode === 'image') {
+    p.style.background = 'rgba(37,99,235,0.08)';
+    p.style.border = '2px dashed #2563eb';
+    p.style.borderRadius = '2px';
+  }
+}
+
+// ── stamps ────────────────────────────────────────────────
+
+function toggleStampMenu(e) {
+  e.stopPropagation();
+  document.getElementById('stamp-menu').classList.toggle('open');
+}
+document.addEventListener('click', () => document.getElementById('stamp-menu')?.classList.remove('open'));
+
+function activateStamp(type) {
+  document.getElementById('stamp-menu').classList.remove('open');
+  if (selectMode) { cancelSelection(); toggleSelectMode(); }
+  deactivateAnnotMode();
+  annotMode = 'stamp:' + type;
+  document.getElementById('btn-stamp').classList.add('active');
+  document.getElementById('page-wrap').style.cursor = 'crosshair';
+  document.getElementById('text-overlay').classList.add('annot-active');
+  const names = {check:'Onay', cross:'İptal', circle:'Daire', date:'Tarih'};
+  toast((names[type] || type) + ' damgası — sayfada tıkla', 'info');
+}
+
+async function placeStamp(xRel, yRel, stampType) {
+  spin(true);
+  const r = await post('/api/stamp', {page: S.currentPage, x: xRel, y: yRel, stamp: stampType, size: 36});
+  spin(false);
+  if (!r.ok) { toast('Damga eklenemedi', 'err'); return; }
+  S.ts = Date.now(); refreshThumb(S.currentPage);
+  await selectPage(S.currentPage);
+  toast('Damga eklendi', 'ok');
+}
+
+// ── watermark tabs ───────────────────────────────────────
+
+function wmTab(tab) {
+  const isAdd = tab === 'add';
+  document.getElementById('wm-panel-add').style.display = isAdd ? '' : 'none';
+  document.getElementById('wm-panel-rm').style.display  = isAdd ? 'none' : '';
+  const addBtn = document.getElementById('wm-tab-add');
+  const rmBtn  = document.getElementById('wm-tab-rm');
+  addBtn.style.color        = isAdd ? 'var(--primary)' : 'var(--text-muted)';
+  addBtn.style.borderBottomColor = isAdd ? 'var(--primary)' : 'transparent';
+  addBtn.style.fontWeight   = isAdd ? '600' : '400';
+  rmBtn.style.color         = isAdd ? 'var(--text-muted)' : 'var(--primary)';
+  rmBtn.style.borderBottomColor  = isAdd ? 'transparent' : 'var(--primary)';
+  rmBtn.style.fontWeight    = isAdd ? '400' : '600';
+}
+
+async function doRemoveWatermark() {
+  const text = document.getElementById('wm-rm-text').value.trim();
+  if (!text) { toast('Filigran metni boş', 'err'); return; }
+  closeModal('m-watermark');
+  spin(true);
+  const r = await post('/api/removewatermark', {text});
+  spin(false);
+  if (!r.ok) { toast(r.error || 'Filigran bulunamadı', 'err'); return; }
+  S.ts = Date.now(); rebuildSidebarFull(); await selectPage(S.currentPage);
+  toast(`Filigran kaldırıldı — ${r.count} alanda temizlendi`, 'ok');
+}
+
+// ── watermark ────────────────────────────────────────────
+
+async function doWatermark() {
+  const text    = document.getElementById('wm-text').value.trim();
+  const opacity = parseFloat(document.getElementById('wm-opacity').value) || 0.15;
+  const size    = parseFloat(document.getElementById('wm-size').value) || 52;
+  if (!text) { toast('Filigran metni boş', 'err'); return; }
+  closeModal('m-watermark');
+  spin(true);
+  const r = await post('/api/watermark', {text, opacity, size});
+  spin(false);
+  if (!r.ok) { toast('Filigran hatası', 'err'); return; }
+  S.ts = Date.now(); rebuildSidebarFull(); await selectPage(S.currentPage);
+  toast('Filigran eklendi — ' + r.pages + ' sayfa', 'ok');
+}
+
+// ── encrypt / decrypt ────────────────────────────────────
+
+function encTab(tab) {
+  document.getElementById('enc-panel-add').style.display = tab === 'add' ? '' : 'none';
+  document.getElementById('enc-panel-rm').style.display  = tab === 'rm'  ? '' : 'none';
+  document.getElementById('enc-tab-add').style.fontWeight = tab === 'add' ? '600' : '';
+  document.getElementById('enc-tab-rm').style.fontWeight  = tab === 'rm'  ? '600' : '';
+}
+
+async function doEncrypt() {
+  const user_pw   = document.getElementById('enc-user-pw').value;
+  const owner_pw  = document.getElementById('enc-owner-pw').value;
+  const allow_print = document.getElementById('enc-allow-print').checked;
+  const allow_copy  = document.getElementById('enc-allow-copy').checked;
+  if (!user_pw && !owner_pw) { toast('En az bir şifre girilmeli', 'err'); return; }
+  closeModal('m-encrypt');
+  spin(true);
+  const r = await post('/api/encrypt', {user_pw, owner_pw, allow_print, allow_copy});
+  spin(false);
+  if (!r.ok) { toast(r.error || 'Şifreleme başarısız', 'err'); return; }
+  toast('Şifrelendi: ' + r.path, 'ok');
+}
+
+async function doDecrypt() {
+  const password = document.getElementById('enc-cur-pw').value;
+  closeModal('m-encrypt');
+  spin(true);
+  const r = await post('/api/decrypt', {password});
+  spin(false);
+  if (!r.ok) { toast(r.error || 'Şifre kaldırılamadı', 'err'); return; }
+  toast('Şifre kaldırıldı: ' + r.path, 'ok');
+}
+
+// ── add blank page ───────────────────────────────────────
+
+async function doAddBlank() {
+  const pos = parseInt(document.getElementById('blank-pos').value, 10);
+  closeModal('m-addblank');
+  spin(true);
+  const r = await post('/api/addblank', {pos});
+  spin(false);
+  if (!r.ok) { toast('Sayfa eklenemedi', 'err'); return; }
+  S.pageCount = r.pages;
+  document.getElementById('tb-info').textContent = r.pages + ' sayfa';
+  document.getElementById('split-end').value = r.pages;
+  rebuildSidebarFull();
+  await selectPage(Math.min(pos, r.pages - 1));
+  toast('Boş sayfa eklendi', 'ok');
+}
+
+// ── reverse page order ───────────────────────────────────
+
+async function doReverse() {
+  if (!confirm('Tüm sayfa sırası ters çevrilsin mi?')) return;
+  spin(true);
+  const r = await post('/api/reverse', {});
+  spin(false);
+  if (!r.ok) { toast('Ters çevirme başarısız', 'err'); return; }
+  S.ts = Date.now(); rebuildSidebarFull(); await selectPage(0);
+  toast('Sayfa sırası ters çevrildi', 'ok');
+}
+
+// ── compress ─────────────────────────────────────────────
+
+async function doCompress() {
+  spin(true);
+  const r = await post('/api/compress', {});
+  spin(false);
+  if (!r.ok) { toast(r.error || 'Sıkıştırma başarısız', 'err'); return; }
+  toast('Sıkıştırıldı: ' + r.path + ' (' + r.size_kb + ' KB)', 'ok');
+}
+
+// ── image insert ─────────────────────────────────────────
+
+function previewImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    _imgData = ev.target.result;
+    document.getElementById('img-preview-wrap').style.display = 'block';
+    document.getElementById('img-preview-el').src = _imgData;
+    document.getElementById('btn-place-img').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function startImagePlace() {
+  if (!_imgData) return;
+  closeModal('m-addimg');
+  deactivateAnnotMode();
+  annotMode = 'image';
+  document.getElementById('page-wrap').style.cursor = 'crosshair';
+  document.getElementById('text-overlay').classList.add('annot-active');
+  toast('Görseli yerleştirmek için sayfada alan seçin', 'info');
+}
+
+// ── open blank page modal helper ─────────────────────────
+
+function openAddBlankModal() {
+  document.getElementById('blank-pos').value = S.currentPage + 1;
+  document.getElementById('blank-max').textContent = S.pageCount;
+  openModal('m-addblank');
+}
+
+// ── signature modal ───────────────────────────────────────
+let _sigColor = '#000000';
+let _sigActiveTab = 'yaz';
+let _sigDrawing = false;
+let _sigDrawInited = false;
+
+function sigTab(tab) {
+  _sigActiveTab = tab;
+  ['yaz','ciz','resim'].forEach(t => {
+    document.getElementById('sig-panel-' + t).style.display = t === tab ? '' : 'none';
+    const btn = document.getElementById('sig-tab-' + t);
+    if (t === tab) {
+      btn.style.borderBottomColor = 'var(--primary)';
+      btn.style.color = 'var(--primary)';
+      btn.style.fontWeight = '600';
+    } else {
+      btn.style.borderBottomColor = 'transparent';
+      btn.style.color = 'var(--text-muted)';
+      btn.style.fontWeight = '';
+    }
+  });
+  if (tab === 'ciz') _initSigDraw();
+}
+
+function setSigColor(panel, dot) {
+  _sigColor = dot.dataset.color;
+  document.querySelectorAll(`#sig-panel-${panel} .color-dot`).forEach(d => d.classList.remove('active'));
+  dot.classList.add('active');
+  if (panel === 'yaz') updateSigTextCanvas();
+}
+
+function updateSigTextCanvas() {
+  const canvas = document.getElementById('sig-text-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(20, canvas.height - 18); ctx.lineTo(canvas.width - 20, canvas.height - 18);
+  ctx.stroke();
+  const text = document.getElementById('sig-text-input').value || '';
+  if (!text) return;
+  const font = document.getElementById('sig-font').value;
+  ctx.fillStyle = _sigColor;
+  ctx.font = `46px ${font}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(text, canvas.width / 2, canvas.height - 26);
+}
+
+function _initSigDraw() {
+  if (_sigDrawInited) return;
+  _sigDrawInited = true;
+  const canvas = document.getElementById('sig-draw-canvas');
+  const ctx = canvas.getContext('2d');
+  _drawSigBaseline(ctx, canvas);
+  let lastX = 0, lastY = 0;
+  const getPos = e => {
+    const r = canvas.getBoundingClientRect();
+    const sc = canvas.width / r.width;
+    const src = e.touches ? e.touches[0] : e;
+    return [(src.clientX - r.left) * sc, (src.clientY - r.top) * sc];
+  };
+  const start = e => { _sigDrawing = true; [lastX, lastY] = getPos(e); e.preventDefault(); };
+  const move  = e => {
+    if (!_sigDrawing) return; e.preventDefault();
+    const [x, y] = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y);
+    ctx.strokeStyle = _sigColor; ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
+    [lastX, lastY] = [x, y];
+  };
+  const end = () => { _sigDrawing = false; };
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  canvas.addEventListener('mouseup', end);
+  canvas.addEventListener('mouseleave', end);
+  canvas.addEventListener('touchstart', start, {passive:false});
+  canvas.addEventListener('touchmove', move, {passive:false});
+  canvas.addEventListener('touchend', end);
+}
+
+function _drawSigBaseline(ctx, canvas) {
+  ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(20, canvas.height - 18); ctx.lineTo(canvas.width - 20, canvas.height - 18);
+  ctx.stroke();
+}
+
+function clearSigDraw() {
+  const canvas = document.getElementById('sig-draw-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  _drawSigBaseline(ctx, canvas);
+}
+
+function sigPreviewImg(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('sig-img-preview').style.display = 'block';
+    document.getElementById('sig-img-el').src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function openSignatureModal() {
+  _sigColor = '#000000';
+  _sigActiveTab = 'yaz';
+  _sigDrawInited = false;
+  document.getElementById('sig-text-input').value = '';
+  const ctx2 = document.getElementById('sig-text-canvas').getContext('2d');
+  ctx2.clearRect(0, 0, 470, 130);
+  clearSigDraw();
+  document.getElementById('sig-img-preview').style.display = 'none';
+  sigTab('yaz');
+  openModal('m-signature');
+}
+
+function createSignature() {
+  let dataUrl;
+  if (_sigActiveTab === 'yaz') {
+    if (!document.getElementById('sig-text-input').value.trim()) { toast('Lütfen imza metni girin', 'warn'); return; }
+    dataUrl = document.getElementById('sig-text-canvas').toDataURL('image/png');
+  } else if (_sigActiveTab === 'ciz') {
+    dataUrl = document.getElementById('sig-draw-canvas').toDataURL('image/png');
+  } else {
+    const img = document.getElementById('sig-img-el');
+    if (!img.src || img.src === window.location.href) { toast('Lütfen bir görsel seçin', 'warn'); return; }
+    dataUrl = img.src;
+  }
+  _imgData = dataUrl;
+  closeModal('m-signature');
+  deactivateAnnotMode();
+  annotMode = 'image';
+  document.getElementById('page-wrap').style.cursor = 'crosshair';
+  document.getElementById('text-overlay').classList.add('annot-active');
+  _setTb2Label('İmzayı yerleştirmek için sayfada alan seçin');
+  toast('İmzayı yerleştirmek için sayfada alan seçin', 'info');
+}
+
+// ── PRINT & COPY TEXT ────────────────────────────────────────────────────────
+async function doPrint() {
+  const r = await fetch('/api/print').then(x => x.json()).catch(() => ({ok:false,error:'Bağlantı hatası'}));
+  if (!r.ok) toast('Yazdırma başlatılamadı: ' + r.error, 'err');
+  else toast('Belge yazdırmaya gönderildi', 'ok');
+}
+
+async function doCopyText() {
+  const r = await fetch('/api/text').then(x => x.json()).catch(() => ({ok:false,error:'Bağlantı hatası'}));
+  if (!r.ok) { toast(r.error, 'error'); return; }
+  if (!r.text.trim()) { toast('Belgede kopyalanacak metin bulunamadı', 'warn'); return; }
+  try {
+    await navigator.clipboard.writeText(r.text);
+    toast('Tüm metin panoya kopyalandı (' + r.chars + ' karakter)', 'success');
+  } catch {
+    toast('Pano erişimi engellendi — lütfen HTTPS üzerinden açın', 'error');
+  }
+}
+// ── END PRINT & COPY TEXT ────────────────────────────────────────────────────
+
+// ── DEMO MODE ──────────────────────────────────────────────────────────────
+const _DEMO_STEPS = [
+  {
+    section: 'BÖLÜM 1 — GİRİŞ', dur: 16,
+    text: 'PDF Editor Pro — Windows için tek seferlik $19 ödemeyle, abonelik gerektirmeyen PDF düzenleme yazılımı. İnternet gerekmez, dosyalarınız buluta yüklenmiyor.',
+    hl: null, enter() {}, leave() {}
+  },
+  {
+    section: 'BÖLÜM 2 — PDF AÇMA', dur: 11,
+    text: 'Dosyayı sürükleyip bırakabilir ya da Aç butonunu kullanabilirsiniz. Sayfalar küçük resimlerle görünüyor, istediğiniz sayfaya hızlıca ulaşabiliyorsunuz.',
+    hl: 'toolbar', enter() {}, leave() {}
+  },
+  {
+    section: 'BÖLÜM 3 — BİRLEŞTİR', dur: 10,
+    text: 'Birden fazla PDF\'i tek dosyada birleştirmek için Birleştir seçeneğini kullanıyoruz. Dosyaları seçin, sırasını belirleyin — tek tıkla birleştirildi.',
+    hl: 'btn-merge', enter() { openModal('m-merge'); }, leave() { closeModal('m-merge'); }
+  },
+  {
+    section: 'BÖLÜM 4 — BÖL', dur: 13,
+    text: 'Büyük bir PDF\'den belirli sayfaları ayıklamak için Böl özelliğini kullanın. Sayfa aralığını girin — örneğin 1\'den 3\'e kadar — ve o sayfalar ayrı dosya olarak kaydediliyor.',
+    hl: 'btn-split', enter() { openModal('m-split'); }, leave() { closeModal('m-split'); }
+  },
+  {
+    section: 'BÖLÜM 5 — SIKIŞTIRIR', dur: 7,
+    text: 'E-posta göndermek için dosya boyutu çok mu büyük? Sıkıştır özelliği ile PDF boyutunu küçültebilirsiniz.',
+    hl: 'btn-compress', enter() {}, leave() {}
+  },
+  {
+    section: 'BÖLÜM 6 — ŞİFRE EKLE', dur: 14,
+    text: 'Hassas belgelerinizi korumak için şifre ekleyebilirsiniz. Açma şifresi ve düzenleme kısıtlaması ayrı ayrı ayarlanıyor. Mevcut şifreli PDF\'in şifresini kaldırmak da aynı menüden mümkün.',
+    hl: 'btn-encrypt', enter() { openModal('m-encrypt'); }, leave() { closeModal('m-encrypt'); }
+  },
+  {
+    section: 'BÖLÜM 7 — DÖNDÜR VE SAYFA YÖNETİMİ', dur: 8,
+    text: 'Yanlış taranmış sayfaları döndürebilir, gereksiz sayfaları silebilir, istediğiniz yere boş sayfa ekleyebilirsiniz.',
+    hl: 'btn-addblank', enter() {}, leave() {}
+  },
+  {
+    section: 'BÖLÜM 8 — DİL SEÇİMİ', dur: 10,
+    text: 'Yazılım 8 dili destekliyor: Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Portekizce ve Rusça. Tek tıkla değiştirebiliyorsunuz.',
+    hl: 'btn-lang-current',
+    enter() {
+      const seq = ['en','de','es','fr','tr'];
+      let i = 0;
+      _demoLangTimer = setInterval(() => {
+        setLang(seq[i++ % seq.length]);
+        if (i >= seq.length) { clearInterval(_demoLangTimer); _demoLangTimer = null; setLang('tr'); }
+      }, 1400);
+    },
+    leave() {
+      if (_demoLangTimer) { clearInterval(_demoLangTimer); _demoLangTimer = null; }
+      setLang(currentLang);
+    }
+  },
+  {
+    section: 'BÖLÜM 9 — KAPANIS', dur: 14,
+    text: 'PDF Editor Pro\'yu ücretsiz denemek için mkbsoft.net adresini ziyaret edin. Demo sürümü tamamen ücretsiz — 3 sayfaya kadar tüm özellikleri kullanabiliyorsunuz. Tam sürüm tek seferlik $19. Abonelik yok.',
+    hl: null, enter() {}, leave() {}
+  }
+];
+
+let _demoActive = false, _demoStep = 0, _demoLangTimer = null, _demoAutoTimer = null, _demoProgTimer = null;
+
+async function startDemo() {
+  toast('Demo başlatılıyor...', 'info');
+  const r = await fetch('/api/demo/open').then(x => x.json()).catch(() => ({ok:false}));
+  if (!r.ok) { toast('Demo PDF yüklenemedi', 'error'); return; }
+  S.pageCount = r.pages; S.currentPage = 0; S.ts = Date.now();
+  document.getElementById('tb-filename').textContent = r.name;
+  document.getElementById('tb-info').textContent = r.pages + ' sayfa';
+  document.getElementById('split-end').value = r.pages;
+  setDocButtons(true); buildSidebar(); await selectPage(0);
+  _demoActive = true; _demoStep = 0;
+  document.getElementById('demo-panel').style.display = 'flex';
+  _demoRender();
+}
+
+function _demoRender() {
+  const s = _DEMO_STEPS[_demoStep];
+  document.getElementById('demo-section-label').textContent = s.section;
+  document.getElementById('demo-text').textContent = s.text;
+  document.getElementById('demo-counter').textContent = (_demoStep+1) + ' / ' + _DEMO_STEPS.length;
+  document.getElementById('demo-prev-btn').disabled = _demoStep === 0;
+  document.getElementById('demo-next-btn').textContent = _demoStep === _DEMO_STEPS.length-1 ? 'Bitir' : 'Sonraki ›';
+  _demoClearRing();
+  s.enter();
+  if (s.hl) _demoRing(s.hl);
+  _demoStartAuto(s.dur);
+}
+
+function _demoStartAuto(seconds) {
+  if (_demoAutoTimer) clearTimeout(_demoAutoTimer);
+  if (_demoProgTimer) clearInterval(_demoProgTimer);
+  const bar = document.getElementById('demo-progress-bar');
+  if (bar) { bar.style.transition = 'none'; bar.style.width = '100%'; }
+  setTimeout(() => {
+    if (bar) { bar.style.transition = `width ${seconds}s linear`; bar.style.width = '0%'; }
+  }, 50);
+  _demoAutoTimer = setTimeout(() => demoNext(), seconds * 1000);
+}
+
+function _demoClearAuto() {
+  if (_demoAutoTimer) { clearTimeout(_demoAutoTimer); _demoAutoTimer = null; }
+  if (_demoProgTimer) { clearInterval(_demoProgTimer); _demoProgTimer = null; }
+  const bar = document.getElementById('demo-progress-bar');
+  if (bar) { bar.style.transition = 'none'; bar.style.width = '0%'; }
+}
+
+function _demoRing(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const rc = el.getBoundingClientRect();
+  const d = document.createElement('div');
+  d.id = 'demo-ring'; d.className = 'demo-ring';
+  d.style.cssText = `top:${rc.top-5}px;left:${rc.left-5}px;width:${rc.width+10}px;height:${rc.height+10}px`;
+  document.body.appendChild(d);
+}
+
+function _demoClearRing() { const r = document.getElementById('demo-ring'); if(r) r.remove(); }
+
+function demoNext() {
+  _demoClearAuto();
+  _DEMO_STEPS[_demoStep].leave();
+  if (_demoStep >= _DEMO_STEPS.length - 1) { demoStop(); return; }
+  _demoStep++; _demoRender();
+}
+
+function demoPrev() {
+  if (_demoStep <= 0) return;
+  _demoClearAuto();
+  _DEMO_STEPS[_demoStep].leave(); _demoStep--; _demoRender();
+}
+
+function demoStop() {
+  _demoClearAuto();
+  if (_demoActive) _DEMO_STEPS[_demoStep].leave();
+  _demoActive = false; _demoClearRing();
+  if (_demoLangTimer) { clearInterval(_demoLangTimer); _demoLangTimer = null; setLang(currentLang); }
+  document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+  document.getElementById('demo-panel').style.display = 'none';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'D') { e.preventDefault(); _demoActive ? demoStop() : startDemo(); }
+  if (_demoActive && e.key === 'ArrowRight') demoNext();
+  if (_demoActive && e.key === 'ArrowLeft') demoPrev();
+});
+// ── END DEMO MODE ────────────────────────────────────────────────────────────
+
+// Apply saved language preference on load
+setLang(currentLang);
+
+// Sayfa yüklenince sunucuda dosya açık mı kontrol et
+(async () => {
+  const r = await fetch('/api/status').then(x => x.json()).catch(() => ({ok: false}));
+  if (r.ok) {
+    S.pageCount = r.pages;
+    S.currentPage = 0;
+    S.ts = Date.now();
+    document.getElementById('tb-filename').textContent = r.name;
+    document.getElementById('tb-info').textContent = `${r.pages} sayfa`;
+    document.getElementById('split-end').value = r.pages;
+    setDocButtons(true);
+    buildSidebar();
+    await selectPage(0);
+  }
+})();
+</script>
+</body>
+</html>

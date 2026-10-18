@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>PDF Editör Pro — Aktivasyon</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #f1f5f9;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1e293b;
+}
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px;
+  width: 440px;
+  max-width: 95vw;
+  box-shadow: 0 8px 30px rgba(0,0,0,.12);
+  text-align: center;
+}
+.logo {
+  font-size: 42px;
+  margin-bottom: 8px;
+}
+h1 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #1e293b;
+}
+.subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 32px;
+}
+.form-group {
+  text-align: left;
+  margin-bottom: 16px;
+}
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 6px;
+}
+input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+  outline: none;
+  transition: border-color .15s;
+  text-transform: uppercase;
+}
+input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px #2563eb18; }
+input::placeholder { text-transform: none; letter-spacing: 0; color: #94a3b8; font-family: inherit; }
+.btn {
+  width: 100%;
+  padding: 13px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+  margin-top: 8px;
+}
+.btn:hover { background: #1d4ed8; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.msg {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  display: none;
+}
+.msg.err { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.msg.ok  { background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; }
+.footer {
+  margin-top: 28px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+.footer a { color: #2563eb; text-decoration: none; }
+.spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid #fff4;
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">📄</div>
+  <h1>PDF Editör Pro</h1>
+  <p class="subtitle">Tam sürümü açmak için lisans anahtarınızı girin.</p>
+
+  <div class="form-group">
+    <label>Lisans Anahtarı</label>
+    <input type="text" id="key-input" placeholder="BILIR-XXXX-XXXX-XXXX" maxlength="20"
+           oninput="formatKey(this)" onkeydown="if(event.key==='Enter') doActivate()">
+  </div>
+
+  <button class="btn" id="activate-btn" onclick="doActivate()">Aktivasyonu Başlat</button>
+
+  <div class="msg" id="msg"></div>
+
+  <a href="/" style="display:block;margin-top:14px;text-align:center;font-size:13px;color:#64748b">
+    Lisansınız yok mu? Demo olarak devam edin (3 sayfa, filigranlı kayıt) →
+  </a>
+
+  <div class="footer">
+    Lisans anahtarınızı satın aldığınız emailde bulabilirsiniz.<br>
+    Sorun mu var? <a href="mailto:destek@mkbsoft.net">destek@mkbsoft.net</a>
+  </div>
+</div>
+
+<script>
+function formatKey(input) {
+  let v = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  // Remove existing "BILIR" prefix if user types it manually
+  if (v.startsWith('BILIR')) v = v.slice(5);
+  v = v.replace(/(.{4})/g, '$1-').replace(/-$/, '');
+  input.value = v.length ? 'BILIR-' + v : '';
+  // Limit to full key length
+  if (input.value.length > 20) input.value = input.value.slice(0, 20);
+}
+
+async function doActivate() {
+  const raw = document.getElementById('key-input').value.trim().toUpperCase();
+  const msg = document.getElementById('msg');
+  const btn = document.getElementById('activate-btn');
+
+  if (!raw) {
+    showMsg('Lütfen lisans anahtarınızı girin.', 'err');
+    return;
+  }
+  if (raw.length < 20) {
+    showMsg('Geçersiz anahtar formatı. Örnek: BILIR-XXXX-XXXX-XXXX', 'err');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Doğrulanıyor...';
+
+  const r = await fetch('/api/activate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ license_key: raw })
+  }).then(x => x.json()).catch(() => ({ ok: false, error: 'Bağlantı hatası' }));
+
+  if (r.ok) {
+    showMsg('✓ ' + (r.message || 'Aktivasyon başarılı! Yönlendiriliyorsunuz...'), 'ok');
+    setTimeout(() => { window.location.href = '/'; }, 1800);
+  } else {
+    showMsg(r.error || 'Aktivasyon başarısız', 'err');
+    btn.disabled = false;
+    btn.textContent = 'Aktivasyonu Başlat';
+  }
+}
+
+function showMsg(text, type) {
+  const el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = 'msg ' + type;
+  el.style.display = 'block';
+}
+</script>
+</body>
+</html>

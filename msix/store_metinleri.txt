@@ -1,0 +1,179 @@
+PARTNER CENTER METİNLERİ — PDF Editor Pro - MKBSoft (MSIX)
+Her başlığın altındaki metni Partner Center'daki ilgili kutuya yapıştırın.
+=====================================================================
+
+
+#####################################################################
+1) PROPERTIES
+#####################################################################
+
+Category ............ Productivity
+Subcategory ......... (boş bırakın)
+Privacy policy URL .. https://mkbsoft.net/privacy.html
+Website ............. https://mkbsoft.net
+Support contact ..... destek@mkbsoft.net
+
+"Product declarations" kutuları:
+  [X] This app allows users to make purchases, but does not use the Microsoft Store commerce system
+      (ZORUNLU: lisans Gumroad'dan satılıyor)
+  [X] Customers can install this app to alternate drives or removable storage   (varsayılan, kalsın)
+  [X] Windows can include this app's data in automatic backups to OneDrive        (varsayılan, kalsın)
+  [ ] Diğerleri işaretsiz
+"System requirements": Minimum RAM 4 GB, DirectX/kamera vs. boş.
+
+
+#####################################################################
+2) STORE LISTING — ENGLISH (United States)
+#####################################################################
+
+--- Product name ---
+PDF Editor Pro - MKBSoft
+
+--- Description ---
+PDF Editor Pro is a fast, lightweight PDF editor for Windows. Everything runs locally on your PC — your documents are never uploaded to the cloud.
+
+EDIT
+• Edit, move and delete existing text directly on the page
+• Add new text, images, rectangles and circles
+• Highlight content, add stamps and watermarks
+• Erase selected areas — the underlying text is permanently removed
+
+ORGANIZE
+• Merge multiple PDFs into one
+• Split by page range or extract pages
+• Rotate, reorder, insert and delete pages with thumbnail view
+
+CONVERT & PROTECT
+• Export to Word (DOCX), images and plain text
+• Compress PDFs to reduce file size
+• Add or remove password protection
+
+Multilingual interface: English, Turkish, German, French, Spanish, Italian, Arabic and Russian.
+
+FREE DEMO & FULL VERSION
+Without a license the app runs as a free demo: documents up to 3 pages, saved files carry a "DEMO" watermark, and password protection and Word/Excel/PowerPoint/JPG export are disabled. To unlock the full version, buy a license key at https://mkbsoft.net and enter it via the "Enter License" button. Individual license: $19 one-time for 1 PC. Corporate license: $80 one-time for up to 5 PCs. No subscription.
+
+--- What's new in this version ---
+• Free demo mode: try the app without a license (up to 3 pages).
+• Shape drawing mode can now be exited with the Esc key or by clicking the Draw Shape button again.
+
+--- Product features (her satır ayrı kutuya) ---
+Edit existing text directly on the PDF page
+Merge, split, rotate and reorder pages
+Add text, images, shapes, highlights, stamps and watermarks
+Export PDF to Word, images or text
+Compress PDF files
+Add or remove password protection
+Works offline — files never leave your PC
+Interface in 8 languages
+
+--- Short description ---
+Edit, merge, split, compress and protect PDF files on Windows. Works offline. Free demo included; full version via one-time license, no subscription.
+
+--- Search terms (her satır ayrı kutuya, en fazla 7) ---
+PDF editor
+edit PDF
+merge PDF
+split PDF
+compress PDF
+PDF to Word
+PDF password
+
+--- Copyright and trademark info ---
+© 2026 MKBSoft
+
+--- Screenshots (Desktop) ---
+images\screenshot_01_main.png
+images\screenshot_02_merge.png
+images\screenshot_03_encrypt.png
+images\screenshot_04_export.png
+
+--- Store logos ---
+1:1 Box art (1080x1080) .... images\store_logo_1080x1080.png
+1:1 App tile icon (300x300)  images\store_logo_300x300.png
+2:3 Poster art (720x1080) .. images\store_poster_720x1080.png
+
+
+#####################################################################
+3) STORE LISTING — TÜRKÇE (Turkish)
+#####################################################################
+
+--- Product name ---
+PDF Editor Pro - MKBSoft
+
+--- Description ---
+PDF Editor Pro, Windows için hızlı ve hafif bir PDF düzenleyicidir. Her şey bilgisayarınızda çalışır — belgeleriniz asla buluta yüklenmez.
+
+DÜZENLE
+• Sayfadaki mevcut metni doğrudan düzenleyin, taşıyın veya silin
+• Yeni metin, görsel, dikdörtgen ve daire ekleyin
+• Vurgulama, damga ve filigran ekleyin
+• Seçili alanları silin — alttaki metin kalıcı olarak kaldırılır
+
+SAYFALARI YÖNET
+• Birden fazla PDF'i tek dosyada birleştirin
+• Sayfa aralığına göre bölün veya sayfa çıkarın
+• Küçük resim görünümünde sayfaları döndürün, sıralayın, ekleyin ve silin
+
+DÖNÜŞTÜR & KORU
+• Word (DOCX), görsel ve metin olarak dışa aktarın
+• PDF dosya boyutunu küçültün
+• Şifre koruması ekleyin veya kaldırın
+
+Çok dilli arayüz: Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Arapça ve Rusça.
+
+ÜCRETSİZ DEMO VE TAM SÜRÜM
+Lisans girilmeden uygulama ücretsiz demo olarak çalışır: en fazla 3 sayfalık belgeler, kaydedilen dosyalarda "DEMO" filigranı; şifreleme ve Word/Excel/PowerPoint/JPG dışa aktarma kapalıdır. Tam sürüm için https://mkbsoft.net adresinden lisans anahtarı alıp "Lisans Gir" butonuyla girin. Bireysel lisans: tek seferlik 19$, 1 bilgisayar. Kurumsal lisans: tek seferlik 80$, 5 bilgisayara kadar. Abonelik yoktur.
+
+--- What's new in this version ---
+• Ücretsiz demo modu: uygulamayı lisanssız deneyin (en fazla 3 sayfa).
+• Şekil çizme modundan artık Esc tuşuyla veya Şekil Çiz butonuna tekrar tıklayarak çıkılabiliyor.
+
+--- Product features (her satır ayrı kutuya) ---
+PDF sayfasındaki metni doğrudan düzenleyin
+Sayfaları birleştirin, bölün, döndürün ve sıralayın
+Metin, görsel, şekil, vurgulama, damga ve filigran ekleyin
+PDF'i Word, görsel veya metne dönüştürün
+PDF dosyalarını sıkıştırın
+Şifre koruması ekleyin veya kaldırın
+İnternetsiz çalışır — dosyalarınız bilgisayarınızdan çıkmaz
+8 dilde arayüz
+
+--- Short description ---
+Windows'ta PDF düzenleyin, birleştirin, bölün, sıkıştırın ve şifreleyin. İnternetsiz çalışır. Ücretsiz demo dahil; tam sürüm tek seferlik lisansla, abonelik yok.
+
+--- Search terms (her satır ayrı kutuya, en fazla 7) ---
+PDF düzenleyici
+PDF düzenle
+PDF birleştir
+PDF böl
+PDF sıkıştır
+PDF Word çevir
+PDF şifre
+
+--- Copyright and trademark info ---
+© 2026 MKBSoft
+
+(Ekran görüntüleri ve logolar İngilizce listedekiyle aynı.)
+
+
+#####################################################################
+4) SUBMISSION OPTIONS → Notes for certification
+#####################################################################
+
+This is a desktop (Win32) application packaged as MSIX. It requires the runFullTrust capability because it is a classic desktop app (Python + WebView2) that opens and saves PDF files chosen by the user anywhere on disk.
+
+Without a license the app runs as a free demo (max 3 pages, watermark on saved files, some exports disabled). To test the full version, please use this license key (valid for up to 10 PCs):
+
+    License key: BILIR-G5SP-XCRG-KDKM
+
+Steps:
+1. Launch "PDF Editor Pro".
+2. The editor opens in demo mode with an orange banner at the top. Click "Lisans Gir" (Enter License) in that banner.
+3. Enter the key above and click "Aktivasyonu Başlat" (Start Activation). An internet connection is needed for this one-time activation. The banner disappears and the full version is unlocked.
+4. Click the open button and choose any PDF file to test editing, merging, splitting, compressing, exporting and password protection.
+
+The interface opens in Turkish by default. To switch to English, click the "TR" language button in the toolbar and choose "English".
+Licenses are sold outside the Store (https://mkbsoft.net) as permitted for non-game apps under Microsoft Store Policy 10.8.
+
+Contact: destek@mkbsoft.net
