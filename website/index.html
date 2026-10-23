@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>PDF Editor Pro — Best PDF Editing Software for Windows ($19)</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
 <meta name="description" content="PDF Editor Pro: merge, split, rotate, encrypt, annotate and convert PDFs on Windows. One-time payment of $19 — no subscription, no cloud, works 100% offline. Free demo available.">
 <meta name="keywords" content="PDF editor Windows, PDF editing software, merge PDF, split PDF, PDF compressor, PDF encryptor, PDF annotator, offline PDF editor, no subscription PDF, PDF editor pro, PDF düzenleyici, PDF birleştirme">
 <meta name="author" content="MKBSoft">
@@ -45,7 +47,7 @@
       "priceCurrency": "USD"
     }
   ],
-  "description": "Professional PDF editing software for Windows. Merge, split, rotate, encrypt, annotate and convert PDFs. One-time payment, no subscription, works 100% offline.",
+  "description": "Professional PDF editing software for Windows. Merge, split, rotate, encrypt, annotate, compress, share and convert PDFs. One-time payment, no subscription, works 100% offline.",
   "url": "https://mkbsoft.net",
   "downloadUrl": "https://kamilicious12.gumroad.com/l/qxshwx",
   "softwareVersion": "1.0.4",
@@ -370,6 +372,34 @@
     color: #64748b;
     font-size: 14px;
   }
+
+  .screenshot-content.real { height: auto; background: #fff; display: block; }
+  .screenshot-content.real img { height: auto; object-fit: initial; }
+  .nav-logo img { width: 32px; height: 32px; display: block; border-radius: 7px; }
+  .footer-logo img { width: 26px; height: 26px; display: block; border-radius: 6px; }
+  .new-pill {
+    display: inline-flex; align-items: center; gap: 8px; margin: 0 auto 14px;
+    background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;
+    font-size: 13px; font-weight: 600; padding: 5px 14px; border-radius: 100px; text-decoration: none;
+  }
+  .new-pill b { background: #10b981; color: #fff; border-radius: 100px; padding: 1px 8px; font-size: 11px; }
+  .new-pill:hover { background: #d1fae5; }
+  #new { background: var(--bg2); }
+  .new-row { display: grid; grid-template-columns: 1.25fr 1fr; gap: 48px; align-items: center; margin-top: 56px; }
+  .new-row.flip { grid-template-columns: 1fr 1.25fr; }
+  .new-row.flip .new-shot { order: 2; }
+  .new-shot { border-radius: 14px; overflow: hidden; border: 1px solid var(--border);
+              box-shadow: 0 18px 60px rgba(0,0,0,.10), 0 3px 12px rgba(0,0,0,.05); background: #fff; }
+  .new-shot img { width: 100%; height: auto; display: block; }
+  .new-text h3 { font-size: 24px; font-weight: 800; letter-spacing: -.4px; margin-bottom: 12px; }
+  .new-text p { color: var(--text2); font-size: 16px; line-height: 1.65; margin-bottom: 14px; }
+  .new-text ul { list-style: none; padding: 0; display: grid; gap: 8px; }
+  .new-text li { color: var(--text); font-size: 15px; padding-left: 26px; position: relative; line-height: 1.5; }
+  .new-text li::before { content: '✓'; position: absolute; left: 0; top: 0; color: #10b981; font-weight: 800; }
+  .new-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px; }
+  .new-mini div { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .new-mini strong { display: block; font-size: 15px; margin-bottom: 6px; }
+  .new-mini span { color: var(--text2); font-size: 14px; line-height: 1.55; }
 
   .screenshot-content img {
     width: 100%;
@@ -867,6 +897,8 @@
   @media (max-width: 768px) {
     .nav-links { display: none; }
     .features-grid { grid-template-columns: 1fr; }
+    .new-row, .new-row.flip, .new-mini { grid-template-columns: 1fr; gap: 24px; }
+    .new-row.flip .new-shot { order: 0; }
     .steps { grid-template-columns: 1fr; }
     .steps::before { display: none; }
     .pricing-grid { grid-template-columns: 1fr; }
@@ -881,15 +913,16 @@
 <nav>
   <div class="nav-inner">
     <a href="/" class="nav-logo">
-      <div class="icon">📄</div>
+      <img src="/img/app-icon.png" alt="" width="32" height="32">
       PDF Editor Pro
     </a>
     <ul class="nav-links">
-      <li><a href="#features">Features</a></li>
-      <li><a href="#how">How it works</a></li>
-      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#new" data-en="What's new" data-tr="Yenilikler">What's new</a></li>
+      <li><a href="#features" data-en="Features" data-tr="Özellikler">Features</a></li>
+      <li><a href="#how" data-en="How it works" data-tr="Nasıl çalışır">How it works</a></li>
+      <li><a href="#pricing" data-en="Pricing" data-tr="Fiyatlar">Pricing</a></li>
       <li><a href="#demo" data-en="Demo" data-tr="Demo">Demo</a></li>
-      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#faq" data-en="FAQ" data-tr="SSS">FAQ</a></li>
       <li><a href="https://kamilicious12.gumroad.com/l/qxshwx" class="nav-cta" data-en="Buy Now — $19" data-tr="Satın Al — $19">Buy Now — $19</a></li>
     </ul>
     <div class="lang-toggle">
@@ -901,6 +934,7 @@
 
 <!-- HERO -->
 <div class="hero">
+  <a href="#new" class="new-pill" data-en="<b>NEW</b> v1.0.4 — Compress &amp; send, organize pages, new ribbon →" data-tr="<b>YENİ</b> v1.0.4 — Küçült ve gönder, sayfaları düzenle, yeni şerit →"><b>NEW</b> v1.0.4 — Compress &amp; send, organize pages, new ribbon →</a><br>
   <div class="hero-badge" data-en="Windows 10 &amp; 11 · No subscription" data-tr="Windows 10 ve 11 · Abonelik yok">Windows 10 &amp; 11 · No subscription</div>
   <h1 data-en="Edit PDFs like a<br><span>pro. Without the cost.</span>" data-tr="PDF'leri profesyonel<br><span>gibi düzenle. Ucuza.</span>">Edit PDFs like a<br><span>pro. Without the cost.</span></h1>
   <p data-en="Merge, split, rotate, encrypt and annotate PDFs directly on your desktop. No cloud, no monthly fees — yours forever." data-tr="PDF'leri birleştir, böl, döndür, şifrele ve doğrudan masaüstünde düzenle. Bulut yok, aylık ücret yok — sonsuza kadar senin.">Merge, split, rotate, encrypt and annotate PDFs directly on your desktop. No cloud, no monthly fees — yours forever.</p>
@@ -921,87 +955,8 @@
       <div class="dot dot-y"></div>
       <div class="dot dot-g"></div>
     </div>
-    <div class="screenshot-content" style="background:#1e293b;display:flex;flex-direction:column;overflow:hidden">
-      <!-- Toolbar mockup -->
-      <div style="background:#fff;padding:8px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #e2e8f0;flex-shrink:0">
-        <span style="color:#0891b2;font-weight:700;font-size:12px;margin-right:4px">PDF Editör</span>
-        <div style="background:#0891b2;color:#fff;border:1px solid #0c4a6e;border-radius:5px;padding:3px 8px;font-size:11px;display:flex;align-items:center;gap:4px">📂 Aç</div>
-        <div style="background:#f8fafc;color:#374151;border:1px solid #d1d5db;border-radius:5px;padding:3px 8px;font-size:11px">↩ Geri Al</div>
-        <div style="background:#f8fafc;color:#374151;border:1px solid #d1d5db;border-radius:5px;padding:3px 8px;font-size:11px">💾 Kaydet</div>
-        <div style="width:1px;height:18px;background:#e2e8f0;margin:0 2px"></div>
-        <div style="background:#f8fafc;color:#374151;border:1px solid #d1d5db;border-radius:5px;padding:3px 8px;font-size:11px">Birleştir</div>
-        <div style="background:#f8fafc;color:#374151;border:1px solid #d1d5db;border-radius:5px;padding:3px 8px;font-size:11px">Böl</div>
-        <div style="background:#f8fafc;color:#374151;border:1px solid #d1d5db;border-radius:5px;padding:3px 8px;font-size:11px;background:#0891b2;color:#fff;border-color:#0c4a6e">PDF'e Çevir</div>
-        <div style="flex:1"></div>
-        <div style="font-size:11px;color:#94a3b8">rapor_2025.pdf &nbsp;·&nbsp; 67 sayfa</div>
-      </div>
-      <!-- Sub-toolbar -->
-      <div style="background:#f1f5f9;padding:5px 12px;display:flex;gap:6px;border-bottom:1px solid #e2e8f0;flex-shrink:0">
-        <div style="width:28px;height:24px;background:#fff;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px">🖊</div>
-        <div style="width:28px;height:24px;background:#fff;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px">🔒</div>
-        <div style="width:28px;height:24px;background:#fff;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px">🖼</div>
-        <div style="width:28px;height:24px;background:#0891b2;border:1px solid #0c4a6e;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px">🔄</div>
-        <div style="width:28px;height:24px;background:#fff;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px">+</div>
-      </div>
-      <!-- Main area -->
-      <div style="display:flex;flex:1;overflow:hidden">
-        <!-- Sidebar -->
-        <div style="width:130px;background:#1e1e2e;padding:8px;display:flex;flex-direction:column;gap:8px;overflow:hidden;flex-shrink:0">
-          <div style="background:#2d2d40;border-radius:6px;padding:4px;border:2px solid #0891b2">
-            <div style="background:#fff;height:72px;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px">
-              <div style="width:80%;height:5px;background:#1e293b;border-radius:2px;opacity:.7"></div>
-              <div style="width:90%;height:4px;background:#e2e8f0;border-radius:2px"></div>
-              <div style="width:90%;height:4px;background:#e2e8f0;border-radius:2px"></div>
-              <div style="width:70%;height:4px;background:#e2e8f0;border-radius:2px"></div>
-            </div>
-            <div style="color:#94a3b8;font-size:9px;text-align:center;margin-top:3px">1</div>
-          </div>
-          <div style="background:#2d2d40;border-radius:6px;padding:4px">
-            <div style="background:#fff;height:72px;border-radius:3px;padding:6px;display:flex;flex-direction:column;gap:3px">
-              <div style="width:90%;height:4px;background:#e2e8f0;border-radius:2px"></div>
-              <div style="width:85%;height:4px;background:#e2e8f0;border-radius:2px"></div>
-              <div style="width:90%;height:4px;background:#e2e8f0;border-radius:2px"></div>
-              <div style="width:60%;height:4px;background:#e2e8f0;border-radius:2px"></div>
-              <div style="width:80%;height:4px;background:#e2e8f0;border-radius:2px"></div>
-            </div>
-            <div style="color:#64748b;font-size:9px;text-align:center;margin-top:3px">2</div>
-          </div>
-          <div style="background:#2d2d40;border-radius:6px;padding:4px">
-            <div style="background:#fff;height:72px;border-radius:3px;padding:6px;display:flex;flex-direction:column;gap:3px">
-              <div style="width:85%;height:4px;background:#e2e8f0;border-radius:2px"></div>
-              <div style="width:90%;height:4px;background:#e2e8f0;border-radius:2px"></div>
-              <div style="width:75%;height:4px;background:#e2e8f0;border-radius:2px"></div>
-            </div>
-            <div style="color:#64748b;font-size:9px;text-align:center;margin-top:3px">3</div>
-          </div>
-        </div>
-        <!-- PDF canvas -->
-        <div style="flex:1;background:#525659;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:hidden">
-          <div style="background:#fff;width:340px;min-height:420px;border-radius:2px;box-shadow:0 4px 24px rgba(0,0,0,.4);padding:32px 36px;display:flex;flex-direction:column;gap:10px">
-            <div style="text-align:center;margin-bottom:8px">
-              <div style="width:40px;height:40px;background:#dbeafe;border-radius:6px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:16px">📄</div>
-              <div style="font-weight:700;font-size:12px;color:#0f172a">Acme Corporation</div>
-              <div style="font-size:9px;color:#64748b">Q3 2024 — Project Summary Report</div>
-            </div>
-            <div style="height:1px;background:#e2e8f0"></div>
-            <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
-              <div style="background:#fef9c3;border-left:3px solid #eab308;padding:3px 6px;font-size:9px;color:#713f12;border-radius:0 3px 3px 0">Vurgulanan metin örneği ✏️</div>
-              <div style="width:100%;height:6px;background:#e2e8f0;border-radius:3px"></div>
-              <div style="width:90%;height:6px;background:#e2e8f0;border-radius:3px"></div>
-              <div style="width:95%;height:6px;background:#e2e8f0;border-radius:3px"></div>
-              <div style="width:80%;height:6px;background:#e2e8f0;border-radius:3px"></div>
-              <div style="width:100%;height:6px;background:#e2e8f0;border-radius:3px;margin-top:4px"></div>
-              <div style="width:88%;height:6px;background:#e2e8f0;border-radius:3px"></div>
-              <div style="border:1.5px solid #0891b2;border-radius:4px;padding:4px 6px;margin-top:6px;position:relative">
-                <div style="font-size:9px;color:#0891b2;font-weight:600">Yeni eklenen metin bloğu</div>
-                <div style="position:absolute;top:-8px;right:6px;width:16px;height:16px;background:#f97316;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px">✏</div>
-              </div>
-              <div style="width:100%;height:6px;background:#e2e8f0;border-radius:3px;margin-top:4px"></div>
-              <div style="width:75%;height:6px;background:#e2e8f0;border-radius:3px"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="screenshot-content real">
+      <img class="lang-img" src="/img/en_01_main.webp" data-src-en="/img/en_01_main.webp" data-src-tr="/img/tr_01_main.webp" alt="PDF Editor Pro main window with the ribbon toolbar" width="1366" height="768">
     </div>
   </div>
 </div>
@@ -1028,6 +983,46 @@
     </div>
   </div>
 </div>
+
+<!-- WHAT'S NEW -->
+<section id="new">
+  <div class="section-inner">
+    <div class="section-label" data-en="New in v1.0.4" data-tr="v1.0.4 ile gelenler">New in v1.0.4</div>
+    <h2 class="section-title" data-en="Shrink it, send it,<br>tidy it up." data-tr="Küçült, gönder,<br>düzenle.">Shrink it, send it,<br>tidy it up.</h2>
+    <p class="section-sub" data-en="The biggest update yet: a cleaner interface and the everyday jobs you asked for." data-tr="Şimdiye kadarki en büyük güncelleme: daha sade bir arayüz ve günlük işler için istenen özellikler.">The biggest update yet: a cleaner interface and the everyday jobs you asked for.</p>
+
+    <div class="new-row">
+      <div class="new-shot" style="max-width:520px;justify-self:center"><img class="lang-img" src="/img/en_04_share.webp" data-src-en="/img/en_04_share.webp" data-src-tr="/img/tr_04_share.webp" alt="Compress result with share options" width="520" height="585" loading="lazy"></div>
+      <div class="new-text">
+        <h3 data-en="Compress &amp; send" data-tr="Küçült ve gönder">Compress &amp; send</h3>
+        <p data-en="Too big for email? Pick a quality level and a 6 MB scan becomes a few hundred KB. Then send it straight away." data-tr="E-posta için çok mu büyük? Bir kalite seviyesi seç; 6 MB'lık tarama birkaç yüz KB'a iner. Sonra hemen gönder.">Too big for email? Pick a quality level and a 6 MB scan becomes a few hundred KB. Then send it straight away.</p>
+        <ul>
+          <li data-en="Small file, Balanced, High quality or Lossless" data-tr="Küçük dosya, Dengeli, Yüksek kalite veya Kayıpsız">Small file, Balanced, High quality or Lossless</li>
+          <li data-en="Send with your email program, Gmail, Outlook.com, WhatsApp, Telegram, Teams or LinkedIn" data-tr="E-posta programın, Gmail, Outlook.com, WhatsApp, Telegram, Teams veya LinkedIn ile gönder">Send with your email program, Gmail, Outlook.com, WhatsApp, Telegram, Teams or LinkedIn</li>
+          <li data-en="Your original file is never changed" data-tr="Orijinal dosyan hiç değişmez">Your original file is never changed</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="new-row flip">
+      <div class="new-shot"><img class="lang-img" src="/img/en_02_pages.webp" data-src-en="/img/en_02_pages.webp" data-src-tr="/img/tr_02_pages.webp" alt="Organize Pages grid with selected pages" width="1366" height="768" loading="lazy"></div>
+      <div class="new-text">
+        <h3 data-en="Organize pages at a glance" data-tr="Sayfaları tek bakışta düzenle">Organize pages at a glance</h3>
+        <p data-en="See every page as a numbered thumbnail. Tick the ones you don't need and delete or rotate them all at once." data-tr="Tüm sayfaları numaralı küçük resimler olarak gör. İstemediklerini işaretle, hepsini tek seferde sil veya döndür.">See every page as a numbered thumbnail. Tick the ones you don't need and delete or rotate them all at once.</p>
+        <ul>
+          <li data-en="Select with a click, ranges with Shift" data-tr="Tıklayarak seç, Shift ile aralık seç">Select with a click, ranges with Shift</li>
+          <li data-en="One Undo brings everything back" data-tr="Tek Geri Al ile hepsi geri gelir">One Undo brings everything back</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="new-mini">
+      <div><strong data-en="New ribbon interface" data-tr="Yeni şerit arayüz">New ribbon interface</strong><span data-en="Home, Edit, Comment, Page, Convert and Protect tabs with clear, labelled, colourful icons." data-tr="Ana Sayfa, Düzenle, Yorum, Sayfa, Dönüştür ve Koru sekmeleri; yazılı ve renkli simgeler.">Home, Edit, Comment, Page, Convert and Protect tabs with clear, labelled, colourful icons.</span></div>
+      <div><strong data-en="Scroll through pages" data-tr="Tekerlekle sayfa geçişi">Scroll through pages</strong><span data-en="Keep scrolling with the mouse wheel to move to the next or previous page." data-tr="Fare tekerleğini çevirmeye devam et, sonraki veya önceki sayfaya geç.">Keep scrolling with the mouse wheel to move to the next or previous page.</span></div>
+      <div><strong data-en="Sharper app icon" data-tr="Daha net simge">Sharper app icon</strong><span data-en="Crisp on the taskbar, desktop and window title at every size." data-tr="Görev çubuğunda, masaüstünde ve pencere başlığında her boyutta net.">Crisp on the taskbar, desktop and window title at every size.</span></div>
+    </div>
+  </div>
+</section>
 
 <!-- FEATURES -->
 <section id="features">
@@ -1067,6 +1062,21 @@
         <div class="feature-icon">✏️</div>
         <h3 data-en="Annotate &amp; Edit" data-tr="Açıklama ve Düzenleme">Annotate &amp; Edit</h3>
         <p data-en="Add text, highlights and annotations directly on any PDF page." data-tr="Herhangi bir PDF sayfasına doğrudan metin, vurgu ve açıklama ekle.">Add text, highlights and annotations directly on any PDF page.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📤</div>
+        <h3 data-en="Compress &amp; Send" data-tr="Küçült ve Gönder">Compress &amp; Send</h3>
+        <p data-en="Shrink large PDFs for email and share them by email, WhatsApp, Teams and more." data-tr="Büyük PDF'leri e-posta için küçült; e-posta, WhatsApp, Teams ve daha fazlasıyla paylaş.">Shrink large PDFs for email and share them by email, WhatsApp, Teams and more.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗂️</div>
+        <h3 data-en="Organize Pages" data-tr="Sayfaları Düzenle">Organize Pages</h3>
+        <p data-en="See all pages as thumbnails and delete or rotate several at once." data-tr="Tüm sayfaları küçük resimlerle gör, birden fazlasını topluca sil veya döndür.">See all pages as thumbnails and delete or rotate several at once.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📑</div>
+        <h3 data-en="Export to Office" data-tr="Office'e Aktar">Export to Office</h3>
+        <p data-en="Turn PDFs into Word, Excel, PowerPoint, PNG, JPG or plain text." data-tr="PDF'leri Word, Excel, PowerPoint, PNG, JPG veya düz metne dönüştür.">Turn PDFs into Word, Excel, PowerPoint, PNG, JPG or plain text.</p>
       </div>
     </div>
   </div>
@@ -1258,7 +1268,7 @@
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">
-      <div class="icon">📄</div>
+      <img src="/img/app-icon.png" alt="" width="32" height="32">
       PDF Editor Pro by MKBSoft
     </div>
     <ul class="footer-links">
@@ -1283,6 +1293,10 @@ function setLang(lang) {
   document.documentElement.lang = lang;
   document.querySelectorAll('[data-en]').forEach(el => {
     el.innerHTML = el.dataset[lang];
+  });
+  document.querySelectorAll('img.lang-img').forEach(img => {
+    const src = lang === 'tr' ? img.dataset.srcTr : img.dataset.srcEn;
+    if (img.getAttribute('src') !== src) img.src = src;
   });
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
   document.getElementById('btn-tr').classList.toggle('active', lang === 'tr');
