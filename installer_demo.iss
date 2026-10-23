@@ -2,7 +2,7 @@
 #define MyAppVersion "1.0.4"
 #define MyAppPublisher "FB Tekstil"
 #define MyAppURL "https://www.mkbsoft.net"
-#define MyAppExeName "PDFEditorDemo.exe"
+#define MyAppExeName "PDFEditor.exe"
 #define MyAppId "{{B7D2E4F1-9C6A-4E8B-A1D3-5F2C7B8D9E0A}"
 
 [Setup]
@@ -44,9 +44,13 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "Masaüstüne kısayol oluştur"; GroupDescription: "Ek seçenekler:"; Flags: checkedonce
 
+[InstallDelete]
+; v1.0.4 öncesi demo ayrı bir exe idi (PDFEditorDemo.exe); artık tam sürümle aynı program demo modunda açılıyor
+Type: files; Name: "{app}\PDFEditorDemo.exe"
+
 [Files]
-Source: "C:\Users\kamil.bilir\pdf_editor\dist\PDFEditorDemo\PDFEditorDemo.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\kamil.bilir\pdf_editor\dist\PDFEditorDemo\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\kamil.bilir\pdf_editor\dist\PDFEditor\PDFEditor.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\kamil.bilir\pdf_editor\dist\PDFEditor\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
