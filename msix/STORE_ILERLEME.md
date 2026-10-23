@@ -33,3 +33,14 @@ Son güncelleme: 2026-10-09 (ara verildi)
 - v1.0.2 GitHub'da yayınlandı (demo + kurulum), pad.xml güncellendi.
 - Gumroad dosyaları kullanıcı tarafından v1.0.2 ile değiştirildi.
 - MSIX derleme: `python build_msix.py <sürüm> <makeappx yolu>` (Windows SDK veya NuGet Microsoft.Windows.SDK.BuildTools gerekir).
+
+## 2026-10-18 (son durum)
+- v1.0.3 paketi yuklendi, TR + EN listeler tamam (4 gercek ekran goruntusu), Submission Options + sertifikasyon notlari + runFullTrust gerekcesi kaydedildi.
+- Tum bolumler Complete. Kalan: "Submit for certification" butonuna kullanici basacak.
+
+## 2026-10-23
+- v1.0.3 Store'da YAYINDA (ücretsiz + demo; lisans Gumroad'dan). Temiz kurulumda demo modu doğrulandı.
+- v1.0.4 derlendi: kalite seçenekli PDF sıkıştırma. Paketler: installer_output\PDFEditorPro_Store_v1.0.4.msix, PDFEditorPro_Kurulum_v1.0.4.exe, PDFEditorPro_Demo_v1.0.4.exe
+- [ ] Partner Center → Update → Packages: 1.0.3'ü kaldır, 1.0.4'ü yükle → Store listings (TR+EN) "What's new" güncelle (store_metinleri.txt) → Submit
+- [ ] Gumroad: kurulum dosyasını v1.0.4 ile değiştir
+- [ ] GitHub release v1.0.4 (demo + kurulum), website yeniden yayınla

@@ -1417,21 +1417,130 @@ def api_removewatermark():
     return jsonify({'ok': True, 'pages': len(doc), 'count': total})
 
 
+# Sıkıştırma seviyeleri: (hedef DPI, JPEG kalitesi). None = kayıpsız (resimlere dokunma)
+COMPRESS_LEVELS = {
+    'lossless': None,
+    'high':     (200, 85),
+    'medium':   (150, 72),
+    'low':      (96, 55),
+}
+
+
+def _image_display_widths(doc):
+    """xref -> sayfadaki en geniş gösterim genişliği (pt). Efektif DPI hesabı için.
+
+    PyMuPDF aynı piksellere sahip resimleri birbirine karıştırabilir; en büyük değeri
+    almak bu durumda resmi gereğinden fazla değil, en fazla daha az küçültür."""
+    widths = {}
+    for page in doc:
+        for img in page.get_images(full=True):
+            xref = img[0]
+            for _rect, m in page.get_image_rects(xref, transform=True):
+                w = (m.a ** 2 + m.b ** 2) ** 0.5  # resmin x ekseni boyunca genişlik (döndürmeye dayanıklı)
+                widths[xref] = max(widths.get(xref, 0), w)
+    return widths
+
+
+def _recompress_images(doc, target_dpi, quality):
+    """Resimleri hedef DPI'ya indirip JPEG olarak yeniden sıkıştırır. Değişen resim sayısını döndürür."""
+    widths = _image_display_widths(doc)
+    owner = {}  # xref -> resmi içeren bir sayfa (replace_image için)
+    for page in doc:
+        for img in page.get_images(full=True):
+            owner.setdefault(img[0], page)
+
+    changed = 0
+    for xref, page in owner.items():
+        try:
+            if doc.xref_get_key(xref, 'Mask')[0] != 'null':
+                continue  # renk anahtarlı maske — dokunma
+            if doc.xref_get_key(xref, 'ImageMask')[1] == 'true':
+                continue
+            # extract_image() JPX'i PNG'ye çevirdiği için çok yavaş — sözlükten oku
+            filt = doc.xref_get_key(xref, 'Filter')[1]
+            bpc = doc.xref_get_key(xref, 'BitsPerComponent')[1]
+            if (bpc.isdigit() and int(bpc) < 8) or 'JBIG2' in filt or 'CCITT' in filt:
+                continue  # 1-bit taramalar zaten küçük, JPEG büyütür
+            width = int(doc.xref_get_key(xref, 'Width')[1])
+            old_len = len(doc.xref_stream_raw(xref) or b'')
+            if old_len < 20 * 1024:
+                continue
+
+            disp_w = widths.get(xref, 0)
+            needs_downscale = disp_w > 0 and width / (disp_w / 72) > target_dpi * 1.1
+            if not needs_downscale and ('DCT' in filt or 'JPX' in filt) and quality > 60:
+                continue  # zaten sıkıştırılmış; aynı çözünürlükte yeniden kodlamak kazandırmaz, sadece yavaşlatır
+
+            pix = fitz.Pixmap(doc, xref)
+            if pix.alpha:
+                continue
+            if pix.n not in (1, 3):
+                pix = fitz.Pixmap(fitz.csRGB, pix)
+            smask = doc.xref_get_key(xref, 'SMask')
+            if smask[0] == 'xref':
+                pix = fitz.Pixmap(pix, fitz.Pixmap(doc, int(smask[1].split()[0])))
+
+            downscaled = False
+            if needs_downscale:
+                scale = target_dpi / (pix.width / (disp_w / 72))
+                nw, nh = max(1, int(pix.width * scale)), max(1, int(pix.height * scale))
+                pix = fitz.Pixmap(pix, nw, nh, None)
+                downscaled = True
+
+            if pix.alpha:
+                # Şeffaf resim: JPEG şeffaflığı bozar — sadece küçült, kayıpsız sakla
+                if downscaled:
+                    page.replace_image(xref, pixmap=pix)
+                    changed += 1
+                continue
+
+            data = pix.tobytes('jpeg', jpg_quality=quality)
+            if len(data) < old_len * 0.9:
+                page.replace_image(xref, stream=data)
+                changed += 1
+        except Exception:
+            continue  # sorunlu tek bir resim tüm işlemi bozmasın
+    return changed
+
+
 @app.route('/api/compress', methods=['POST'])
 def api_compress():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False})
-    path = request.json.get('path', '').strip().strip('"')
+    data = request.json or {}
+    path = (data.get('path') or '').strip().strip('"')
+    level = data.get('quality', 'medium')
+    if level not in COMPRESS_LEVELS:
+        level = 'medium'
     if not path:
         path = _default_out('_sikistirildi')
     try:
-        if is_demo():
-            _save_with_watermark(doc, path)
-        else:
-            doc.save(path, garbage=4, deflate=True, deflate_images=True, deflate_fonts=True)
+        orig_kb = None
+        if state.get('path') and os.path.exists(state['path']):
+            orig_kb = os.path.getsize(state['path']) // 1024
+
+        # Açık belgeye dokunmamak için kopya üzerinde çalış
+        work = fitz.open('pdf', doc.tobytes())
+        images = 0
+        try:
+            preset = COMPRESS_LEVELS[level]
+            if preset:
+                images = _recompress_images(work, *preset)
+                try:
+                    work.subset_fonts()
+                except Exception:
+                    pass
+            if is_demo():
+                _save_with_watermark(work, path)
+            else:
+                work.save(path, garbage=4, deflate=True, deflate_images=True,
+                          deflate_fonts=True, clean=True)
+        finally:
+            work.close()
         size_kb = Path(path).stat().st_size // 1024
-        return jsonify({'ok': True, 'path': path, 'size_kb': size_kb})
+        return jsonify({'ok': True, 'path': path, 'size_kb': size_kb,
+                        'orig_kb': orig_kb, 'images': images, 'quality': level})
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)})
 

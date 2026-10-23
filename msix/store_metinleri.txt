@@ -45,17 +45,16 @@ ORGANIZE
 
 CONVERT & PROTECT
 • Export to Word (DOCX), images and plain text
-• Compress PDFs to reduce file size
+• Compress PDFs with selectable quality to reduce file size
 • Add or remove password protection
 
-Multilingual interface: English, Turkish, German, French, Spanish, Italian, Arabic and Russian.
+Multilingual interface: English, Turkish, German, French, Spanish, Italian, Portuguese and Russian.
 
 FREE DEMO & FULL VERSION
 Without a license the app runs as a free demo: documents up to 3 pages, saved files carry a "DEMO" watermark, and password protection and Word/Excel/PowerPoint/JPG export are disabled. To unlock the full version, buy a license key at https://mkbsoft.net and enter it via the "Enter License" button. Individual license: $19 one-time for 1 PC. Corporate license: $80 one-time for up to 5 PCs. No subscription.
 
 --- What's new in this version ---
-• Free demo mode: try the app without a license (up to 3 pages).
-• Shape drawing mode can now be exited with the Esc key or by clicking the Draw Shape button again.
+• PDF compression now offers quality levels: Small file, Balanced, High quality and Lossless. Images are downsampled and recompressed, so scanned and photo-heavy PDFs get much smaller — ideal for email.
 
 --- Product features (her satır ayrı kutuya) ---
 Edit existing text directly on the PDF page
@@ -117,17 +116,16 @@ SAYFALARI YÖNET
 
 DÖNÜŞTÜR & KORU
 • Word (DOCX), görsel ve metin olarak dışa aktarın
-• PDF dosya boyutunu küçültün
+• PDF dosya boyutunu kalite seçerek küçültün
 • Şifre koruması ekleyin veya kaldırın
 
-Çok dilli arayüz: Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Arapça ve Rusça.
+Çok dilli arayüz: Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Portekizce ve Rusça.
 
 ÜCRETSİZ DEMO VE TAM SÜRÜM
 Lisans girilmeden uygulama ücretsiz demo olarak çalışır: en fazla 3 sayfalık belgeler, kaydedilen dosyalarda "DEMO" filigranı; şifreleme ve Word/Excel/PowerPoint/JPG dışa aktarma kapalıdır. Tam sürüm için https://mkbsoft.net adresinden lisans anahtarı alıp "Lisans Gir" butonuyla girin. Bireysel lisans: tek seferlik 19$, 1 bilgisayar. Kurumsal lisans: tek seferlik 80$, 5 bilgisayara kadar. Abonelik yoktur.
 
 --- What's new in this version ---
-• Ücretsiz demo modu: uygulamayı lisanssız deneyin (en fazla 3 sayfa).
-• Şekil çizme modundan artık Esc tuşuyla veya Şekil Çiz butonuna tekrar tıklayarak çıkılabiliyor.
+• PDF sıkıştırmada kalite seçenekleri: Küçük dosya, Dengeli, Yüksek kalite ve Kayıpsız. Resimler küçültülüp yeniden sıkıştırılıyor; taranmış ve fotoğraflı PDF'ler çok daha küçük oluyor — e-posta için ideal.
 
 --- Product features (her satır ayrı kutuya) ---
 PDF sayfasındaki metni doğrudan düzenleyin

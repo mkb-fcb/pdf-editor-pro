@@ -1,5 +1,5 @@
 #define MyAppName "PDF Editör Pro"
-#define MyAppVersion "1.0.3"
+#define MyAppVersion "1.0.4"
 #define MyAppPublisher "FB Tekstil"
 #define MyAppURL "https://www.fbtextile.com"
 #define MyAppExeName "PDFEditor.exe"

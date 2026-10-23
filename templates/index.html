@@ -1077,7 +1077,7 @@ body.has-file #sidebar {
   <button class="btn-secondary tb2-icon" id="btn-encrypt" onclick="openModal('m-encrypt')" disabled title="Şifre ekle / kaldır">
     <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
   </button>
-  <button class="btn-secondary tb2-icon" id="btn-compress" onclick="doCompress()" disabled title="PDF'i sıkıştır">
+  <button class="btn-secondary tb2-icon" id="btn-compress" onclick="openModal('m-compress')" disabled title="PDF'i sıkıştır">
     <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
   </button>
   <button class="btn-secondary tb2-icon" id="btn-signature" onclick="openSignatureModal()" disabled title="İmza ekle">
@@ -1297,6 +1297,36 @@ body.has-file #sidebar {
         <button class="btn-secondary" onclick="closeModal('m-encrypt')">İptal</button>
         <button class="btn-danger" style="background:var(--danger);color:#fff;padding:6px 14px;border-radius:var(--radius)" onclick="doDecrypt()">🔓 Şifreyi Kaldır</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Sıkıştır -->
+<div class="modal-backdrop" id="m-compress">
+  <div class="modal-card">
+    <h3>🗜️ PDF Sıkıştır</h3>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">E-posta ile göndermek için dosya boyutunu küçültün. Açık belge değişmez; sıkıştırılmış kopya ayrı kaydedilir.</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;cursor:pointer">
+        <input type="radio" name="cmp-q" value="low" style="margin-top:3px">
+        <span><b>Küçük dosya</b> — 96 DPI, en çok küçültme<br><span style="color:var(--text-muted)">E-posta ve ekranda okuma için</span></span>
+      </label>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;cursor:pointer">
+        <input type="radio" name="cmp-q" value="medium" checked style="margin-top:3px">
+        <span><b>Dengeli (önerilen)</b> — 150 DPI<br><span style="color:var(--text-muted)">Okunaklı ve küçük; çoğu belge için ideal</span></span>
+      </label>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;cursor:pointer">
+        <input type="radio" name="cmp-q" value="high" style="margin-top:3px">
+        <span><b>Yüksek kalite</b> — 200 DPI<br><span style="color:var(--text-muted)">Yazdırma için; daha az küçültme</span></span>
+      </label>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;cursor:pointer">
+        <input type="radio" name="cmp-q" value="lossless" style="margin-top:3px">
+        <span><b>Kayıpsız</b> — resimlere dokunmaz<br><span style="color:var(--text-muted)">Sadece gereksiz veriyi temizler</span></span>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('m-compress')">İptal</button>
+      <button class="btn-primary" onclick="doCompress()">🗜️ Sıkıştır ve Kaydet</button>
     </div>
   </div>
 </div>
@@ -3356,11 +3386,21 @@ async function doReverse() {
 // ── compress ─────────────────────────────────────────────
 
 async function doCompress() {
+  const sel = document.querySelector('input[name="cmp-q"]:checked');
+  closeModal('m-compress');
   spin(true);
-  const r = await post('/api/compress', {});
+  const r = await post('/api/compress', { quality: sel ? sel.value : 'medium' });
   spin(false);
   if (!r.ok) { toast(r.error || 'Sıkıştırma başarısız', 'err'); return; }
-  toast('Sıkıştırıldı: ' + r.path + ' (' + r.size_kb + ' KB)', 'ok');
+  let msg = 'Sıkıştırıldı: ' + r.path + ' (';
+  if (r.orig_kb) {
+    const pct = Math.round((1 - r.size_kb / r.orig_kb) * 100);
+    msg += r.orig_kb + ' KB → ' + r.size_kb + ' KB';
+    if (pct > 0) msg += ', %' + pct + ' küçük';
+  } else {
+    msg += r.size_kb + ' KB';
+  }
+  toast(msg + ')', 'ok');
 }
 
 // ── image insert ─────────────────────────────────────────
