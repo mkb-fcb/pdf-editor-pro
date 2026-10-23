@@ -529,27 +529,49 @@ def api_page(i):
 
 @app.route('/api/delete', methods=['POST'])
 def api_delete():
+    """Deletes one page ({i}) or several ({pages: [...]}) as a single undo step."""
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
-    i = request.json.get('i', -1)
-    if i < 0 or i >= len(doc):
+    data = request.json or {}
+    pages = data.get('pages')
+    if pages is None:
+        pages = [data.get('i', -1)]
+    try:
+        pages = sorted({int(i) for i in pages})
+    except (TypeError, ValueError):
         return jsonify({'ok': False, 'error': 'Geçersiz sayfa'})
+    if not pages or pages[0] < 0 or pages[-1] >= len(doc):
+        return jsonify({'ok': False, 'error': 'Geçersiz sayfa'})
+    if len(pages) >= len(doc):
+        return jsonify({'ok': False, 'error': 'Tüm sayfalar silinemez; en az bir sayfa kalmalı'})
     push_history()
-    doc.delete_page(i)
-    return jsonify({'ok': True, 'pages': len(doc)})
+    drop = set(pages)
+    doc.select([i for i in range(len(doc)) if i not in drop])
+    return jsonify({'ok': True, 'pages': len(doc), 'deleted': len(pages)})
 
 
 @app.route('/api/rotate', methods=['POST'])
 def api_rotate():
+    """Rotates one page ({i}) or several ({pages: [...]}) as a single undo step."""
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False})
-    i = request.json.get('i', 0)
-    deg = request.json.get('deg', 90)
-    page = doc[i]
+    data = request.json or {}
+    pages = data.get('pages')
+    if pages is None:
+        pages = [data.get('i', 0)]
+    deg = data.get('deg', 90)
+    try:
+        pages = sorted({int(i) for i in pages})
+    except (TypeError, ValueError):
+        return jsonify({'ok': False, 'error': 'Geçersiz sayfa'})
+    if not pages or pages[0] < 0 or pages[-1] >= len(doc):
+        return jsonify({'ok': False, 'error': 'Geçersiz sayfa'})
     push_history()
-    page.set_rotation((page.rotation + deg) % 360)
+    for i in pages:
+        page = doc[i]
+        page.set_rotation((page.rotation + deg) % 360)
     return jsonify({'ok': True})
 
 
@@ -1545,6 +1567,181 @@ def api_compress():
         return jsonify({'ok': False, 'error': str(e)})
 
 
+def _existing_pdf(path):
+    path = (path or '').strip().strip('"')
+    if path and path.lower().endswith('.pdf') and os.path.isfile(path):
+        return os.path.abspath(path)
+    return None
+
+
+def _reveal_in_explorer(path):
+    import subprocess
+    subprocess.Popen(['explorer', '/select,', path])
+
+
+@app.route('/api/reveal', methods=['POST'])
+def api_reveal():
+    path = _existing_pdf((request.json or {}).get('path'))
+    if not path:
+        return jsonify({'ok': False, 'error': 'Dosya bulunamadı'})
+    _reveal_in_explorer(path)
+    return jsonify({'ok': True})
+
+
+def _mapi_send_mail(path, subject):
+    """Varsayılan e-posta programında (Outlook, Thunderbird…) eki hazır yeni bir posta açar.
+    Pencere kapanana kadar bloklar. MAPI dönüş kodunu döndürür (0 = başarılı, 1 = kullanıcı iptal)."""
+    import ctypes
+    from ctypes import wintypes, POINTER, Structure, c_void_p, c_ulong
+
+    class MapiRecipDescW(Structure):
+        _fields_ = [('ulReserved', c_ulong), ('ulRecipClass', c_ulong),
+                    ('lpszName', wintypes.LPWSTR), ('lpszAddress', wintypes.LPWSTR),
+                    ('ulEIDSize', c_ulong), ('lpEntryID', c_void_p)]
+
+    class MapiFileDescW(Structure):
+        _fields_ = [('ulReserved', c_ulong), ('flFlags', c_ulong), ('nPosition', c_ulong),
+                    ('lpszPathName', wintypes.LPWSTR), ('lpszFileName', wintypes.LPWSTR),
+                    ('lpFileType', c_void_p)]
+
+    class MapiMessageW(Structure):
+        _fields_ = [('ulReserved', c_ulong), ('lpszSubject', wintypes.LPWSTR),
+                    ('lpszNoteText', wintypes.LPWSTR), ('lpszMessageType', wintypes.LPWSTR),
+                    ('lpszDateReceived', wintypes.LPWSTR), ('lpszConversationID', wintypes.LPWSTR),
+                    ('flFlags', c_ulong), ('lpOriginator', POINTER(MapiRecipDescW)),
+                    ('nRecipCount', c_ulong), ('lpRecips', POINTER(MapiRecipDescW)),
+                    ('nFileCount', c_ulong), ('lpFiles', POINTER(MapiFileDescW))]
+
+    MAPI_LOGON_UI, MAPI_DIALOG = 0x1, 0x8
+    mapi = ctypes.WinDLL('mapi32.dll')
+    send = mapi.MAPISendMailW
+    send.argtypes = [ctypes.c_size_t, ctypes.c_size_t, POINTER(MapiMessageW), c_ulong, c_ulong]
+    send.restype = c_ulong
+
+    fd = MapiFileDescW(0, 0, 0xFFFFFFFF, path, os.path.basename(path), None)
+    msg = MapiMessageW()
+    msg.lpszSubject = subject
+    msg.nFileCount = 1
+    msg.lpFiles = ctypes.pointer(fd)
+    return send(0, 0, ctypes.byref(msg), MAPI_LOGON_UI | MAPI_DIALOG, 0)
+
+
+@app.route('/api/send_mail', methods=['POST'])
+def api_send_mail():
+    path = _existing_pdf((request.json or {}).get('path'))
+    if not path:
+        return jsonify({'ok': False, 'error': 'Dosya bulunamadı'})
+
+    # MAPISendMail posta penceresi kapanana kadar döner; arka planda çalıştır.
+    # E-posta programı yoksa hemen hata döner — kısa süre bekleyip bunu yakala.
+    result = {}
+
+    def worker():
+        try:
+            result['code'] = _mapi_send_mail(path, Path(path).stem)
+        except Exception as e:
+            result['code'] = -1
+            result['error'] = str(e)
+
+    t = threading.Thread(target=worker, daemon=True)
+    t.start()
+    t.join(4)
+    code = result.get('code')
+    if code is None or code in (0, 1):
+        return jsonify({'ok': True, 'mode': 'mail'})
+    # E-posta programı yok / desteklemiyor: dosyayı klasörde seçili göster
+    _reveal_in_explorer(path)
+    return jsonify({'ok': True, 'mode': 'folder'})
+
+
+def _copy_file_to_clipboard(path):
+    """Puts the file on the clipboard like Explorer's Ctrl+C (CF_HDROP), so it can be
+    pasted with Ctrl+V into WhatsApp, Teams, Outlook, a browser tab, etc."""
+    import ctypes
+    from ctypes import wintypes
+    k32, u32 = ctypes.windll.kernel32, ctypes.windll.user32
+    k32.GlobalAlloc.restype = wintypes.HGLOBAL
+    k32.GlobalAlloc.argtypes = [wintypes.UINT, ctypes.c_size_t]
+    k32.GlobalLock.restype = ctypes.c_void_p
+    k32.GlobalLock.argtypes = [wintypes.HGLOBAL]
+    k32.GlobalUnlock.argtypes = [wintypes.HGLOBAL]
+    u32.SetClipboardData.argtypes = [wintypes.UINT, wintypes.HANDLE]
+    u32.SetClipboardData.restype = wintypes.HANDLE
+    u32.RegisterClipboardFormatW.argtypes = [wintypes.LPCWSTR]
+    GMEM_MOVEABLE, CF_HDROP = 0x0002, 15
+
+    def global_bytes(data):
+        h = k32.GlobalAlloc(GMEM_MOVEABLE, len(data))
+        ctypes.memmove(k32.GlobalLock(h), data, len(data))
+        k32.GlobalUnlock(h)
+        return h
+
+    # DROPFILES header (20 bytes): pFiles offset, pt.x, pt.y, fNC, fWide=1; then a
+    # double-NUL-terminated UTF-16 file list
+    files = (os.path.abspath(path) + '\0\0').encode('utf-16-le')
+    hdrop = global_bytes((20).to_bytes(4, 'little') + b'\0' * 12
+                         + (1).to_bytes(4, 'little') + files)
+    effect = global_bytes((1).to_bytes(4, 'little'))  # DROPEFFECT_COPY
+    for _ in range(10):  # another app may hold the clipboard for a moment
+        if u32.OpenClipboard(None):
+            break
+        time.sleep(0.05)
+    else:
+        raise RuntimeError('Pano kullanılamıyor')
+    try:
+        u32.EmptyClipboard()
+        u32.SetClipboardData(CF_HDROP, hdrop)
+        u32.SetClipboardData(u32.RegisterClipboardFormatW('Preferred DropEffect'), effect)
+    finally:
+        u32.CloseClipboard()
+
+
+def _protocol_registered(scheme):
+    import winreg
+    try:
+        winreg.CloseKey(winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, scheme))
+        return True
+    except OSError:
+        return False
+
+
+@app.route('/api/share', methods=['POST'])
+def api_share():
+    """Copies the file to the clipboard and opens the chosen app/site, where the user
+    pastes it into a chat or email. Web services can't take a local file via a URL."""
+    from urllib.parse import quote
+    data = request.json or {}
+    path = _existing_pdf(data.get('path'))
+    if not path:
+        return jsonify({'ok': False, 'error': 'Dosya bulunamadı'})
+    subject = quote(Path(path).stem)
+    target = data.get('target', 'copy')
+    targets = {
+        'whatsapp': ('whatsapp', 'whatsapp://', 'https://web.whatsapp.com/'),
+        'telegram': ('tg', 'tg://', 'https://web.telegram.org/'),
+        'teams':    ('msteams', 'msteams://', 'https://teams.microsoft.com/'),
+        'gmail':    (None, None, f'https://mail.google.com/mail/?view=cm&fs=1&su={subject}'),
+        'outlookweb': (None, None, f'https://outlook.live.com/mail/0/deeplink/compose?subject={subject}'),
+        'linkedin': (None, None, 'https://www.linkedin.com/messaging/'),
+        'copy':     (None, None, None),
+    }
+    if target not in targets:
+        return jsonify({'ok': False, 'error': 'Geçersiz hedef'})
+    try:
+        _copy_file_to_clipboard(path)
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)})
+    scheme, app_url, web_url = targets[target]
+    opened = None
+    if scheme and _protocol_registered(scheme):
+        os.startfile(app_url)
+        opened = 'app'
+    elif web_url:
+        webbrowser.open(web_url)
+        opened = 'web'
+    return jsonify({'ok': True, 'opened': opened})
+
+
 @app.route('/api/encrypt', methods=['POST'])
 def api_encrypt():
     doc = state['doc']
@@ -1788,12 +1985,12 @@ if __name__ == '__main__':
             except Exception as e:
                 print(f'Dosya gonderilemedi: {e}')
         window = webview.create_window(
-            'PDF Editör',
+            'PDF Editor Pro',
             f'http://localhost:{PORT}',
             width=1280, height=800,
             min_size=(900, 600),
         )
-        webview.start()
+        webview.start(icon=os.path.join(_BASE_DIR, 'static', 'app-icon.ico'))
     else:
         if filepath:
             try:
@@ -1811,9 +2008,9 @@ if __name__ == '__main__':
         time.sleep(1.0)
 
         window = webview.create_window(
-            'PDF Editör',
+            'PDF Editor Pro',
             f'http://localhost:{PORT}',
             width=1280, height=800,
             min_size=(900, 600),
         )
-        webview.start()
+        webview.start(icon=os.path.join(_BASE_DIR, 'static', 'app-icon.ico'))

@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>PDF Editör</title>
+<title>PDF Editor Pro</title>
 <link rel="manifest" href="/static/manifest.json">
 <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 <link rel="icon" type="image/png" sizes="512x512" href="/static/icon-512.png">
@@ -47,7 +47,7 @@ body {
 #toolbar {
   background: var(--toolbar-bg);
   border-bottom: 1px solid var(--border);
-  height: 52px;
+  height: 46px;
   display: flex;
   align-items: center;
   gap: 3px;
@@ -64,6 +64,11 @@ body:not(.has-file) #toolbar button:disabled { display: none; }
 body:not(.has-file) #toolbar .tb-sep { display: none; }
 body:not(.has-file) #toolbar .tb-dropdown:has(button:disabled) { display: none; }
 
+.tb-brand { display: flex; align-items: center; gap: 8px; margin-right: 8px; padding-right: 12px; border-right: 1px solid var(--border); flex-shrink: 0; user-select: none; }
+.tb-brand img { width: 32px; height: 32px; display: block; }
+.tb-brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.tb-brand-name { font-size: 14px; font-weight: 700; color: #0f1c2f; letter-spacing: -.2px; white-space: nowrap; }
+.tb-brand-co { font-size: 10.5px; font-weight: 600; color: var(--primary); letter-spacing: .3px; white-space: nowrap; }
 .tb-logo {
   font-weight: 700;
   font-size: 15px;
@@ -636,18 +641,81 @@ body.has-file #sidebar {
 /* ── LANG SWITCH ── */
 #dd-lang { position: relative; flex-shrink: 0; margin-left: 2px; }
 
-/* ── TOOLBAR 2 ── */
+/* ── PAYLAŞ ── */
+.share-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.share-btn {
+  flex-direction: column; justify-content: center; gap: 5px; padding: 10px 6px;
+  background: #fff; border: 1px solid var(--border); border-radius: 10px;
+  font-size: 12px; color: var(--text); font-weight: 500;
+}
+.share-btn:hover { background: #f8fafc; border-color: #94a3b8; }
+.share-ic { width: 34px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center;
+            justify-content: center; color: #fff; font-weight: 800; font-size: 15px; }
+.share-ic .ri { width: 19px; height: 19px; }
+#share-hint { display: none; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46;
+              border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-bottom: 12px; line-height: 1.45; }
+
+/* ── SAYFA DÜZENLEYİCİ ── */
+#m-pages .modal-card { width: min(1180px, 94vw); height: 88vh; display: flex; flex-direction: column; padding: 18px 20px; }
+.po-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.po-bar h3 { margin: 0 12px 0 0 !important; }
+.po-count { font-size: 13px; color: var(--text-muted); margin-right: auto; }
+.po-hint { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+#po-grid { flex: 1; overflow: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+           gap: 16px; padding: 6px; background: #f1f5f9; border-radius: 8px; align-content: start; }
+.po-card { position: relative; background: #fff; border: 2px solid transparent; border-radius: 8px;
+           padding: 8px 8px 6px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.12); user-select: none; }
+.po-card:hover { border-color: #93c5fd; }
+.po-card.sel { border-color: var(--primary); background: var(--primary-light); }
+.po-card img { width: 100%; display: block; border: 1px solid #e2e8f0; background: #fff; }
+.po-num { text-align: center; font-size: 13px; font-weight: 600; color: #334155; margin-top: 6px; }
+.po-check { position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 6px;
+            background: #fff; border: 2px solid #94a3b8; display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 15px; font-weight: 800; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.po-card.sel .po-check { background: var(--primary); border-color: var(--primary); }
+.po-card.sel .po-check::after { content: '✓'; }
+
+/* ── TOOLBAR 2: ŞERİT ── */
 #toolbar2 {
-  background: #f1f5f9;
+  background: #fff;
   border-bottom: 1px solid var(--border);
-  min-height: 38px;
+  min-height: 68px;
   display: flex;
-  align-items: center;
-  gap: 3px;
-  padding: 0 12px;
+  align-items: stretch;
+  gap: 2px;
+  padding: 4px 10px;
   flex-shrink: 0;
   flex-wrap: wrap;
 }
+.ri { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8;
+      stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.rb-group { display: none; align-items: stretch; gap: 2px; }
+.rb-group.active { display: flex; }
+.rb {
+  flex-direction: column; justify-content: center; gap: 4px;
+  min-width: 64px; padding: 5px 8px;
+  background: transparent; color: #334155;
+  border: 1px solid transparent; border-radius: 8px;
+  font-size: 12px; font-weight: 500;
+}
+.rb > span { display: inline-flex; align-items: center; gap: 3px; }
+.rb:hover:not(:disabled) { background: #f1f5f9; border-color: #e2e8f0; }
+.rb.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }
+.rb-caret { opacity: .6; }
+.rb-sep { width: 1px; background: var(--border); margin: 8px 6px; }
+.rb-dots { display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 0 8px 0 2px; }
+.rb-dots .color-dot { width: 13px; height: 13px; }
+.rb-dots .color-dot.active { box-shadow: 0 0 0 1.5px #fff, 0 0 0 3px #334155; border-color: transparent; }
+.rb-tabs { display: flex; align-self: stretch; align-items: flex-end; gap: 2px; margin-left: 14px; }
+#toolbar .rb-tab {
+  background: none; border: none; border-bottom: 2px solid transparent; border-radius: 0;
+  padding: 0 14px 10px; font-size: 13px; font-weight: 600; color: #64748b;
+}
+#toolbar .rb-tab:hover { color: var(--text); }
+#toolbar .rb-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+#toolbar .qa { background: none; border: 1px solid transparent; padding: 5px; border-radius: 6px; }
+#toolbar .qa:hover:not(:disabled) { background: #f1f5f9; border-color: #e2e8f0; }
+#toolbar .qa .ri { width: 19px; height: 19px; }
 .tb2-icon {
   width: 34px; height: 30px;
   padding: 0;
@@ -911,9 +979,77 @@ body.has-file #sidebar {
 </div>
 {% endif %}
 
-<!-- TOOLBAR -->
+<!-- TOOLBAR: üst satır (hızlı erişim + sekmeler) -->
+<!-- Icons: Lucide (https://lucide.dev), ISC License, Copyright (c) Lucide Icons and Contributors.
+     Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee
+     is hereby granted, provided that the above copyright notice and this permission notice appear in all copies. -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2" /></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /> <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" /> <path d="M7 3v4a1 1 0 0 0 1 1h7" /></symbol>
+  <symbol id="i-printer" viewBox="0 0 24 24"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /> <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" /> <rect x="6" y="14" width="12" height="8" rx="1" /></symbol>
+  <symbol id="i-undo-2" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /> <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" /></symbol>
+  <symbol id="i-shrink" viewBox="0 0 24 24"><path d="m15 15 6 6m-6-6v4.8m0-4.8h4.8" /> <path d="M9 19.8V15m0 0H4.2M9 15l-6 6" /> <path d="M15 4.2V9m0 0h4.8M15 9l6-6" /> <path d="M9 4.2V9m0 0H4.2M9 9 3 3" /></symbol>
+  <symbol id="i-clipboard-copy" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /> <path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /> <path d="M16 4h2a2 2 0 0 1 2 2v4" /> <path d="M21 14H11" /> <path d="m15 10-4 4 4 4" /></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 15V3" /> <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <path d="m7 10 5 5 5-5" /></symbol>
+  <symbol id="i-type" viewBox="0 0 24 24"><path d="M12 4v16" /> <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" /> <path d="M9 20h6" /></symbol>
+  <symbol id="i-replace" viewBox="0 0 24 24"><path d="M14 4a1 1 0 0 1 1-1" /> <path d="M15 10a1 1 0 0 1-1-1" /> <path d="M21 4a1 1 0 0 0-1-1" /> <path d="M21 9a1 1 0 0 1-1 1" /> <path d="m3 7 3 3 3-3" /> <path d="M6 10V5a2 2 0 0 1 2-2h2" /> <rect x="3" y="14" width="7" height="7" rx="1" /></symbol>
+  <symbol id="i-eraser" viewBox="0 0 24 24"><path d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21" /> <path d="m5.082 11.09 8.828 8.828" /></symbol>
+  <symbol id="i-shapes" viewBox="0 0 24 24"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z" /> <rect x="3" y="14" width="7" height="7" rx="1" /> <circle cx="17.5" cy="17.5" r="3.5" /></symbol>
+  <symbol id="i-image-plus" viewBox="0 0 24 24"><path d="M16 5h6" /> <path d="M19 2v6" /> <path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /> <circle cx="9" cy="9" r="2" /></symbol>
+  <symbol id="i-highlighter" viewBox="0 0 24 24"><path d="m9 11-6 6v3h9l3-3" /> <path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4" /></symbol>
+  <symbol id="i-stamp" viewBox="0 0 24 24"><path d="M14 13V8.5C14 7 15 7 15 5a3 3 0 0 0-6 0c0 2 1 2 1 3.5V13" /> <path d="M20 15.5a2.5 2.5 0 0 0-2.5-2.5h-11A2.5 2.5 0 0 0 4 15.5V17a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1z" /> <path d="M5 22h14" /></symbol>
+  <symbol id="i-signature" viewBox="0 0 24 24"><path d="m21 17-2.156-1.868A.5.5 0 0 0 18 15.5v.5a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1c0-2.545-3.991-3.97-8.5-4a1 1 0 0 0 0 5c4.153 0 4.745-11.295 5.708-13.5a2.5 2.5 0 1 1 3.31 3.284" /> <path d="M3 21h18" /></symbol>
+  <symbol id="i-combine" viewBox="0 0 24 24"><path d="M14 3a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1" /> <path d="M19 3a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1" /> <path d="m7 15 3 3" /> <path d="m7 21 3-3H5a2 2 0 0 1-2-2v-2" /> <rect x="14" y="14" width="7" height="7" rx="1" /> <rect x="3" y="3" width="7" height="7" rx="1" /></symbol>
+  <symbol id="i-scissors" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3" /> <path d="M8.12 8.12 12 12" /> <path d="M20 4 8.12 15.88" /> <circle cx="6" cy="18" r="3" /> <path d="M14.8 14.8 20 20" /></symbol>
+  <symbol id="i-file-plus" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /> <path d="M14 2v5a1 1 0 0 0 1 1h5" /> <path d="M9 15h6" /> <path d="M12 18v-6" /></symbol>
+  <symbol id="i-arrow-up-down" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4" /> <path d="M17 20V4" /> <path d="m3 8 4-4 4 4" /> <path d="M7 4v16" /></symbol>
+  <symbol id="i-file-input" viewBox="0 0 24 24"><path d="M4 11V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1" /> <path d="M14 2v5a1 1 0 0 0 1 1h5" /> <path d="M2 15h10" /> <path d="m9 18 3-3-3-3" /></symbol>
+  <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /> <path d="M14 2v5a1 1 0 0 0 1 1h5" /> <path d="M10 9H8" /> <path d="M16 13H8" /> <path d="M16 17H8" /></symbol>
+  <symbol id="i-file-spreadsheet" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /> <path d="M14 2v5a1 1 0 0 0 1 1h5" /> <path d="M8 13h2" /> <path d="M14 13h2" /> <path d="M8 17h2" /> <path d="M14 17h2" /></symbol>
+  <symbol id="i-presentation" viewBox="0 0 24 24"><path d="M2 3h20" /> <path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3" /> <path d="m7 21 5-5 5 5" /></symbol>
+  <symbol id="i-file-image" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /> <path d="M14 2v5a1 1 0 0 0 1 1h5" /> <circle cx="10" cy="12" r="2" /> <path d="m20 17-1.296-1.296a2.41 2.41 0 0 0-3.408 0L9 22" /></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /> <circle cx="9" cy="9" r="2" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></symbol>
+  <symbol id="i-file-type" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /> <path d="M14 2v5a1 1 0 0 0 1 1h5" /> <path d="M11 18h2" /> <path d="M12 12v6" /> <path d="M9 13v-.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v.5" /></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /> <path d="M7 11V7a5 5 0 0 1 10 0v4" /></symbol>
+  <symbol id="i-droplets" viewBox="0 0 24 24"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z" /> <path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97" /></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /> <rect x="2" y="4" width="20" height="16" rx="2" /></symbol>
+  <symbol id="i-message-circle" viewBox="0 0 24 24"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" /> <path d="m21.854 2.147-10.94 10.939" /></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /> <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></symbol>
+  <symbol id="i-layout-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1" /> <rect width="7" height="7" x="14" y="3" rx="1" /> <rect width="7" height="7" x="14" y="14" rx="1" /> <rect width="7" height="7" x="3" y="14" rx="1" /></symbol>
+  <symbol id="i-rotate-cw" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /></symbol>
+  <symbol id="i-trash-2" viewBox="0 0 24 24"><path d="M10 11v6" /> <path d="M14 11v6" /> <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /> <path d="M3 6h18" /> <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></symbol>
+  <symbol id="i-check-check" viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5" /> <path d="m22 10-7.5 7.5L13 16" /></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /></symbol>
+</svg>
 <div id="toolbar">
-  <span class="tb-logo" data-i18n="appName">PDF Editör</span>
+  <div class="tb-brand" title="PDF Editor Pro — MKBSoft">
+    <img src="/static/app-icon-96.png" alt="" width="32" height="32">
+    <div class="tb-brand-text">
+      <span class="tb-brand-name">PDF Editor Pro</span>
+      <span class="tb-brand-co">by MKBSoft</span>
+    </div>
+  </div>
+  <button class="qa" onclick="browseFile()" title="Aç"><svg class="ri" style="color:#f59e0b"><use href="#i-folder-open"/></svg></button>
+  <button class="qa" id="qa-save" onclick="doSave()" disabled title="Kaydet"><svg class="ri" style="color:#2563eb"><use href="#i-save"/></svg></button>
+  <button class="qa" id="qa-print" onclick="doPrint()" disabled title="Yazdır"><svg class="ri" style="color:#475569"><use href="#i-printer"/></svg></button>
+  <button class="qa" id="qa-undo" onclick="doUndo()" disabled title="Geri Al"><svg class="ri" style="color:#64748b"><use href="#i-undo-2"/></svg></button>
+  <div class="rb-tabs" role="tablist">
+    <button class="rb-tab" data-tabbtn="home" onclick="setRibbonTab('home')" data-i18n="tabHome">Ana Sayfa</button>
+    <button class="rb-tab" data-tabbtn="edit" onclick="setRibbonTab('edit')" data-i18n="tabEdit">Düzenle</button>
+    <button class="rb-tab" data-tabbtn="comment" onclick="setRibbonTab('comment')" data-i18n="tabComment">Yorum</button>
+    <button class="rb-tab" data-tabbtn="page" onclick="setRibbonTab('page')" data-i18n="tabPage">Sayfa</button>
+    <button class="rb-tab" data-tabbtn="convert" onclick="setRibbonTab('convert')" data-i18n="tabConvert">Dönüştür</button>
+    <button class="rb-tab" data-tabbtn="protect" onclick="setRibbonTab('protect')" data-i18n="tabProtect">Koru</button>
+  </div>
+  <div style="flex:1"></div>
+  <span class="font-badge" id="tb-font" style="display:none" title="Aktif font — temizlemek için × tıkla">
+    <span id="tb-font-label"></span>
+    <span class="clear-font" onclick="clearLearnedFont()">×</span>
+  </span>
+  <span class="tb-filename" id="tb-filename">Dosya açılmadı</span>
+  <span class="tb-info" id="tb-info"></span>
   <div class="tb-dropdown" id="dd-lang" style="margin-right:4px">
     <button class="btn-secondary" id="btn-lang-current" onclick="toggleLangMenu(event)" style="padding:4px 10px;font-size:12px;font-weight:700;gap:3px">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16A8 8 0 0010 2zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.559-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.559.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z" clip-rule="evenodd"/></svg>
@@ -931,68 +1067,37 @@ body.has-file #sidebar {
       <button class="tb-dropdown-item" onclick="setLang('ru')">🇷🇺 Русский</button>
     </div>
   </div>
-  <div class="tb-sep"></div>
+</div>
 
-  <button class="btn-primary" onclick="browseFile()">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
-    <span data-i18n="open">Aç</span>
-  </button>
-
-  <button class="btn-secondary" id="btn-undo" onclick="doUndo()" disabled>
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-    <span data-i18n="undo">Geri Al</span>
-  </button>
-
-  <button class="btn-secondary" id="btn-save" onclick="doSave()" disabled>
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M5 4a2 2 0 00-2 2v8a2 2 0 002 2h10a2 2 0 002-2V8.828a2 2 0 00-.586-1.414l-2.828-2.828A2 2 0 0012.172 4H5zm5 9a2 2 0 100-4 2 2 0 000 4zm3-9v3H7V4h6z"/></svg>
-    <span data-i18n="save">Kaydet</span>
-  </button>
-
-  <button class="btn-secondary" id="btn-print" onclick="doPrint()" disabled title="Yazdır">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a1 1 0 001 1h8a1 1 0 001-1v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a1 1 0 00-1-1H6a1 1 0 00-1 1zm2 0h6v3H7V4zm-1 9v-2h8v2H6zm7-6a1 1 0 110 2 1 1 0 010-2z" clip-rule="evenodd"/></svg>
-    <span data-i18n="printBtn">Yazdır</span>
-  </button>
-
-  <button class="btn-secondary" id="btn-copy-text" onclick="doCopyText()" disabled title="Tüm sayfaların metnini panoya kopyala">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/></svg>
-    <span data-i18n="copyTextBtn">Metni Kopyala</span>
-  </button>
-
-  <div class="tb-sep"></div>
-
-  <button class="btn-secondary" id="btn-merge" onclick="openModal('m-merge')" disabled>
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z" clip-rule="evenodd"/></svg>
-    <span data-i18n="merge">Birleştir</span>
-  </button>
-
-  <button class="btn-secondary" id="btn-split" onclick="openModal('m-split')" disabled>
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L15 13.586V12a1 1 0 011-1z" clip-rule="evenodd"/></svg>
-    <span data-i18n="split">Böl</span>
-  </button>
-
-  <div class="tb-sep"></div>
-
-  <button class="btn-secondary" onclick="doConvertToPdf()">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
-    <span data-i18n="convertBtn">PDF'e Çevir</span>
-  </button>
-
-  <button class="btn-secondary" id="btn-fr" onclick="openModal('m-fr')" disabled>
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
-    <span data-i18n="findReplace">Bul & Değiştir</span>
-  </button>
-
-  <button class="btn-secondary" id="btn-addtext" onclick="openAddText()" disabled>
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
-    <span data-i18n="addText">Metin Ekle</span>
-  </button>
-
-  <div class="tb-dropdown" id="dd-shape">
-    <button class="btn-toggle" id="btn-shape-dd" onclick="toggleShapeMenu(event)" disabled>
-      <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
-      Şekil Çiz
-      <svg viewBox="0 0 20 20" fill="currentColor" width="11" height="11"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-    </button>
+<!-- TOOLBAR 2: Şerit (seçili sekmenin araçları) -->
+<div id="toolbar2">
+  <div class="rb-group" data-tab="home">
+    <button class="rb" onclick="browseFile()"><svg class="ri" style="color:#f59e0b"><use href="#i-folder-open"/></svg><span><span data-i18n="open">Aç</span></span></button>
+    <button class="rb" id="btn-save" onclick="doSave()" disabled><svg class="ri" style="color:#2563eb"><use href="#i-save"/></svg><span><span data-i18n="save">Kaydet</span></span></button>
+    <button class="rb" id="btn-print" onclick="doPrint()" disabled><svg class="ri" style="color:#475569"><use href="#i-printer"/></svg><span><span data-i18n="printBtn">Yazdır</span></span></button>
+    <button class="rb" id="btn-undo" onclick="doUndo()" disabled><svg class="ri" style="color:#64748b"><use href="#i-undo-2"/></svg><span><span data-i18n="undo">Geri Al</span></span></button>
+    <div class="rb-sep"></div>
+    <button class="rb" id="btn-compress" onclick="openModal('m-compress')" disabled title="PDF boyutunu küçült, kaydet veya e-postayla gönder"><svg class="ri" style="color:#0891b2"><use href="#i-shrink"/></svg><span><span data-i18n="compressBtn">Küçült / Gönder</span></span></button>
+    <button class="rb" id="btn-copy-text" onclick="doCopyText()" disabled title="Tüm sayfaların metnini panoya kopyala"><svg class="ri" style="color:#7c3aed"><use href="#i-clipboard-copy"/></svg><span><span data-i18n="copyTextBtn">Metni Kopyala</span></span></button>
+    <div class="tb-dropdown" id="dd-export">
+    <button class="rb" id="btn-export" onclick="toggleExportMenu(event)" disabled><svg class="ri" style="color:#16a34a"><use href="#i-download"/></svg><span><span data-i18n="exportBtn">Dışa Aktar</span> <svg class="rb-caret" viewBox="0 0 20 20" fill="currentColor" width="10" height="10"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></span></button>
+    <div class="tb-dropdown-menu" id="export-menu">
+      <button class="tb-dropdown-item" onclick="doExport('docx')"   data-i18n="exportDocx">Word (.docx)</button>
+      <button class="tb-dropdown-item" onclick="doExport('excel')"  data-i18n="exportExcel">Excel (.xlsx)</button>
+      <button class="tb-dropdown-item" onclick="doExport('pptx')">PowerPoint (.pptx)</button>
+      <button class="tb-dropdown-item" onclick="doExport('images')" data-i18n="exportImages">PNG</button>
+      <button class="tb-dropdown-item" onclick="doExport('jpg')">JPG</button>
+      <button class="tb-dropdown-item" onclick="doExport('txt')"    data-i18n="exportTxt">Metin (.txt)</button>
+    </div>
+    </div>
+  </div>
+  <div class="rb-group" data-tab="edit">
+    <button class="rb" id="btn-addtext" onclick="openAddText()" disabled><svg class="ri" style="color:#2563eb"><use href="#i-type"/></svg><span><span data-i18n="addText">Metin Ekle</span></span></button>
+    <button class="rb" id="btn-fr" onclick="openModal('m-fr')" disabled><svg class="ri" style="color:#4f46e5"><use href="#i-replace"/></svg><span><span data-i18n="findReplace">Bul & Değiştir</span></span></button>
+    <button class="rb rb-toggle" id="btn-select" onclick="toggleSelectMode()" disabled><svg class="ri" style="color:#dc2626"><use href="#i-eraser"/></svg><span><span data-i18n="deleteArea">Alan Sil</span></span></button>
+    <div class="rb-sep"></div>
+    <div class="tb-dropdown" id="dd-shape">
+    <button class="rb rb-toggle" id="btn-shape-dd" onclick="toggleShapeMenu(event)" disabled><svg class="ri" style="color:#ea580c"><use href="#i-shapes"/></svg><span><span data-i18n="rbShape">Şekil Çiz</span> <svg class="rb-caret" viewBox="0 0 20 20" fill="currentColor" width="10" height="10"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></span></button>
     <div class="tb-dropdown-menu" id="shape-menu">
       <button class="tb-dropdown-item" onclick="pickShape('rect')">▭ &nbsp;Dikdörtgen</button>
       <button class="tb-dropdown-item" onclick="pickShape('circle')">◯ &nbsp;Daire</button>
@@ -1005,86 +1110,52 @@ body.has-file #sidebar {
         <span class="color-dot"        style="background:#000000" data-color="#000000" id="sc-4" onclick="setShapeColorDot(this)"></span>
       </div>
     </div>
-  </div>
-
-  <button class="btn-toggle" id="btn-select" onclick="toggleSelectMode()" disabled>
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L15 13.586V12a1 1 0 011-1z" clip-rule="evenodd"/></svg>
-    <span data-i18n="deleteArea">Alan Sil</span>
-  </button>
-
-  <div class="tb-sep"></div>
-
-  <div class="tb-dropdown" id="dd-export">
-    <button class="btn-secondary" id="btn-export" onclick="toggleExportMenu(event)" disabled>
-      <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-      <span data-i18n="exportBtn">Dışa Aktar</span>
-      <svg viewBox="0 0 20 20" fill="currentColor" width="11" height="11"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-    </button>
-    <div class="tb-dropdown-menu" id="export-menu">
-      <button class="tb-dropdown-item" onclick="doExport('docx')"   data-i18n="exportDocx">Word (.docx)</button>
-      <button class="tb-dropdown-item" onclick="doExport('excel')"  data-i18n="exportExcel">Excel (.xlsx)</button>
-      <button class="tb-dropdown-item" onclick="doExport('pptx')">PowerPoint (.pptx)</button>
-      <button class="tb-dropdown-item" onclick="doExport('images')" data-i18n="exportImages">PNG</button>
-      <button class="tb-dropdown-item" onclick="doExport('jpg')">JPG</button>
-      <button class="tb-dropdown-item" onclick="doExport('txt')"    data-i18n="exportTxt">Metin (.txt)</button>
     </div>
+    <button class="rb" id="btn-addimg" onclick="openModal('m-addimg')" disabled title="Sayfaya görsel ekle"><svg class="ri" style="color:#16a34a"><use href="#i-image-plus"/></svg><span><span data-i18n="rbAddImage">Görsel Ekle</span></span></button>
   </div>
-
-  <span class="font-badge" id="tb-font" style="display:none" title="Aktif font — temizlemek için × tıkla">
-    <span id="tb-font-label"></span>
-    <span class="clear-font" onclick="clearLearnedFont()">×</span>
-  </span>
-  <span class="tb-filename" id="tb-filename">Dosya açılmadı</span>
-  <span class="tb-info" id="tb-info"></span>
-</div>
-
-<!-- TOOLBAR 2: Annotation & Page Tools -->
-<div id="toolbar2">
-  <!-- Vurgulama -->
-  <button class="btn-toggle tb2-icon" id="btn-hl" onclick="toggleAnnotMode('highlight')" disabled title="Vurgula">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M13.586 3.586a2 2 0 112.828 2.828l-8 8a2 2 0 01-.828.514l-4 1a1 1 0 01-1.213-1.213l1-4a2 2 0 01.514-.828l8-8z"/></svg>
-  </button>
-  <span class="color-dot active" style="background:#FFD700" data-color="#FFD700" onclick="setAnnotColor(this)" title="Sarı"></span>
-  <span class="color-dot" style="background:#90EE90" data-color="#90EE90" onclick="setAnnotColor(this)" title="Yeşil"></span>
-  <span class="color-dot" style="background:#ADD8E6" data-color="#ADD8E6" onclick="setAnnotColor(this)" title="Mavi"></span>
-  <div class="tb-sep"></div>
-  <!-- Damga -->
-  <div class="stamp-dd" id="dd-stamp">
-    <button class="btn-secondary tb2-icon" id="btn-stamp" onclick="toggleStampMenu(event)" disabled title="Damga">
-      <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
-    </button>
+  <div class="rb-group" data-tab="comment">
+    <button class="rb rb-toggle" id="btn-hl" onclick="toggleAnnotMode('highlight')" disabled><svg class="ri" style="color:#eab308"><use href="#i-highlighter"/></svg><span><span data-i18n="rbHighlight">Vurgula</span></span></button>
+    <div class="rb-dots">
+      <span class="color-dot active" style="background:#FFD700" data-color="#FFD700" onclick="setAnnotColor(this)" title="Sarı"></span>
+      <span class="color-dot" style="background:#90EE90" data-color="#90EE90" onclick="setAnnotColor(this)" title="Yeşil"></span>
+      <span class="color-dot" style="background:#ADD8E6" data-color="#ADD8E6" onclick="setAnnotColor(this)" title="Mavi"></span>
+    </div>
+    <div class="rb-sep"></div>
+    <div class="stamp-dd" id="dd-stamp">
+    <button class="rb" id="btn-stamp" onclick="toggleStampMenu(event)" disabled><svg class="ri" style="color:#dc2626"><use href="#i-stamp"/></svg><span><span data-i18n="rbStamp">Damga</span> <svg class="rb-caret" viewBox="0 0 20 20" fill="currentColor" width="10" height="10"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></span></button>
     <div class="stamp-menu" id="stamp-menu">
       <button class="stamp-item" onclick="activateStamp('check')">✓ &nbsp;Onay (yeşil)</button>
       <button class="stamp-item" onclick="activateStamp('cross')">✗ &nbsp;İptal (kırmızı)</button>
       <button class="stamp-item" onclick="activateStamp('circle')">○ &nbsp;Daire (mavi)</button>
       <button class="stamp-item" onclick="activateStamp('date')">📅 Tarih</button>
     </div>
+    </div>
+    <button class="rb" id="btn-signature" onclick="openSignatureModal()" disabled title="İmza ekle"><svg class="ri" style="color:#2563eb"><use href="#i-signature"/></svg><span><span data-i18n="rbSignature">İmza</span></span></button>
   </div>
-  <div class="tb-sep"></div>
-  <!-- Sayfa araçları -->
-  <button class="btn-secondary tb2-icon" id="btn-watermark" onclick="openModal('m-watermark')" disabled title="Filigran ekle / kaldır">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
-  </button>
-  <button class="btn-secondary tb2-icon" id="btn-addimg" onclick="openModal('m-addimg')" disabled title="Sayfaya görsel ekle">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>
-  </button>
-  <button class="btn-secondary tb2-icon" id="btn-reverse" onclick="doReverse()" disabled title="Sayfa sırasını ters çevir">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M5 12a1 1 0 102 0V6.414l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L5 6.414V12zm10-4a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z"/></svg>
-  </button>
-  <button class="btn-secondary tb2-icon" id="btn-addblank" onclick="openAddBlankModal()" disabled title="Boş sayfa ekle">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
-  </button>
-  <button class="btn-secondary tb2-icon" id="btn-encrypt" onclick="openModal('m-encrypt')" disabled title="Şifre ekle / kaldır">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
-  </button>
-  <button class="btn-secondary tb2-icon" id="btn-compress" onclick="openModal('m-compress')" disabled title="PDF'i sıkıştır">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
-  </button>
-  <button class="btn-secondary tb2-icon" id="btn-signature" onclick="openSignatureModal()" disabled title="İmza ekle">
-    <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
-  </button>
-  <!-- Araç etiketi -->
-  <span id="tb2-label" style="margin-left:8px;font-size:12px;color:var(--text-muted);display:none"></span>
+  <div class="rb-group" data-tab="page">
+    <button class="rb" id="btn-pages" onclick="openPageOrganizer()" disabled title="Tüm sayfaları küçük resimlerle gör, seç, sil veya döndür"><svg class="ri" style="color:#0891b2"><use href="#i-layout-grid"/></svg><span><span data-i18n="rbPages">Sayfaları Düzenle</span></span></button>
+    <div class="rb-sep"></div>
+    <button class="rb" id="btn-merge" onclick="openModal('m-merge')" disabled><svg class="ri" style="color:#16a34a"><use href="#i-combine"/></svg><span><span data-i18n="merge">Birleştir</span></span></button>
+    <button class="rb" id="btn-split" onclick="openModal('m-split')" disabled><svg class="ri" style="color:#ea580c"><use href="#i-scissors"/></svg><span><span data-i18n="split">Böl</span></span></button>
+    <div class="rb-sep"></div>
+    <button class="rb" id="btn-addblank" onclick="openAddBlankModal()" disabled title="Boş sayfa ekle"><svg class="ri" style="color:#2563eb"><use href="#i-file-plus"/></svg><span><span data-i18n="rbAddBlank">Boş Sayfa</span></span></button>
+    <button class="rb" id="btn-reverse" onclick="doReverse()" disabled title="Sayfa sırasını ters çevir"><svg class="ri" style="color:#7c3aed"><use href="#i-arrow-up-down"/></svg><span><span data-i18n="rbReverse">Ters Çevir</span></span></button>
+  </div>
+  <div class="rb-group" data-tab="convert">
+    <button class="rb" onclick="doConvertToPdf()" title="Word, Excel, PowerPoint veya resim dosyasını PDF'e çevir"><svg class="ri" style="color:#dc2626"><use href="#i-file-input"/></svg><span><span data-i18n="convertBtn">PDF'e Çevir</span></span></button>
+    <div class="rb-sep"></div>
+    <button class="rb" id="btn-cv-docx" onclick="doExport('docx')" disabled><svg class="ri" style="color:#2b579a"><use href="#i-file-text"/></svg><span><span data-i18n="rbWord">Word</span></span></button>
+    <button class="rb" id="btn-cv-excel" onclick="doExport('excel')" disabled><svg class="ri" style="color:#217346"><use href="#i-file-spreadsheet"/></svg><span><span data-i18n="rbExcel">Excel</span></span></button>
+    <button class="rb" id="btn-cv-pptx" onclick="doExport('pptx')" disabled><svg class="ri" style="color:#d24726"><use href="#i-presentation"/></svg><span><span data-i18n="rbPpt">PowerPoint</span></span></button>
+    <button class="rb" id="btn-cv-images" onclick="doExport('images')" disabled><svg class="ri" style="color:#0d9488"><use href="#i-file-image"/></svg><span><span data-i18n="rbPng">PNG</span></span></button>
+    <button class="rb" id="btn-cv-jpg" onclick="doExport('jpg')" disabled><svg class="ri" style="color:#db2777"><use href="#i-image"/></svg><span><span data-i18n="rbJpg">JPG</span></span></button>
+    <button class="rb" id="btn-cv-txt" onclick="doExport('txt')" disabled><svg class="ri" style="color:#64748b"><use href="#i-file-type"/></svg><span><span data-i18n="rbTxt">Metin</span></span></button>
+  </div>
+  <div class="rb-group" data-tab="protect">
+    <button class="rb" id="btn-encrypt" onclick="openModal('m-encrypt')" disabled title="Şifre ekle / kaldır"><svg class="ri" style="color:#dc2626"><use href="#i-lock"/></svg><span><span data-i18n="rbEncrypt">Şifrele</span></span></button>
+    <button class="rb" id="btn-watermark" onclick="openModal('m-watermark')" disabled title="Filigran ekle / kaldır"><svg class="ri" style="color:#0891b2"><use href="#i-droplets"/></svg><span><span data-i18n="rbWatermark">Filigran</span></span></button>
+  </div>
+  <span id="tb2-label" style="margin-left:8px;font-size:12px;color:var(--text-muted);display:none;align-self:center"></span>
 </div>
 
 <!-- FORMAT BAR: Her zaman görünür — boşken ipucu gösterir, seçimde/düzenlemede kontroller açılır -->
@@ -1304,29 +1375,75 @@ body.has-file #sidebar {
 <!-- MODAL: Sıkıştır -->
 <div class="modal-backdrop" id="m-compress">
   <div class="modal-card">
-    <h3>🗜️ PDF Sıkıştır</h3>
-    <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">E-posta ile göndermek için dosya boyutunu küçültün. Açık belge değişmez; sıkıştırılmış kopya ayrı kaydedilir.</p>
+    <h3 data-i18n="cmpTitle">PDF Boyutunu Küçült</h3>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px" data-i18n="cmpDesc"></p>
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
       <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;cursor:pointer">
         <input type="radio" name="cmp-q" value="low" style="margin-top:3px">
-        <span><b>Küçük dosya</b> — 96 DPI, en çok küçültme<br><span style="color:var(--text-muted)">E-posta ve ekranda okuma için</span></span>
+        <span><span data-i18n="cmpLow"></span><br><span style="color:var(--text-muted)" data-i18n="cmpLowD"></span></span>
       </label>
       <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;cursor:pointer">
         <input type="radio" name="cmp-q" value="medium" checked style="margin-top:3px">
-        <span><b>Dengeli (önerilen)</b> — 150 DPI<br><span style="color:var(--text-muted)">Okunaklı ve küçük; çoğu belge için ideal</span></span>
+        <span><span data-i18n="cmpMed"></span><br><span style="color:var(--text-muted)" data-i18n="cmpMedD"></span></span>
       </label>
       <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;cursor:pointer">
         <input type="radio" name="cmp-q" value="high" style="margin-top:3px">
-        <span><b>Yüksek kalite</b> — 200 DPI<br><span style="color:var(--text-muted)">Yazdırma için; daha az küçültme</span></span>
+        <span><span data-i18n="cmpHigh"></span><br><span style="color:var(--text-muted)" data-i18n="cmpHighD"></span></span>
       </label>
       <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;cursor:pointer">
         <input type="radio" name="cmp-q" value="lossless" style="margin-top:3px">
-        <span><b>Kayıpsız</b> — resimlere dokunmaz<br><span style="color:var(--text-muted)">Sadece gereksiz veriyi temizler</span></span>
+        <span><span data-i18n="cmpLossless"></span><br><span style="color:var(--text-muted)" data-i18n="cmpLosslessD"></span></span>
       </label>
     </div>
     <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('m-compress')">İptal</button>
-      <button class="btn-primary" onclick="doCompress()">🗜️ Sıkıştır ve Kaydet</button>
+      <button class="btn-secondary" onclick="closeModal('m-compress')" data-i18n="cmpCancel">İptal</button>
+      <button class="btn-primary" onclick="doCompress()" data-i18n="cmpRun">Küçült</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Sayfa düzenleyici -->
+<div class="modal-backdrop" id="m-pages">
+  <div class="modal-card">
+    <div class="po-bar">
+      <h3 data-i18n="poTitle">Sayfaları Düzenle</h3>
+      <span class="po-count" id="po-count"></span>
+      <button class="btn-secondary" onclick="poSelectAll(true)"><svg class="ri" style="width:16px;height:16px"><use href="#i-check-check"/></svg><span data-i18n="poSelectAll">Tümünü Seç</span></button>
+      <button class="btn-secondary" onclick="poSelectAll(false)"><svg class="ri" style="width:16px;height:16px"><use href="#i-x"/></svg><span data-i18n="poSelectNone">Seçimi Kaldır</span></button>
+      <button class="btn-secondary" id="po-rotate" onclick="poRotate()"><svg class="ri" style="width:16px;height:16px;color:#7c3aed"><use href="#i-rotate-cw"/></svg><span data-i18n="poRotate">Döndür</span></button>
+      <button class="btn-secondary" id="po-delete" onclick="poDelete()" style="color:#dc2626;border-color:#fecaca"><svg class="ri" style="width:16px;height:16px"><use href="#i-trash-2"/></svg><span data-i18n="poDelete">Seçilenleri Sil</span></button>
+      <button class="btn-primary" onclick="closeModal('m-pages')" data-i18n="cmpClose">Kapat</button>
+    </div>
+    <div class="po-hint" data-i18n="poHint">Seçmek için sayfaya veya köşedeki kutuya tıklayın. Shift ile aralık seçin. Sayfayı açmak için çift tıklayın.</div>
+    <div id="po-grid"></div>
+  </div>
+</div>
+
+<!-- MODAL: Sıkıştırma sonucu -->
+<div class="modal-backdrop" id="m-compress-done">
+  <div class="modal-card" style="width:480px">
+    <h3>✅ <span data-i18n="cmpDoneTitle">PDF küçültüldü ve kaydedildi</span></h3>
+    <div id="cmp-sizes" style="font-size:22px;font-weight:700;margin:6px 0 2px"></div>
+    <div id="cmp-note" style="font-size:13px;color:var(--text-muted);margin-bottom:12px"></div>
+    <div style="background:var(--primary-light);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:13px;margin-bottom:16px;word-break:break-all">
+      <div><span style="color:var(--text-muted)" data-i18n="cmpFile">Dosya:</span> <b id="cmp-file"></b></div>
+      <div style="margin-top:4px"><span style="color:var(--text-muted)" data-i18n="cmpFolder">Klasör:</span> <span id="cmp-folder"></span></div>
+    </div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px" data-i18n="shareTitle">Gönder / Paylaş</div>
+    <div class="share-grid">
+      <button class="share-btn" onclick="cmpSendMail()"><span class="share-ic" style="background:#2563eb"><svg class="ri"><use href="#i-mail"/></svg></span><span data-i18n="shareMailApp">E-posta Programı</span></button>
+      <button class="share-btn" onclick="cmpShare('gmail','Gmail')"><span class="share-ic" style="background:#ea4335"><svg class="ri"><use href="#i-mail"/></svg></span><span>Gmail</span></button>
+      <button class="share-btn" onclick="cmpShare('outlookweb','Outlook.com')"><span class="share-ic" style="background:#0078d4"><svg class="ri"><use href="#i-mail"/></svg></span><span>Outlook.com</span></button>
+      <button class="share-btn" onclick="cmpShare('whatsapp','WhatsApp')"><span class="share-ic" style="background:#25d366"><svg class="ri"><use href="#i-message-circle"/></svg></span><span>WhatsApp</span></button>
+      <button class="share-btn" onclick="cmpShare('telegram','Telegram')"><span class="share-ic" style="background:#229ed9"><svg class="ri"><use href="#i-send"/></svg></span><span>Telegram</span></button>
+      <button class="share-btn" onclick="cmpShare('linkedin','LinkedIn')"><span class="share-ic" style="background:#0a66c2">in</span><span>LinkedIn</span></button>
+      <button class="share-btn" onclick="cmpShare('teams','Teams')"><span class="share-ic" style="background:#5b5fc7"><svg class="ri"><use href="#i-users"/></svg></span><span>Teams</span></button>
+      <button class="share-btn" onclick="cmpShare('copy','')"><span class="share-ic" style="background:#7c3aed"><svg class="ri"><use href="#i-copy"/></svg></span><span data-i18n="shareCopy">Dosyayı Kopyala</span></button>
+      <button class="share-btn" onclick="cmpReveal()"><span class="share-ic" style="background:#f59e0b"><svg class="ri"><use href="#i-folder-open"/></svg></span><span data-i18n="cmpShowFolder">Klasörde Göster</span></button>
+    </div>
+    <div id="share-hint"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('m-compress-done')" data-i18n="cmpClose">Kapat</button>
     </div>
   </div>
 </div>
@@ -1693,6 +1810,63 @@ const LANGS = {
     pdfPwOpen: 'Aç',
     encryptTitle: 'Şifre Ekle / Kaldır',
     printBtn: 'Yazdır', copyTextBtn: 'Metni Kopyala',
+    shareTitle: 'Gönder / Paylaş',
+    shareMailApp: 'E-posta Programı',
+    shareCopy: 'Dosyayı Kopyala',
+    shareHintApp: 'Dosya panoya kopyalandı ve {app} açılıyor. Sohbeti veya alıcıyı seçip <b>Ctrl+V</b> ile yapıştırın.',
+    shareHintFallback: 'Yapıştırma çalışmazsa ataç (ek) simgesine tıklayıp dosyayı yukarıdaki klasörden seçin.',
+    shareHintCopy: 'Dosya panoya kopyalandı. İstediğiniz yere <b>Ctrl+V</b> ile yapıştırabilirsiniz.',
+    rbPages: 'Sayfaları Düzenle',
+    poTitle: 'Sayfaları Düzenle',
+    poSelectAll: 'Tümünü Seç',
+    poSelectNone: 'Seçimi Kaldır',
+    poRotate: 'Döndür',
+    poDelete: 'Seçilenleri Sil',
+    poHint: 'Seçmek için sayfaya veya köşedeki kutuya tıklayın. Shift ile aralık seçin. Sayfayı açmak için çift tıklayın.',
+    poCount: '{n} / {total} sayfa seçili',
+    poConfirm: '{n} sayfa silinsin mi? (Geri Al ile geri alınabilir)',
+    poDeleted: '{n} sayfa silindi',
+    poKeepOne: 'Tüm sayfalar silinemez; en az bir sayfa kalmalı.',
+    tabHome: 'Ana Sayfa',
+    tabEdit: 'Düzenle',
+    tabComment: 'Yorum',
+    tabPage: 'Sayfa',
+    tabConvert: 'Dönüştür',
+    tabProtect: 'Koru',
+    rbShape: 'Şekil Çiz',
+    rbAddImage: 'Görsel Ekle',
+    rbHighlight: 'Vurgula',
+    rbStamp: 'Damga',
+    rbSignature: 'İmza',
+    rbAddBlank: 'Boş Sayfa',
+    rbReverse: 'Ters Çevir',
+    rbEncrypt: 'Şifrele',
+    rbWatermark: 'Filigran',
+    rbTxt: 'Metin',
+    compressBtn: 'Küçült / Gönder',
+    cmpTitle: 'PDF Boyutunu Küçült',
+    cmpDesc: 'E-postayla göndermek için dosyayı küçültün. Açık belge değişmez; küçültülmüş kopya ayrı bir dosya olarak kaydedilir.',
+    cmpLow: '<b>Küçük dosya</b> — en çok küçültme',
+    cmpLowD: 'E-posta ve ekranda okuma için (96 DPI)',
+    cmpMed: '<b>Dengeli</b> — önerilen',
+    cmpMedD: 'Okunaklı ve küçük; çoğu belge için ideal (150 DPI)',
+    cmpHigh: '<b>Yüksek kalite</b>',
+    cmpHighD: 'Yazdırma için; daha az küçültme (200 DPI)',
+    cmpLossless: '<b>Kayıpsız</b>',
+    cmpLosslessD: 'Resimlere dokunmaz, sadece gereksiz veriyi temizler',
+    cmpCancel: 'İptal',
+    cmpRun: 'Küçült',
+    cmpDoneTitle: 'PDF küçültüldü ve kaydedildi',
+    cmpFile: 'Dosya:',
+    cmpFolder: 'Klasör:',
+    cmpClose: 'Kapat',
+    cmpShowFolder: 'Klasörde Göster',
+    cmpSendMail: 'E-postayla Gönder',
+    cmpSmaller: 'Dosya %{p} küçüldü.',
+    cmpAlreadySmall: 'Bu dosya zaten küçük; daha fazla küçültülemedi.',
+    cmpMailOpened: 'E-posta penceresi açıldı, PDF ekte.',
+    cmpMailFallback: 'E-posta programı bulunamadı. Dosya klasörde seçili; e-postanıza sürükleyebilirsiniz.',
+    cmpFailed: 'Küçültme başarısız',
   },
   en: {
     appName: 'PDF Editor',
@@ -1736,6 +1910,63 @@ const LANGS = {
     pdfPwOpen: 'Open',
     encryptTitle: 'Add / Remove Password',
     printBtn: 'Print', copyTextBtn: 'Copy Text',
+    shareTitle: 'Send / Share',
+    shareMailApp: 'Email Program',
+    shareCopy: 'Copy File',
+    shareHintApp: 'The file is on the clipboard and {app} is opening. Pick the chat or recipient and paste with <b>Ctrl+V</b>.',
+    shareHintFallback: 'If pasting does not work, click the paperclip (attach) icon and pick the file from the folder above.',
+    shareHintCopy: 'The file is on the clipboard. Paste it anywhere with <b>Ctrl+V</b>.',
+    rbPages: 'Organize Pages',
+    poTitle: 'Organize Pages',
+    poSelectAll: 'Select All',
+    poSelectNone: 'Clear Selection',
+    poRotate: 'Rotate',
+    poDelete: 'Delete Selected',
+    poHint: 'Click a page or its corner box to select it. Shift-click selects a range. Double-click opens the page.',
+    poCount: '{n} of {total} pages selected',
+    poConfirm: 'Delete {n} page(s)? (You can undo this)',
+    poDeleted: '{n} page(s) deleted',
+    poKeepOne: 'You cannot delete every page; at least one must remain.',
+    tabHome: 'Home',
+    tabEdit: 'Edit',
+    tabComment: 'Comment',
+    tabPage: 'Page',
+    tabConvert: 'Convert',
+    tabProtect: 'Protect',
+    rbShape: 'Draw Shape',
+    rbAddImage: 'Add Image',
+    rbHighlight: 'Highlight',
+    rbStamp: 'Stamp',
+    rbSignature: 'Signature',
+    rbAddBlank: 'Blank Page',
+    rbReverse: 'Reverse',
+    rbEncrypt: 'Encrypt',
+    rbWatermark: 'Watermark',
+    rbTxt: 'Text',
+    compressBtn: 'Compress / Send',
+    cmpTitle: 'Reduce PDF Size',
+    cmpDesc: 'Make the file smaller for email. The open document is not changed; the compressed copy is saved as a separate file.',
+    cmpLow: '<b>Small file</b> — maximum compression',
+    cmpLowD: 'For email and on-screen reading (96 DPI)',
+    cmpMed: '<b>Balanced</b> — recommended',
+    cmpMedD: 'Readable and small; ideal for most documents (150 DPI)',
+    cmpHigh: '<b>High quality</b>',
+    cmpHighD: 'For printing; less compression (200 DPI)',
+    cmpLossless: '<b>Lossless</b>',
+    cmpLosslessD: 'Leaves images untouched, only removes unused data',
+    cmpCancel: 'Cancel',
+    cmpRun: 'Compress',
+    cmpDoneTitle: 'PDF compressed and saved',
+    cmpFile: 'File:',
+    cmpFolder: 'Folder:',
+    cmpClose: 'Close',
+    cmpShowFolder: 'Show in Folder',
+    cmpSendMail: 'Send by Email',
+    cmpSmaller: 'The file is {p}% smaller.',
+    cmpAlreadySmall: 'This file is already small and could not be reduced further.',
+    cmpMailOpened: 'Email window opened with the PDF attached.',
+    cmpMailFallback: 'No email program found. The file is selected in its folder; drag it into your email.',
+    cmpFailed: 'Compression failed',
   },
   de: {
     appName: 'PDF Editor',
@@ -1779,6 +2010,63 @@ const LANGS = {
     pdfPwOpen: 'Öffnen',
     encryptTitle: 'Passwort hinzufügen / entfernen',
     printBtn: 'Drucken', copyTextBtn: 'Text kopieren',
+    shareTitle: 'Senden / Teilen',
+    shareMailApp: 'E-Mail-Programm',
+    shareCopy: 'Datei kopieren',
+    shareHintApp: 'Die Datei ist in der Zwischenablage und {app} wird geöffnet. Chat oder Empfänger wählen und mit <b>Strg+V</b> einfügen.',
+    shareHintFallback: 'Falls Einfügen nicht klappt: Büroklammer (Anhang) anklicken und die Datei aus dem Ordner oben wählen.',
+    shareHintCopy: 'Die Datei ist in der Zwischenablage. Mit <b>Strg+V</b> überall einfügen.',
+    rbPages: 'Seiten verwalten',
+    poTitle: 'Seiten verwalten',
+    poSelectAll: 'Alle auswählen',
+    poSelectNone: 'Auswahl aufheben',
+    poRotate: 'Drehen',
+    poDelete: 'Auswahl löschen',
+    poHint: 'Zum Auswählen auf eine Seite oder ihr Eckkästchen klicken. Umschalt+Klick wählt einen Bereich. Doppelklick öffnet die Seite.',
+    poCount: '{n} von {total} Seiten ausgewählt',
+    poConfirm: '{n} Seite(n) löschen? (Rückgängig möglich)',
+    poDeleted: '{n} Seite(n) gelöscht',
+    poKeepOne: 'Es muss mindestens eine Seite übrig bleiben.',
+    tabHome: 'Start',
+    tabEdit: 'Bearbeiten',
+    tabComment: 'Kommentar',
+    tabPage: 'Seite',
+    tabConvert: 'Konvertieren',
+    tabProtect: 'Schützen',
+    rbShape: 'Form zeichnen',
+    rbAddImage: 'Bild einfügen',
+    rbHighlight: 'Markieren',
+    rbStamp: 'Stempel',
+    rbSignature: 'Unterschrift',
+    rbAddBlank: 'Leere Seite',
+    rbReverse: 'Umkehren',
+    rbEncrypt: 'Verschlüsseln',
+    rbWatermark: 'Wasserzeichen',
+    rbTxt: 'Text',
+    compressBtn: 'Verkleinern / Senden',
+    cmpTitle: 'PDF-Größe reduzieren',
+    cmpDesc: 'Verkleinern Sie die Datei für den E-Mail-Versand. Das geöffnete Dokument bleibt unverändert; die verkleinerte Kopie wird als separate Datei gespeichert.',
+    cmpLow: '<b>Kleine Datei</b> — maximale Komprimierung',
+    cmpLowD: 'Für E-Mail und Bildschirm (96 DPI)',
+    cmpMed: '<b>Ausgewogen</b> — empfohlen',
+    cmpMedD: 'Gut lesbar und klein; ideal für die meisten Dokumente (150 DPI)',
+    cmpHigh: '<b>Hohe Qualität</b>',
+    cmpHighD: 'Für den Druck; weniger Komprimierung (200 DPI)',
+    cmpLossless: '<b>Verlustfrei</b>',
+    cmpLosslessD: 'Bilder bleiben unverändert, nur unnötige Daten werden entfernt',
+    cmpCancel: 'Abbrechen',
+    cmpRun: 'Verkleinern',
+    cmpDoneTitle: 'PDF verkleinert und gespeichert',
+    cmpFile: 'Datei:',
+    cmpFolder: 'Ordner:',
+    cmpClose: 'Schließen',
+    cmpShowFolder: 'Im Ordner anzeigen',
+    cmpSendMail: 'Per E-Mail senden',
+    cmpSmaller: 'Die Datei ist {p} % kleiner.',
+    cmpAlreadySmall: 'Diese Datei ist bereits klein und konnte nicht weiter verkleinert werden.',
+    cmpMailOpened: 'E-Mail-Fenster mit angehängter PDF geöffnet.',
+    cmpMailFallback: 'Kein E-Mail-Programm gefunden. Die Datei ist im Ordner markiert; ziehen Sie sie in Ihre E-Mail.',
+    cmpFailed: 'Komprimierung fehlgeschlagen',
   },
   es: {
     appName: 'PDF Editor',
@@ -1822,6 +2110,63 @@ const LANGS = {
     pdfPwOpen: 'Abrir',
     encryptTitle: 'Añadir / quitar contraseña',
     printBtn: 'Imprimir', copyTextBtn: 'Copiar texto',
+    shareTitle: 'Enviar / Compartir',
+    shareMailApp: 'Programa de correo',
+    shareCopy: 'Copiar archivo',
+    shareHintApp: 'El archivo está en el portapapeles y se está abriendo {app}. Elija el chat o destinatario y pegue con <b>Ctrl+V</b>.',
+    shareHintFallback: 'Si pegar no funciona, pulse el clip (adjuntar) y elija el archivo de la carpeta de arriba.',
+    shareHintCopy: 'El archivo está en el portapapeles. Péguelo donde quiera con <b>Ctrl+V</b>.',
+    rbPages: 'Organizar páginas',
+    poTitle: 'Organizar páginas',
+    poSelectAll: 'Seleccionar todo',
+    poSelectNone: 'Quitar selección',
+    poRotate: 'Girar',
+    poDelete: 'Eliminar seleccionadas',
+    poHint: 'Haga clic en una página o en su casilla para seleccionarla. Mayús+clic selecciona un rango. Doble clic abre la página.',
+    poCount: '{n} de {total} páginas seleccionadas',
+    poConfirm: '¿Eliminar {n} página(s)? (Se puede deshacer)',
+    poDeleted: '{n} página(s) eliminada(s)',
+    poKeepOne: 'Debe quedar al menos una página.',
+    tabHome: 'Inicio',
+    tabEdit: 'Editar',
+    tabComment: 'Comentar',
+    tabPage: 'Página',
+    tabConvert: 'Convertir',
+    tabProtect: 'Proteger',
+    rbShape: 'Dibujar forma',
+    rbAddImage: 'Añadir imagen',
+    rbHighlight: 'Resaltar',
+    rbStamp: 'Sello',
+    rbSignature: 'Firma',
+    rbAddBlank: 'Página en blanco',
+    rbReverse: 'Invertir',
+    rbEncrypt: 'Cifrar',
+    rbWatermark: 'Marca de agua',
+    rbTxt: 'Texto',
+    compressBtn: 'Reducir / Enviar',
+    cmpTitle: 'Reducir tamaño del PDF',
+    cmpDesc: 'Reduzca el archivo para enviarlo por correo. El documento abierto no cambia; la copia reducida se guarda como un archivo aparte.',
+    cmpLow: '<b>Archivo pequeño</b> — máxima compresión',
+    cmpLowD: 'Para correo y lectura en pantalla (96 DPI)',
+    cmpMed: '<b>Equilibrado</b> — recomendado',
+    cmpMedD: 'Legible y pequeño; ideal para la mayoría de documentos (150 DPI)',
+    cmpHigh: '<b>Alta calidad</b>',
+    cmpHighD: 'Para imprimir; menos compresión (200 DPI)',
+    cmpLossless: '<b>Sin pérdida</b>',
+    cmpLosslessD: 'No modifica las imágenes, solo elimina datos innecesarios',
+    cmpCancel: 'Cancelar',
+    cmpRun: 'Reducir',
+    cmpDoneTitle: 'PDF reducido y guardado',
+    cmpFile: 'Archivo:',
+    cmpFolder: 'Carpeta:',
+    cmpClose: 'Cerrar',
+    cmpShowFolder: 'Mostrar en carpeta',
+    cmpSendMail: 'Enviar por correo',
+    cmpSmaller: 'El archivo es un {p} % más pequeño.',
+    cmpAlreadySmall: 'Este archivo ya es pequeño y no se pudo reducir más.',
+    cmpMailOpened: 'Ventana de correo abierta con el PDF adjunto.',
+    cmpMailFallback: 'No se encontró un programa de correo. El archivo está seleccionado en su carpeta; arrástrelo a su correo.',
+    cmpFailed: 'Error al reducir',
   },
   fr: {
     appName: 'PDF Editor',
@@ -1865,6 +2210,63 @@ const LANGS = {
     pdfPwOpen: 'Ouvrir',
     encryptTitle: 'Ajouter / supprimer le mot de passe',
     printBtn: 'Imprimer', copyTextBtn: 'Copier le texte',
+    shareTitle: 'Envoyer / Partager',
+    shareMailApp: 'Logiciel de messagerie',
+    shareCopy: 'Copier le fichier',
+    shareHintApp: 'Le fichier est dans le presse-papiers et {app} s’ouvre. Choisissez la conversation ou le destinataire et collez avec <b>Ctrl+V</b>.',
+    shareHintFallback: 'Si le collage ne fonctionne pas, cliquez sur le trombone (pièce jointe) et choisissez le fichier dans le dossier ci-dessus.',
+    shareHintCopy: 'Le fichier est dans le presse-papiers. Collez-le où vous voulez avec <b>Ctrl+V</b>.',
+    rbPages: 'Organiser les pages',
+    poTitle: 'Organiser les pages',
+    poSelectAll: 'Tout sélectionner',
+    poSelectNone: 'Désélectionner',
+    poRotate: 'Pivoter',
+    poDelete: 'Supprimer la sélection',
+    poHint: 'Cliquez sur une page ou sa case pour la sélectionner. Maj+clic sélectionne une plage. Double-cliquez pour ouvrir la page.',
+    poCount: '{n} / {total} pages sélectionnées',
+    poConfirm: 'Supprimer {n} page(s) ? (Annulable)',
+    poDeleted: '{n} page(s) supprimée(s)',
+    poKeepOne: 'Au moins une page doit rester.',
+    tabHome: 'Accueil',
+    tabEdit: 'Modifier',
+    tabComment: 'Commenter',
+    tabPage: 'Page',
+    tabConvert: 'Convertir',
+    tabProtect: 'Protéger',
+    rbShape: 'Dessiner',
+    rbAddImage: 'Ajouter une image',
+    rbHighlight: 'Surligner',
+    rbStamp: 'Tampon',
+    rbSignature: 'Signature',
+    rbAddBlank: 'Page vierge',
+    rbReverse: 'Inverser',
+    rbEncrypt: 'Chiffrer',
+    rbWatermark: 'Filigrane',
+    rbTxt: 'Texte',
+    compressBtn: 'Réduire / Envoyer',
+    cmpTitle: 'Réduire la taille du PDF',
+    cmpDesc: 'Réduisez le fichier pour l’envoyer par e-mail. Le document ouvert n’est pas modifié ; la copie réduite est enregistrée dans un fichier séparé.',
+    cmpLow: '<b>Petit fichier</b> — compression maximale',
+    cmpLowD: 'Pour l’e-mail et la lecture à l’écran (96 DPI)',
+    cmpMed: '<b>Équilibré</b> — recommandé',
+    cmpMedD: 'Lisible et léger ; idéal pour la plupart des documents (150 DPI)',
+    cmpHigh: '<b>Haute qualité</b>',
+    cmpHighD: 'Pour l’impression ; moins de compression (200 DPI)',
+    cmpLossless: '<b>Sans perte</b>',
+    cmpLosslessD: 'Ne modifie pas les images, supprime seulement les données inutiles',
+    cmpCancel: 'Annuler',
+    cmpRun: 'Réduire',
+    cmpDoneTitle: 'PDF réduit et enregistré',
+    cmpFile: 'Fichier :',
+    cmpFolder: 'Dossier :',
+    cmpClose: 'Fermer',
+    cmpShowFolder: 'Afficher dans le dossier',
+    cmpSendMail: 'Envoyer par e-mail',
+    cmpSmaller: 'Le fichier est {p} % plus petit.',
+    cmpAlreadySmall: 'Ce fichier est déjà léger et n’a pas pu être réduit davantage.',
+    cmpMailOpened: 'Fenêtre de messagerie ouverte avec le PDF en pièce jointe.',
+    cmpMailFallback: 'Aucun logiciel de messagerie trouvé. Le fichier est sélectionné dans son dossier ; faites-le glisser dans votre e-mail.',
+    cmpFailed: 'Échec de la réduction',
   },
   it: {
     appName: 'PDF Editor',
@@ -1908,6 +2310,63 @@ const LANGS = {
     pdfPwOpen: 'Apri',
     encryptTitle: 'Aggiungi / rimuovi password',
     printBtn: 'Stampa', copyTextBtn: 'Copia testo',
+    shareTitle: 'Invia / Condividi',
+    shareMailApp: 'Programma di posta',
+    shareCopy: 'Copia file',
+    shareHintApp: 'Il file è negli appunti e {app} si sta aprendo. Scegli la chat o il destinatario e incolla con <b>Ctrl+V</b>.',
+    shareHintFallback: 'Se incollare non funziona, fai clic sulla graffetta (allega) e scegli il file dalla cartella sopra.',
+    shareHintCopy: 'Il file è negli appunti. Incollalo dove vuoi con <b>Ctrl+V</b>.',
+    rbPages: 'Organizza pagine',
+    poTitle: 'Organizza pagine',
+    poSelectAll: 'Seleziona tutto',
+    poSelectNone: 'Deseleziona',
+    poRotate: 'Ruota',
+    poDelete: 'Elimina selezionate',
+    poHint: 'Fai clic su una pagina o sulla sua casella per selezionarla. Maiusc+clic seleziona un intervallo. Doppio clic apre la pagina.',
+    poCount: '{n} di {total} pagine selezionate',
+    poConfirm: 'Eliminare {n} pagina/e? (Annullabile)',
+    poDeleted: '{n} pagina/e eliminata/e',
+    poKeepOne: 'Deve restare almeno una pagina.',
+    tabHome: 'Home',
+    tabEdit: 'Modifica',
+    tabComment: 'Commento',
+    tabPage: 'Pagina',
+    tabConvert: 'Converti',
+    tabProtect: 'Proteggi',
+    rbShape: 'Disegna forma',
+    rbAddImage: 'Aggiungi immagine',
+    rbHighlight: 'Evidenzia',
+    rbStamp: 'Timbro',
+    rbSignature: 'Firma',
+    rbAddBlank: 'Pagina vuota',
+    rbReverse: 'Inverti',
+    rbEncrypt: 'Crittografa',
+    rbWatermark: 'Filigrana',
+    rbTxt: 'Testo',
+    compressBtn: 'Riduci / Invia',
+    cmpTitle: 'Riduci dimensione PDF',
+    cmpDesc: 'Riduci il file per inviarlo via e-mail. Il documento aperto non cambia; la copia ridotta viene salvata come file separato.',
+    cmpLow: '<b>File piccolo</b> — massima compressione',
+    cmpLowD: 'Per e-mail e lettura a schermo (96 DPI)',
+    cmpMed: '<b>Bilanciato</b> — consigliato',
+    cmpMedD: 'Leggibile e leggero; ideale per la maggior parte dei documenti (150 DPI)',
+    cmpHigh: '<b>Alta qualità</b>',
+    cmpHighD: 'Per la stampa; compressione minore (200 DPI)',
+    cmpLossless: '<b>Senza perdita</b>',
+    cmpLosslessD: 'Non modifica le immagini, rimuove solo i dati inutili',
+    cmpCancel: 'Annulla',
+    cmpRun: 'Riduci',
+    cmpDoneTitle: 'PDF ridotto e salvato',
+    cmpFile: 'File:',
+    cmpFolder: 'Cartella:',
+    cmpClose: 'Chiudi',
+    cmpShowFolder: 'Mostra nella cartella',
+    cmpSendMail: 'Invia per e-mail',
+    cmpSmaller: 'Il file è più piccolo del {p}%.',
+    cmpAlreadySmall: 'Questo file è già piccolo e non è stato possibile ridurlo ulteriormente.',
+    cmpMailOpened: 'Finestra e-mail aperta con il PDF allegato.',
+    cmpMailFallback: 'Nessun programma di posta trovato. Il file è selezionato nella sua cartella; trascinalo nella tua e-mail.',
+    cmpFailed: 'Riduzione non riuscita',
   },
   pt: {
     appName: 'PDF Editor',
@@ -1951,6 +2410,63 @@ const LANGS = {
     pdfPwOpen: 'Abrir',
     encryptTitle: 'Adicionar / remover senha',
     printBtn: 'Imprimir', copyTextBtn: 'Copiar texto',
+    shareTitle: 'Enviar / Compartilhar',
+    shareMailApp: 'Programa de e-mail',
+    shareCopy: 'Copiar arquivo',
+    shareHintApp: 'O arquivo está na área de transferência e o {app} está abrindo. Escolha a conversa ou o destinatário e cole com <b>Ctrl+V</b>.',
+    shareHintFallback: 'Se colar não funcionar, clique no clipe (anexar) e escolha o arquivo na pasta acima.',
+    shareHintCopy: 'O arquivo está na área de transferência. Cole onde quiser com <b>Ctrl+V</b>.',
+    rbPages: 'Organizar páginas',
+    poTitle: 'Organizar páginas',
+    poSelectAll: 'Selecionar tudo',
+    poSelectNone: 'Limpar seleção',
+    poRotate: 'Girar',
+    poDelete: 'Excluir selecionadas',
+    poHint: 'Clique em uma página ou na caixa do canto para selecioná-la. Shift+clique seleciona um intervalo. Clique duplo abre a página.',
+    poCount: '{n} de {total} páginas selecionadas',
+    poConfirm: 'Excluir {n} página(s)? (Pode ser desfeito)',
+    poDeleted: '{n} página(s) excluída(s)',
+    poKeepOne: 'Pelo menos uma página deve permanecer.',
+    tabHome: 'Início',
+    tabEdit: 'Editar',
+    tabComment: 'Comentar',
+    tabPage: 'Página',
+    tabConvert: 'Converter',
+    tabProtect: 'Proteger',
+    rbShape: 'Desenhar forma',
+    rbAddImage: 'Adicionar imagem',
+    rbHighlight: 'Destacar',
+    rbStamp: 'Carimbo',
+    rbSignature: 'Assinatura',
+    rbAddBlank: 'Página em branco',
+    rbReverse: 'Inverter',
+    rbEncrypt: 'Criptografar',
+    rbWatermark: 'Marca d’água',
+    rbTxt: 'Texto',
+    compressBtn: 'Reduzir / Enviar',
+    cmpTitle: 'Reduzir tamanho do PDF',
+    cmpDesc: 'Reduza o arquivo para enviar por e-mail. O documento aberto não é alterado; a cópia reduzida é salva como um arquivo separado.',
+    cmpLow: '<b>Arquivo pequeno</b> — compressão máxima',
+    cmpLowD: 'Para e-mail e leitura na tela (96 DPI)',
+    cmpMed: '<b>Equilibrado</b> — recomendado',
+    cmpMedD: 'Legível e leve; ideal para a maioria dos documentos (150 DPI)',
+    cmpHigh: '<b>Alta qualidade</b>',
+    cmpHighD: 'Para impressão; menos compressão (200 DPI)',
+    cmpLossless: '<b>Sem perdas</b>',
+    cmpLosslessD: 'Não altera as imagens, apenas remove dados desnecessários',
+    cmpCancel: 'Cancelar',
+    cmpRun: 'Reduzir',
+    cmpDoneTitle: 'PDF reduzido e salvo',
+    cmpFile: 'Arquivo:',
+    cmpFolder: 'Pasta:',
+    cmpClose: 'Fechar',
+    cmpShowFolder: 'Mostrar na pasta',
+    cmpSendMail: 'Enviar por e-mail',
+    cmpSmaller: 'O arquivo ficou {p}% menor.',
+    cmpAlreadySmall: 'Este arquivo já é pequeno e não pôde ser reduzido mais.',
+    cmpMailOpened: 'Janela de e-mail aberta com o PDF anexado.',
+    cmpMailFallback: 'Nenhum programa de e-mail encontrado. O arquivo está selecionado na pasta; arraste-o para o seu e-mail.',
+    cmpFailed: 'Falha ao reduzir',
   },
   ru: {
     appName: 'PDF Редактор',
@@ -1994,6 +2510,63 @@ const LANGS = {
     pdfPwOpen: 'Открыть',
     encryptTitle: 'Добавить / удалить пароль',
     printBtn: 'Печать', copyTextBtn: 'Копировать текст',
+    shareTitle: 'Отправить / Поделиться',
+    shareMailApp: 'Почтовая программа',
+    shareCopy: 'Копировать файл',
+    shareHintApp: 'Файл скопирован в буфер обмена, открывается {app}. Выберите чат или получателя и вставьте <b>Ctrl+V</b>.',
+    shareHintFallback: 'Если вставка не сработала, нажмите на скрепку (вложение) и выберите файл из папки выше.',
+    shareHintCopy: 'Файл скопирован в буфер обмена. Вставьте его куда нужно с помощью <b>Ctrl+V</b>.',
+    rbPages: 'Упорядочить страницы',
+    poTitle: 'Упорядочить страницы',
+    poSelectAll: 'Выбрать все',
+    poSelectNone: 'Снять выбор',
+    poRotate: 'Повернуть',
+    poDelete: 'Удалить выбранные',
+    poHint: 'Щёлкните страницу или флажок в углу, чтобы выбрать. Shift+щелчок — диапазон. Двойной щелчок открывает страницу.',
+    poCount: 'Выбрано {n} из {total}',
+    poConfirm: 'Удалить страниц: {n}? (Можно отменить)',
+    poDeleted: 'Удалено страниц: {n}',
+    poKeepOne: 'Должна остаться хотя бы одна страница.',
+    tabHome: 'Главная',
+    tabEdit: 'Правка',
+    tabComment: 'Комментарии',
+    tabPage: 'Страницы',
+    tabConvert: 'Конвертация',
+    tabProtect: 'Защита',
+    rbShape: 'Фигура',
+    rbAddImage: 'Изображение',
+    rbHighlight: 'Выделить',
+    rbStamp: 'Штамп',
+    rbSignature: 'Подпись',
+    rbAddBlank: 'Пустая страница',
+    rbReverse: 'Обратный порядок',
+    rbEncrypt: 'Пароль',
+    rbWatermark: 'Водяной знак',
+    rbTxt: 'Текст',
+    compressBtn: 'Сжать / Отправить',
+    cmpTitle: 'Уменьшить размер PDF',
+    cmpDesc: 'Уменьшите файл для отправки по почте. Открытый документ не изменяется; сжатая копия сохраняется отдельным файлом.',
+    cmpLow: '<b>Маленький файл</b> — максимальное сжатие',
+    cmpLowD: 'Для почты и чтения с экрана (96 DPI)',
+    cmpMed: '<b>Сбалансированно</b> — рекомендуется',
+    cmpMedD: 'Читаемо и компактно; подходит для большинства документов (150 DPI)',
+    cmpHigh: '<b>Высокое качество</b>',
+    cmpHighD: 'Для печати; меньше сжатие (200 DPI)',
+    cmpLossless: '<b>Без потерь</b>',
+    cmpLosslessD: 'Изображения не изменяются, удаляются только лишние данные',
+    cmpCancel: 'Отмена',
+    cmpRun: 'Сжать',
+    cmpDoneTitle: 'PDF сжат и сохранён',
+    cmpFile: 'Файл:',
+    cmpFolder: 'Папка:',
+    cmpClose: 'Закрыть',
+    cmpShowFolder: 'Показать в папке',
+    cmpSendMail: 'Отправить по почте',
+    cmpSmaller: 'Файл стал меньше на {p}%.',
+    cmpAlreadySmall: 'Этот файл уже маленький, уменьшить его сильнее не удалось.',
+    cmpMailOpened: 'Открыто окно письма с вложенным PDF.',
+    cmpMailFallback: 'Почтовая программа не найдена. Файл выделен в папке — перетащите его в письмо.',
+    cmpFailed: 'Не удалось сжать',
   }
 };
 let currentLang = localStorage.getItem('lang') || 'tr';
@@ -2228,12 +2801,108 @@ document.querySelectorAll('.modal-backdrop').forEach(el => {
   el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
 });
 
+// ── page organizer ────────────────────────────────────────
+const PO = { sel: new Set(), last: null };
+
+function openPageOrganizer() {
+  if (!S.pageCount) return;
+  PO.sel.clear(); PO.last = null;
+  poRender();
+  openModal('m-pages');
+}
+
+function poRender() {
+  const g = document.getElementById('po-grid');
+  g.innerHTML = '';
+  for (let i = 0; i < S.pageCount; i++) {
+    const c = document.createElement('div');
+    c.className = 'po-card' + (PO.sel.has(i) ? ' sel' : '');
+    c.dataset.i = i;
+    c.innerHTML = `<span class="po-check"></span><img loading="lazy" src="/api/thumb/${i}?t=${S.ts}"><div class="po-num">${i + 1}</div>`;
+    c.addEventListener('click', e => poToggle(i, e.shiftKey));
+    c.addEventListener('dblclick', () => { closeModal('m-pages'); selectPage(i, 'top'); });
+    g.appendChild(c);
+  }
+  poUpdate();
+}
+
+function poToggle(i, range) {
+  if (range && PO.last !== null) {
+    const [a, b] = [Math.min(PO.last, i), Math.max(PO.last, i)];
+    for (let k = a; k <= b; k++) PO.sel.add(k);
+  } else if (PO.sel.has(i)) PO.sel.delete(i);
+  else PO.sel.add(i);
+  PO.last = i;
+  document.querySelectorAll('#po-grid .po-card').forEach(c => c.classList.toggle('sel', PO.sel.has(+c.dataset.i)));
+  poUpdate();
+}
+
+function poSelectAll(on) {
+  PO.sel = on ? new Set([...Array(S.pageCount).keys()]) : new Set();
+  document.querySelectorAll('#po-grid .po-card').forEach(c => c.classList.toggle('sel', on));
+  poUpdate();
+}
+
+function poUpdate() {
+  const n = PO.sel.size;
+  document.getElementById('po-count').textContent = t('poCount').replace('{n}', n).replace('{total}', S.pageCount);
+  document.getElementById('po-delete').disabled = n === 0;
+  document.getElementById('po-rotate').disabled = n === 0;
+}
+
+async function poDelete() {
+  const pages = [...PO.sel].sort((a, b) => a - b);
+  if (!pages.length) return;
+  if (pages.length >= S.pageCount) { toast(t('poKeepOne'), 'err'); return; }
+  if (!confirm(t('poConfirm').replace('{n}', pages.length))) return;
+  spin(true);
+  const r = await post('/api/delete', { pages });
+  spin(false);
+  if (!r.ok) { toast(r.error, 'err'); return; }
+  S.pageCount = r.pages;
+  document.getElementById('tb-info').textContent = `${r.pages} sayfa`;
+  document.getElementById('split-end').value = r.pages;
+  PO.sel.clear(); PO.last = null;
+  rebuildSidebarFull();
+  poRender();
+  await selectPage(Math.min(S.currentPage, r.pages - 1));
+  toast(t('poDeleted').replace('{n}', r.deleted), 'ok');
+}
+
+async function poRotate() {
+  const pages = [...PO.sel];
+  if (!pages.length) return;
+  spin(true);
+  const r = await post('/api/rotate', { pages, deg: 90 });
+  spin(false);
+  if (!r.ok) { toast(r.error || 'Döndürme başarısız', 'err'); return; }
+  S.ts = Date.now();
+  pages.forEach(i => {
+    refreshThumb(i);
+    const img = document.querySelector(`#po-grid .po-card[data-i="${i}"] img`);
+    if (img) img.src = `/api/thumb/${i}?t=${S.ts}`;
+  });
+  if (pages.includes(S.currentPage)) await selectPage(S.currentPage);
+}
+
+function setRibbonTab(tab) {
+  if (!document.querySelector(`.rb-group[data-tab="${tab}"]`)) tab = 'home';
+  document.querySelectorAll('.rb-group').forEach(g => g.classList.toggle('active', g.dataset.tab === tab));
+  document.querySelectorAll('.rb-tab').forEach(b => b.classList.toggle('active', b.dataset.tabbtn === tab));
+  document.querySelectorAll('.tb-dropdown-menu.open, .stamp-menu.open').forEach(m => {
+    if (m.id !== 'lang-menu') m.classList.remove('open');
+  });
+  try { localStorage.setItem('ribbonTab', tab); } catch (e) {}
+}
+(() => { let t = 'home'; try { t = localStorage.getItem('ribbonTab') || 'home'; } catch (e) {} setRibbonTab(t); })();
+
 function setDocButtons(enabled) {
   [
     'btn-undo','btn-save','btn-merge','btn-split','btn-fr','btn-addtext','btn-select','btn-export',
     'btn-shape-dd','btn-hl','btn-stamp','btn-watermark','btn-addimg',
     'btn-reverse','btn-addblank','btn-compress','btn-signature','btn-encrypt',
-    'btn-print','btn-copy-text'
+    'btn-print','btn-copy-text','btn-pages','qa-save','qa-print','qa-undo',
+    'btn-cv-docx','btn-cv-excel','btn-cv-pptx','btn-cv-images','btn-cv-jpg','btn-cv-txt'
   ].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.disabled = !enabled;
@@ -2398,7 +3067,7 @@ function rebuildSidebarFull() {
 
 // ── select page ───────────────────────────────────────────
 
-async function selectPage(i) {
+async function selectPage(i, scrollTo) {
   document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('selected'));
   const th = document.getElementById(`th-${i}`);
   if (th) th.classList.add('selected');
@@ -2414,8 +3083,35 @@ async function selectPage(i) {
   const img = document.getElementById('page-img');
   img._zoom = r.zoom;
   img.src = 'data:image/png;base64,' + r.img;
-  img.onload = () => loadTextBlocks(i);
+  img.onload = () => {
+    loadTextBlocks(i);
+    const v = document.getElementById('viewer');
+    if (scrollTo === 'top') v.scrollTop = 0;
+    else if (scrollTo === 'bottom') v.scrollTop = v.scrollHeight;
+  };
+  if (th) th.scrollIntoView({ block: 'nearest' });
 }
+
+// Fare tekerleği: sayfanın sonuna/başına gelince sonraki/önceki sayfaya geç
+(() => {
+  const v = document.getElementById('viewer');
+  let acc = 0, lockUntil = 0;
+  v.addEventListener('wheel', e => {
+    if (e.ctrlKey || !S.pageCount || document.querySelector('.modal-backdrop.open')) return;
+    if (e.target.closest('textarea,[contenteditable]')) return;
+    const atBottom = v.scrollTop + v.clientHeight >= v.scrollHeight - 2;
+    const atTop = v.scrollTop <= 1;
+    if ((e.deltaY > 0 && !atBottom) || (e.deltaY < 0 && !atTop)) { acc = 0; return; }
+    e.preventDefault();
+    if (Date.now() < lockUntil) return;
+    acc += e.deltaY;
+    if (acc > 60 && S.currentPage < S.pageCount - 1) {
+      acc = 0; lockUntil = Date.now() + 350; selectPage(S.currentPage + 1, 'top');
+    } else if (acc < -60 && S.currentPage > 0) {
+      acc = 0; lockUntil = Date.now() + 350; selectPage(S.currentPage - 1, 'bottom');
+    }
+  }, { passive: false });
+})();
 
 // ── page ops ──────────────────────────────────────────────
 
@@ -3117,10 +3813,10 @@ document.addEventListener('keydown', e => {
     if (selectMode && selDrag?.locked) { e.preventDefault(); applyRedact(); return; }
     if (hoveredBlock) { e.preventDefault(); doDeleteBlock(hoveredBlock.block, hoveredBlock.div); return; }
   }
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-    if (S.currentPage > 0) selectPage(S.currentPage - 1);
-  } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-    if (S.currentPage < S.pageCount - 1) selectPage(S.currentPage + 1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+    if (S.currentPage > 0) selectPage(S.currentPage - 1, 'top');
+  } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
+    if (S.currentPage < S.pageCount - 1) selectPage(S.currentPage + 1, 'top');
   } else if (e.key === 'Escape') {
     if (selectMode) { cancelSelection(); toggleSelectMode(); }
     if (annotMode) {
@@ -3385,22 +4081,61 @@ async function doReverse() {
 
 // ── compress ─────────────────────────────────────────────
 
+let cmpLastPath = '';
+
 async function doCompress() {
   const sel = document.querySelector('input[name="cmp-q"]:checked');
   closeModal('m-compress');
   spin(true);
   const r = await post('/api/compress', { quality: sel ? sel.value : 'medium' });
   spin(false);
-  if (!r.ok) { toast(r.error || 'Sıkıştırma başarısız', 'err'); return; }
-  let msg = 'Sıkıştırıldı: ' + r.path + ' (';
+  if (!r.ok) { toast(r.error || t('cmpFailed'), 'err'); return; }
+  cmpLastPath = r.path;
+  shareHint('');
+  const sep = Math.max(r.path.lastIndexOf('\\'), r.path.lastIndexOf('/'));
+  document.getElementById('cmp-file').textContent = r.path.slice(sep + 1);
+  document.getElementById('cmp-folder').textContent = r.path.slice(0, sep);
+  const fmt = kb => kb >= 1024 ? (kb / 1024).toFixed(1) + ' MB' : kb + ' KB';
+  const sizes = document.getElementById('cmp-sizes');
+  const note = document.getElementById('cmp-note');
   if (r.orig_kb) {
     const pct = Math.round((1 - r.size_kb / r.orig_kb) * 100);
-    msg += r.orig_kb + ' KB → ' + r.size_kb + ' KB';
-    if (pct > 0) msg += ', %' + pct + ' küçük';
+    sizes.textContent = fmt(r.orig_kb) + ' → ' + fmt(r.size_kb);
+    note.textContent = pct >= 10 ? t('cmpSmaller').replace('{p}', pct) : t('cmpAlreadySmall');
   } else {
-    msg += r.size_kb + ' KB';
+    sizes.textContent = fmt(r.size_kb);
+    note.textContent = '';
   }
-  toast(msg + ')', 'ok');
+  openModal('m-compress-done');
+}
+
+async function cmpReveal() {
+  const r = await post('/api/reveal', { path: cmpLastPath });
+  if (!r.ok) toast(r.error || t('cmpFailed'), 'err');
+}
+
+function shareHint(html) {
+  const el = document.getElementById('share-hint');
+  el.innerHTML = html;
+  el.style.display = html ? 'block' : 'none';
+}
+
+async function cmpSendMail() {
+  spin(true);
+  const r = await post('/api/send_mail', { path: cmpLastPath });
+  spin(false);
+  if (!r.ok) { toast(r.error || t('cmpFailed'), 'err'); return; }
+  shareHint(r.mode === 'mail' ? t('cmpMailOpened') : t('cmpMailFallback'));
+}
+
+async function cmpShare(target, appName) {
+  spin(true);
+  const r = await post('/api/share', { path: cmpLastPath, target });
+  spin(false);
+  if (!r.ok) { toast(r.error || t('cmpFailed'), 'err'); return; }
+  if (target === 'copy') { shareHint('📋 ' + t('shareHintCopy')); return; }
+  shareHint('📋 ' + t('shareHintApp').replace('{app}', '<b>' + appName + '</b>')
+            + '<br><span style="opacity:.8">' + t('shareHintFallback') + '</span>');
 }
 
 // ── image insert ─────────────────────────────────────────
@@ -3620,7 +4355,7 @@ const _DEMO_STEPS = [
   },
   {
     section: 'BÖLÜM 5 — SIKIŞTIRIR', dur: 7,
-    text: 'E-posta göndermek için dosya boyutu çok mu büyük? Sıkıştır özelliği ile PDF boyutunu küçültebilirsiniz.',
+    text: 'E-posta göndermek için dosya boyutu çok mu büyük? "Küçült / Gönder" butonuyla PDF\'i küçültüp doğrudan e-postayla gönderebilirsiniz.',
     hl: 'btn-compress', enter() {}, leave() {}
   },
   {
@@ -3707,6 +4442,8 @@ function _demoClearAuto() {
 function _demoRing(id) {
   const el = document.getElementById(id);
   if (!el) return;
+  const panel = el.closest('.rb-group');
+  if (panel) setRibbonTab(panel.dataset.tab);
   const rc = el.getBoundingClientRect();
   const d = document.createElement('div');
   d.id = 'demo-ring'; d.className = 'demo-ring';

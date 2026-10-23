@@ -1211,12 +1211,12 @@ if __name__ == '__main__':
             except Exception as e:
                 print(f'Dosya gonderilemedi: {e}')
         window = webview.create_window(
-            'PDF Editör Pro — Demo',
+            'PDF Editor Pro — Demo',
             f'http://localhost:{PORT}',
             width=1280, height=800,
             min_size=(900, 600),
         )
-        webview.start()
+        webview.start(icon=os.path.join(_BASE_DIR, 'static', 'app-icon.ico'))
     else:
         if filepath:
             try:
@@ -1235,9 +1235,9 @@ if __name__ == '__main__':
         time.sleep(1.0)
 
         window = webview.create_window(
-            'PDF Editör Pro — Demo',
+            'PDF Editor Pro — Demo',
             f'http://localhost:{PORT}',
             width=1280, height=800,
             min_size=(900, 600),
         )
-        webview.start()
+        webview.start(icon=os.path.join(_BASE_DIR, 'static', 'app-icon.ico'))

@@ -40,7 +40,7 @@ Son güncelleme: 2026-10-09 (ara verildi)
 
 ## 2026-10-23
 - v1.0.3 Store'da YAYINDA (ücretsiz + demo; lisans Gumroad'dan). Temiz kurulumda demo modu doğrulandı.
-- v1.0.4 derlendi: kalite seçenekli PDF sıkıştırma. Paketler: installer_output\PDFEditorPro_Store_v1.0.4.msix, PDFEditorPro_Kurulum_v1.0.4.exe, PDFEditorPro_Demo_v1.0.4.exe
-- [ ] Partner Center → Update → Packages: 1.0.3'ü kaldır, 1.0.4'ü yükle → Store listings (TR+EN) "What's new" güncelle (store_metinleri.txt) → Submit
+- v1.0.4 derlendi (yeniden, 17:37): kalite seçenekli sıkıştırma + paylaşım seçenekleri, sekmeli şerit arayüz, Sayfaları Düzenle ızgarası, tekerlekle sayfa geçişi, yeni küçük-boy simgeler (resources.pri), pencere simgesi/başlık logosu. Paketler: installer_output\PDFEditorPro_Store_v1.0.4.msix, PDFEditorPro_Kurulum_v1.0.4.exe, PDFEditorPro_Demo_v1.0.4.exe
+- [ ] Partner Center → Update → Packages: 1.0.3'ü kaldır, 1.0.4'ü yükle → Store listings (TR+EN) "What's new" güncelle (store_metinleri.txt) + ekran görüntülerini images\store_v104\ (tr_*/en_* 01–06) ile değiştir → Submit
 - [ ] Gumroad: kurulum dosyasını v1.0.4 ile değiştir
 - [ ] GitHub release v1.0.4 (demo + kurulum), website yeniden yayınla

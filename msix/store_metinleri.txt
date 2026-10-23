@@ -54,7 +54,12 @@ FREE DEMO & FULL VERSION
 Without a license the app runs as a free demo: documents up to 3 pages, saved files carry a "DEMO" watermark, and password protection and Word/Excel/PowerPoint/JPG export are disabled. To unlock the full version, buy a license key at https://mkbsoft.net and enter it via the "Enter License" button. Individual license: $19 one-time for 1 PC. Corporate license: $80 one-time for up to 5 PCs. No subscription.
 
 --- What's new in this version ---
-• PDF compression now offers quality levels: Small file, Balanced, High quality and Lossless. Images are downsampled and recompressed, so scanned and photo-heavy PDFs get much smaller — ideal for email.
+• New ribbon interface with tabs (Home, Edit, Comment, Page, Convert, Protect) and clear, colorful icons.
+• Compress with quality levels (Small file, Balanced, High quality, Lossless) — scanned and photo-heavy PDFs get much smaller.
+• Send the compressed PDF by email program, Gmail, Outlook.com, WhatsApp, Telegram, Teams or LinkedIn.
+• Organize Pages: see all pages as thumbnails, select several and delete or rotate them at once.
+• Scroll with the mouse wheel to move to the next or previous page.
+• Sharper app icon on the taskbar and desktop.
 
 --- Product features (her satır ayrı kutuya) ---
 Edit existing text directly on the PDF page
@@ -125,7 +130,12 @@ DÖNÜŞTÜR & KORU
 Lisans girilmeden uygulama ücretsiz demo olarak çalışır: en fazla 3 sayfalık belgeler, kaydedilen dosyalarda "DEMO" filigranı; şifreleme ve Word/Excel/PowerPoint/JPG dışa aktarma kapalıdır. Tam sürüm için https://mkbsoft.net adresinden lisans anahtarı alıp "Lisans Gir" butonuyla girin. Bireysel lisans: tek seferlik 19$, 1 bilgisayar. Kurumsal lisans: tek seferlik 80$, 5 bilgisayara kadar. Abonelik yoktur.
 
 --- What's new in this version ---
-• PDF sıkıştırmada kalite seçenekleri: Küçük dosya, Dengeli, Yüksek kalite ve Kayıpsız. Resimler küçültülüp yeniden sıkıştırılıyor; taranmış ve fotoğraflı PDF'ler çok daha küçük oluyor — e-posta için ideal.
+• Sekmeli yeni şerit arayüzü (Ana Sayfa, Düzenle, Yorum, Sayfa, Dönüştür, Koru) ve anlaşılır, renkli simgeler.
+• Kalite seçenekli küçültme (Küçük dosya, Dengeli, Yüksek kalite, Kayıpsız) — taranmış ve fotoğraflı PDF'ler çok daha küçük oluyor.
+• Küçültülen PDF'i e-posta programı, Gmail, Outlook.com, WhatsApp, Telegram, Teams veya LinkedIn ile gönderin.
+• Sayfaları Düzenle: tüm sayfaları küçük resimlerle görün, birden fazlasını seçip topluca silin veya döndürün.
+• Fare tekerleğiyle sonraki/önceki sayfaya geçiş.
+• Görev çubuğunda ve masaüstünde daha net uygulama simgesi.
 
 --- Product features (her satır ayrı kutuya) ---
 PDF sayfasındaki metni doğrudan düzenleyin
