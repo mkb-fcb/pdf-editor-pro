@@ -44,22 +44,20 @@ ORGANIZE
 • Rotate, reorder, insert and delete pages with thumbnail view
 
 CONVERT & PROTECT
-• Export to Word (DOCX), images and plain text
+• Export to Word (DOCX), images, plain text and e-book (EPUB) — and send to Kindle
 • Compress PDFs with selectable quality to reduce file size
 • Add or remove password protection
 
 Multilingual interface: English, Turkish, German, French, Spanish, Italian, Portuguese and Russian.
 
 FREE DEMO & FULL VERSION
-Without a license the app runs as a free demo: documents up to 3 pages, saved files carry a "DEMO" watermark, and password protection and Word/Excel/PowerPoint/JPG export are disabled. To unlock the full version, buy a license key at https://mkbsoft.net and enter it via the "Enter License" button. Individual license: $19 one-time for 1 PC. Corporate license: $80 one-time for up to 5 PCs. No subscription.
+Without a license the app runs as a free demo: documents up to 3 pages, saved files carry a "DEMO" watermark, and password protection and Word/Excel/PowerPoint/JPG/EPUB export are disabled. To unlock the full version, buy a license key at https://mkbsoft.net and enter it via the "Enter License" button. Individual license: $19 one-time for 1 PC. Corporate license: $80 one-time for up to 5 PCs. No subscription.
 
 --- What's new in this version ---
-• New ribbon interface with tabs (Home, Edit, Comment, Page, Convert, Protect) and clear, colorful icons.
-• Compress with quality levels (Small file, Balanced, High quality, Lossless) — scanned and photo-heavy PDFs get much smaller.
-• Send the compressed PDF by email program, Gmail, Outlook.com, WhatsApp, Telegram, Teams or LinkedIn.
-• Organize Pages: see all pages as thumbnails, select several and delete or rotate them at once.
-• Scroll with the mouse wheel to move to the next or previous page.
-• Sharper app icon on the taskbar and desktop.
+• PDF to e-book: convert PDFs to EPUB with reflowing text, headings, chapters, images, charts and tables.
+• Send to Kindle: send the e-book to your Kindle library with your email program or Amazon's web page.
+• AZW3 export for Kindle when the free Calibre app is installed.
+• Fixes for the free demo installer.
 
 --- Product features (her satır ayrı kutuya) ---
 Edit existing text directly on the PDF page
@@ -120,22 +118,20 @@ SAYFALARI YÖNET
 • Küçük resim görünümünde sayfaları döndürün, sıralayın, ekleyin ve silin
 
 DÖNÜŞTÜR & KORU
-• Word (DOCX), görsel ve metin olarak dışa aktarın
+• Word (DOCX), görsel, metin ve e-kitap (EPUB) olarak dışa aktarın — Kindle'a gönderin
 • PDF dosya boyutunu kalite seçerek küçültün
 • Şifre koruması ekleyin veya kaldırın
 
 Çok dilli arayüz: Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Portekizce ve Rusça.
 
 ÜCRETSİZ DEMO VE TAM SÜRÜM
-Lisans girilmeden uygulama ücretsiz demo olarak çalışır: en fazla 3 sayfalık belgeler, kaydedilen dosyalarda "DEMO" filigranı; şifreleme ve Word/Excel/PowerPoint/JPG dışa aktarma kapalıdır. Tam sürüm için https://mkbsoft.net adresinden lisans anahtarı alıp "Lisans Gir" butonuyla girin. Bireysel lisans: tek seferlik 19$, 1 bilgisayar. Kurumsal lisans: tek seferlik 80$, 5 bilgisayara kadar. Abonelik yoktur.
+Lisans girilmeden uygulama ücretsiz demo olarak çalışır: en fazla 3 sayfalık belgeler, kaydedilen dosyalarda "DEMO" filigranı; şifreleme ve Word/Excel/PowerPoint/JPG/EPUB dışa aktarma kapalıdır. Tam sürüm için https://mkbsoft.net adresinden lisans anahtarı alıp "Lisans Gir" butonuyla girin. Bireysel lisans: tek seferlik 19$, 1 bilgisayar. Kurumsal lisans: tek seferlik 80$, 5 bilgisayara kadar. Abonelik yoktur.
 
 --- What's new in this version ---
-• Sekmeli yeni şerit arayüzü (Ana Sayfa, Düzenle, Yorum, Sayfa, Dönüştür, Koru) ve anlaşılır, renkli simgeler.
-• Kalite seçenekli küçültme (Küçük dosya, Dengeli, Yüksek kalite, Kayıpsız) — taranmış ve fotoğraflı PDF'ler çok daha küçük oluyor.
-• Küçültülen PDF'i e-posta programı, Gmail, Outlook.com, WhatsApp, Telegram, Teams veya LinkedIn ile gönderin.
-• Sayfaları Düzenle: tüm sayfaları küçük resimlerle görün, birden fazlasını seçip topluca silin veya döndürün.
-• Fare tekerleğiyle sonraki/önceki sayfaya geçiş.
-• Görev çubuğunda ve masaüstünde daha net uygulama simgesi.
+• PDF'ten e-kitaba: PDF'leri EPUB'a dönüştürün; metin ekrana göre akar, başlıklar, bölümler, resimler, grafikler ve tablolar korunur.
+• Kindle'a Gönder: e-kitabı e-posta programınızla veya Amazon'un web sayfasıyla Kindle kitaplığınıza gönderin.
+• Ücretsiz Calibre programı kuruluysa Kindle için AZW3 dışa aktarma.
+• Ücretsiz demo kurulumu için düzeltmeler.
 
 --- Product features (her satır ayrı kutuya) ---
 PDF sayfasındaki metni doğrudan düzenleyin

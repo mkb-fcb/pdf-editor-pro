@@ -945,7 +945,7 @@ def api_export_dest():
     """Dışa aktarma için 'Kaydet' penceresi (kaydedilecek yeri kullanıcı seçer)."""
     name = Path(request.args.get('name', 'export')).name or 'export'
     ext = Path(name).suffix.lower()
-    if ext not in ('.docx', '.xlsx', '.pptx', '.png', '.jpg', '.zip', '.txt'):
+    if ext not in ('.docx', '.xlsx', '.pptx', '.png', '.jpg', '.zip', '.txt', '.epub', '.azw3'):
         return jsonify({'path': '', 'error': 'Geçersiz dosya türü'})
     try:
         import tkinter as tk
@@ -1131,6 +1131,93 @@ def api_export_txt():
     return send_file(buf, mimetype='text/plain; charset=utf-8',
                      as_attachment=True,
                      download_name=f'{stem}.txt')
+
+
+def _find_ebook_convert():
+    """Calibre's converter, if Calibre is installed (needed only for AZW3)."""
+    import shutil
+    for base in (os.environ.get('ProgramFiles', r'C:\Program Files'),
+                 os.environ.get('ProgramFiles(x86)', r'C:\Program Files (x86)'),
+                 os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Programs')):
+        for sub in ('Calibre2', 'Calibre'):
+            exe = os.path.join(base, sub, 'ebook-convert.exe')
+            if os.path.isfile(exe):
+                return exe
+    return shutil.which('ebook-convert')
+
+
+def _epub_bytes(doc):
+    from epub_export import build_epub
+    return build_epub(doc, title=_doc_stem())
+
+
+@app.route('/api/export/epub')
+def api_export_epub():
+    doc = state['doc']
+    if not doc:
+        return jsonify({'ok': False, 'error': 'Dosya açık değil'})
+    if is_demo():
+        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    return send_file(io.BytesIO(_epub_bytes(doc)), mimetype='application/epub+zip',
+                     as_attachment=True, download_name=f'{_doc_stem()}.epub')
+
+
+@app.route('/api/export/azw3')
+def api_export_azw3():
+    doc = state['doc']
+    if not doc:
+        return jsonify({'ok': False, 'error': 'Dosya açık değil'})
+    if is_demo():
+        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    exe = _find_ebook_convert()
+    if not exe:
+        return jsonify({'ok': False, 'error': 'AZW3 için ücretsiz Calibre programı gerekiyor (calibre-ebook.com). '
+                                              "Kindle'a göndermek için EPUB yeterlidir."})
+    import subprocess
+    with tempfile.TemporaryDirectory() as tmp:
+        src, dst = os.path.join(tmp, 'book.epub'), os.path.join(tmp, 'book.azw3')
+        with open(src, 'wb') as f:
+            f.write(_epub_bytes(doc))
+        r = subprocess.run([exe, src, dst], capture_output=True, timeout=600,
+                           creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+        if r.returncode != 0 or not os.path.isfile(dst):
+            return jsonify({'ok': False, 'error': 'Calibre dönüştürmesi başarısız oldu.'})
+        with open(dst, 'rb') as f:
+            data = f.read()
+    return send_file(io.BytesIO(data), mimetype='application/octet-stream',
+                     as_attachment=True, download_name=f'{_doc_stem()}.azw3')
+
+
+@app.route('/api/kindle_prepare', methods=['POST'])
+def api_kindle_prepare():
+    """Saves the EPUB next to the other outputs so it can be mailed or uploaded to Kindle."""
+    doc = state['doc']
+    if not doc:
+        return jsonify({'ok': False, 'error': 'Dosya açık değil'})
+    if is_demo():
+        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    path = _default_out('')[:-4] + '.epub'
+    n = 2
+    while os.path.exists(path):
+        path = _default_out('')[:-4] + f' ({n}).epub'
+        n += 1
+    data = _epub_bytes(doc)
+    with open(path, 'wb') as f:
+        f.write(data)
+    return jsonify({'ok': True, 'path': path, 'size_kb': len(data) // 1024})
+
+
+@app.route('/api/open_link', methods=['POST'])
+def api_open_link():
+    links = {
+        'kindle_settings': 'https://www.amazon.com/hz/mycd/myx#/home/settings/pdoc',
+        'calibre': 'https://calibre-ebook.com/download_windows',
+    }
+    url = links.get((request.json or {}).get('key'))
+    if not url:
+        return jsonify({'ok': False})
+    webbrowser.open(url)
+    return jsonify({'ok': True})
 
 
 @app.route('/api/export/docx')
@@ -1567,11 +1654,15 @@ def api_compress():
         return jsonify({'ok': False, 'error': str(e)})
 
 
-def _existing_pdf(path):
+def _existing_file(path, exts=('.pdf',)):
     path = (path or '').strip().strip('"')
-    if path and path.lower().endswith('.pdf') and os.path.isfile(path):
+    if path and path.lower().endswith(exts) and os.path.isfile(path):
         return os.path.abspath(path)
     return None
+
+
+def _existing_pdf(path):
+    return _existing_file(path, ('.pdf', '.epub'))
 
 
 def _reveal_in_explorer(path):
@@ -1588,7 +1679,7 @@ def api_reveal():
     return jsonify({'ok': True})
 
 
-def _mapi_send_mail(path, subject):
+def _mapi_send_mail(path, subject, to=None):
     """Varsayılan e-posta programında (Outlook, Thunderbird…) eki hazır yeni bir posta açar.
     Pencere kapanana kadar bloklar. MAPI dönüş kodunu döndürür (0 = başarılı, 1 = kullanıcı iptal)."""
     import ctypes
@@ -1623,12 +1714,21 @@ def _mapi_send_mail(path, subject):
     msg.lpszSubject = subject
     msg.nFileCount = 1
     msg.lpFiles = ctypes.pointer(fd)
+    if to:
+        MAPI_TO = 1
+        rcpt = MapiRecipDescW(0, MAPI_TO, to, 'SMTP:' + to, 0, None)
+        msg.nRecipCount = 1
+        msg.lpRecips = ctypes.pointer(rcpt)
     return send(0, 0, ctypes.byref(msg), MAPI_LOGON_UI | MAPI_DIALOG, 0)
 
 
 @app.route('/api/send_mail', methods=['POST'])
 def api_send_mail():
-    path = _existing_pdf((request.json or {}).get('path'))
+    data = request.json or {}
+    path = _existing_file(data.get('path'), ('.pdf', '.epub'))
+    to = (data.get('to') or '').strip()
+    if to and not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', to):
+        return jsonify({'ok': False, 'error': 'Geçersiz e-posta adresi'})
     if not path:
         return jsonify({'ok': False, 'error': 'Dosya bulunamadı'})
 
@@ -1638,7 +1738,7 @@ def api_send_mail():
 
     def worker():
         try:
-            result['code'] = _mapi_send_mail(path, Path(path).stem)
+            result['code'] = _mapi_send_mail(path, Path(path).stem, to)
         except Exception as e:
             result['code'] = -1
             result['error'] = str(e)
@@ -1725,6 +1825,11 @@ def api_share():
         'linkedin': (None, None, 'https://www.linkedin.com/messaging/'),
         'copy':     (None, None, None),
     }
+    if target == 'kindleweb':
+        # The Send to Kindle page uploads a picked file; show the file so it can be dragged in
+        webbrowser.open('https://www.amazon.com/sendtokindle')
+        _reveal_in_explorer(path)
+        return jsonify({'ok': True, 'opened': 'web'})
     if target not in targets:
         return jsonify({'ok': False, 'error': 'Geçersiz hedef'})
     try:

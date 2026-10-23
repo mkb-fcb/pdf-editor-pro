@@ -1022,6 +1022,10 @@ body.has-file #sidebar {
   <symbol id="i-check-check" viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5" /> <path d="m22 10-7.5 7.5L13 16" /></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /></symbol>
+  <symbol id="i-book-open" viewBox="0 0 24 24"><path d="M12 5v16" /> <path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z" /></symbol>
+  <symbol id="i-book-marked" viewBox="0 0 24 24"><path d="M10 2v7.751a.25.25 0 00.407.195l2.28-1.834a.5.5 0 01.627 0l2.28 1.834A.25.25 0 0016 9.751V2" /> <path d="M4 19.5v-15A2.5 2.5 0 016.5 2H19a1 1 0 011 1v18a1 1 0 01-1 1H6.5a1 1 0 010-5H20" /></symbol>
+  <symbol id="i-tablet-smartphone" viewBox="0 0 24 24"><rect width="10" height="14" x="3" y="8" rx="2" /> <path d="M5 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-2.4" /> <path d="M8 18h.01" /></symbol>
+  <symbol id="i-external-link" viewBox="0 0 24 24"><path d="M15 3h6v6" /> <path d="M10 14 21 3" /> <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></symbol>
 </svg>
 <div id="toolbar">
   <div class="tb-brand" title="PDF Editor Pro — MKBSoft">
@@ -1088,6 +1092,8 @@ body.has-file #sidebar {
       <button class="tb-dropdown-item" onclick="doExport('images')" data-i18n="exportImages">PNG</button>
       <button class="tb-dropdown-item" onclick="doExport('jpg')">JPG</button>
       <button class="tb-dropdown-item" onclick="doExport('txt')"    data-i18n="exportTxt">Metin (.txt)</button>
+      <button class="tb-dropdown-item" onclick="doExport('epub')"   data-i18n="exportEpub">E-kitap (.epub)</button>
+      <button class="tb-dropdown-item" onclick="doExport('azw3')"   data-i18n="exportAzw3">Kindle (.azw3)</button>
     </div>
     </div>
   </div>
@@ -1150,6 +1156,10 @@ body.has-file #sidebar {
     <button class="rb" id="btn-cv-images" onclick="doExport('images')" disabled><svg class="ri" style="color:#0d9488"><use href="#i-file-image"/></svg><span><span data-i18n="rbPng">PNG</span></span></button>
     <button class="rb" id="btn-cv-jpg" onclick="doExport('jpg')" disabled><svg class="ri" style="color:#db2777"><use href="#i-image"/></svg><span><span data-i18n="rbJpg">JPG</span></span></button>
     <button class="rb" id="btn-cv-txt" onclick="doExport('txt')" disabled><svg class="ri" style="color:#64748b"><use href="#i-file-type"/></svg><span><span data-i18n="rbTxt">Metin</span></span></button>
+    <div class="rb-sep"></div>
+    <button class="rb" id="btn-cv-epub" onclick="doExport('epub')" disabled title="E-kitap (EPUB): metin ekrana göre akar; Kindle, Kobo, Apple Books"><svg class="ri" style="color:#b45309"><use href="#i-book-open"/></svg><span><span data-i18n="rbEpub">EPUB</span></span></button>
+    <button class="rb" id="btn-cv-azw3" onclick="doExport('azw3')" disabled title="Kindle biçimi (AZW3) — ücretsiz Calibre programı gerekir"><svg class="ri" style="color:#92400e"><use href="#i-book-marked"/></svg><span><span data-i18n="rbAzw3">AZW3</span></span></button>
+    <button class="rb" id="btn-kindle" onclick="openKindle()" disabled title="E-kitabı Kindle'ınıza gönderin"><svg class="ri" style="color:#0f766e"><use href="#i-tablet-smartphone"/></svg><span><span data-i18n="rbKindle">Kindle'a Gönder</span></span></button>
   </div>
   <div class="rb-group" data-tab="protect">
     <button class="rb" id="btn-encrypt" onclick="openModal('m-encrypt')" disabled title="Şifre ekle / kaldır"><svg class="ri" style="color:#dc2626"><use href="#i-lock"/></svg><span><span data-i18n="rbEncrypt">Şifrele</span></span></button>
@@ -1416,6 +1426,28 @@ body.has-file #sidebar {
     </div>
     <div class="po-hint" data-i18n="poHint">Seçmek için sayfaya veya köşedeki kutuya tıklayın. Shift ile aralık seçin. Sayfayı açmak için çift tıklayın.</div>
     <div id="po-grid"></div>
+  </div>
+</div>
+
+<!-- MODAL: Kindle'a gönder -->
+<div class="modal-backdrop" id="m-kindle">
+  <div class="modal-card" style="width:480px">
+    <h3><svg class="ri" style="width:20px;height:20px;color:#0f766e;vertical-align:-4px"><use href="#i-tablet-smartphone"/></svg> <span data-i18n="kTitle">Kindle'a Gönder</span></h3>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px" data-i18n="kDesc">PDF, ekrana göre akan bir e-kitaba (EPUB) dönüştürülür ve Kindle kitaplığınıza gönderilir.</p>
+    <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px" data-i18n="kAddrLabel">Kindle e-posta adresiniz</label>
+    <input type="email" id="kindle-addr" placeholder="adiniz_123@kindle.com" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;margin-bottom:6px">
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.5">
+      <span data-i18n="kAddrHelp">Adresinizi ve onaylı gönderen listesini Amazon'daki Kişisel Belge Ayarları'nda bulursunuz. Gönderen e-postanız bu listede olmalı.</span>
+      <a href="#" onclick="openLink('kindle_settings');return false" style="color:var(--primary);white-space:nowrap"><span data-i18n="kOpenSettings">Ayarları aç</span> <svg class="ri" style="width:12px;height:12px;vertical-align:-1px"><use href="#i-external-link"/></svg></a>
+    </div>
+    <div class="share-grid" style="grid-template-columns:1fr 1fr">
+      <button class="share-btn" onclick="kindleSend('mail')"><span class="share-ic" style="background:#2563eb"><svg class="ri"><use href="#i-mail"/></svg></span><span data-i18n="kViaMail">E-posta programıyla gönder</span></button>
+      <button class="share-btn" onclick="kindleSend('web')"><span class="share-ic" style="background:#f59e0b"><svg class="ri"><use href="#i-external-link"/></svg></span><span data-i18n="kViaWeb">Amazon web sayfasıyla gönder</span></button>
+    </div>
+    <div id="kindle-hint" style="display:none;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:12px;line-height:1.45"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('m-kindle')" data-i18n="cmpClose">Kapat</button>
+    </div>
   </div>
 </div>
 
@@ -1810,6 +1842,22 @@ const LANGS = {
     pdfPwOpen: 'Aç',
     encryptTitle: 'Şifre Ekle / Kaldır',
     printBtn: 'Yazdır', copyTextBtn: 'Metni Kopyala',
+    rbEpub: 'EPUB',
+    rbAzw3: 'AZW3',
+    rbKindle: 'Kindle\'a Gönder',
+    exportEpub: 'E-kitap (.epub)',
+    exportAzw3: 'Kindle (.azw3)',
+    kTitle: 'Kindle\'a Gönder',
+    kDesc: 'PDF, ekrana göre akan bir e-kitaba (EPUB) dönüştürülür ve Kindle kitaplığınıza gönderilir.',
+    kAddrLabel: 'Kindle e-posta adresiniz',
+    kAddrHelp: 'Adresinizi ve onaylı gönderen listesini Amazon\'daki Kişisel Belge Ayarları\'nda bulursunuz. Gönderen e-postanız bu listede olmalı.',
+    kOpenSettings: 'Ayarları aç',
+    kViaMail: 'E-posta programıyla gönder',
+    kViaWeb: 'Amazon web sayfasıyla gönder',
+    kAddrInvalid: 'Geçerli bir Kindle e-posta adresi girin.',
+    kMailHint: 'E-posta hazır: alıcı {addr}, EPUB ekte. <b>Gönder</b>\'e basın; kitap birkaç dakika içinde Kindle kitaplığınızda olur.',
+    kWebHint: 'Amazon\'un Send to Kindle sayfası açılıyor. Klasörde seçili olan {file} dosyasını sayfaya sürükleyin.',
+    kAddrWarn: 'Not: Kindle adresleri genellikle <b>@kindle.com</b> ile biter.',
     shareTitle: 'Gönder / Paylaş',
     shareMailApp: 'E-posta Programı',
     shareCopy: 'Dosyayı Kopyala',
@@ -1910,6 +1958,22 @@ const LANGS = {
     pdfPwOpen: 'Open',
     encryptTitle: 'Add / Remove Password',
     printBtn: 'Print', copyTextBtn: 'Copy Text',
+    rbEpub: 'EPUB',
+    rbAzw3: 'AZW3',
+    rbKindle: 'Send to Kindle',
+    exportEpub: 'E-book (.epub)',
+    exportAzw3: 'Kindle (.azw3)',
+    kTitle: 'Send to Kindle',
+    kDesc: 'The PDF is turned into a reflowable e-book (EPUB) and sent to your Kindle library.',
+    kAddrLabel: 'Your Kindle email address',
+    kAddrHelp: 'You\'ll find your address and the approved sender list in Amazon\'s Personal Document Settings. Your sending email must be on that list.',
+    kOpenSettings: 'Open settings',
+    kViaMail: 'Send with email program',
+    kViaWeb: 'Send via Amazon web page',
+    kAddrInvalid: 'Enter a valid Kindle email address.',
+    kMailHint: 'Email ready: to {addr}, EPUB attached. Click <b>Send</b>; the book appears in your Kindle library within a few minutes.',
+    kWebHint: 'Amazon\'s Send to Kindle page is opening. Drag {file} (selected in the folder) onto the page.',
+    kAddrWarn: 'Note: Kindle addresses usually end with <b>@kindle.com</b>.',
     shareTitle: 'Send / Share',
     shareMailApp: 'Email Program',
     shareCopy: 'Copy File',
@@ -2010,6 +2074,22 @@ const LANGS = {
     pdfPwOpen: 'Öffnen',
     encryptTitle: 'Passwort hinzufügen / entfernen',
     printBtn: 'Drucken', copyTextBtn: 'Text kopieren',
+    rbEpub: 'EPUB',
+    rbAzw3: 'AZW3',
+    rbKindle: 'An Kindle senden',
+    exportEpub: 'E-Book (.epub)',
+    exportAzw3: 'Kindle (.azw3)',
+    kTitle: 'An Kindle senden',
+    kDesc: 'Das PDF wird in ein umfließendes E-Book (EPUB) umgewandelt und an Ihre Kindle-Bibliothek gesendet.',
+    kAddrLabel: 'Ihre Kindle-E-Mail-Adresse',
+    kAddrHelp: 'Adresse und Liste genehmigter Absender finden Sie bei Amazon unter „Einstellungen für persönliche Dokumente“. Ihre Absenderadresse muss auf dieser Liste stehen.',
+    kOpenSettings: 'Einstellungen öffnen',
+    kViaMail: 'Mit E-Mail-Programm senden',
+    kViaWeb: 'Über Amazon-Webseite senden',
+    kAddrInvalid: 'Geben Sie eine gültige Kindle-E-Mail-Adresse ein.',
+    kMailHint: 'E-Mail bereit: an {addr}, EPUB im Anhang. Klicken Sie auf <b>Senden</b>; das Buch erscheint in wenigen Minuten in Ihrer Kindle-Bibliothek.',
+    kWebHint: 'Die Amazon-Seite „Send to Kindle“ wird geöffnet. Ziehen Sie {file} (im Ordner markiert) auf die Seite.',
+    kAddrWarn: 'Hinweis: Kindle-Adressen enden meist auf <b>@kindle.com</b>.',
     shareTitle: 'Senden / Teilen',
     shareMailApp: 'E-Mail-Programm',
     shareCopy: 'Datei kopieren',
@@ -2110,6 +2190,22 @@ const LANGS = {
     pdfPwOpen: 'Abrir',
     encryptTitle: 'Añadir / quitar contraseña',
     printBtn: 'Imprimir', copyTextBtn: 'Copiar texto',
+    rbEpub: 'EPUB',
+    rbAzw3: 'AZW3',
+    rbKindle: 'Enviar a Kindle',
+    exportEpub: 'Libro electrónico (.epub)',
+    exportAzw3: 'Kindle (.azw3)',
+    kTitle: 'Enviar a Kindle',
+    kDesc: 'El PDF se convierte en un libro electrónico adaptable (EPUB) y se envía a su biblioteca de Kindle.',
+    kAddrLabel: 'Su dirección de correo de Kindle',
+    kAddrHelp: 'Encontrará su dirección y la lista de remitentes aprobados en la Configuración de documentos personales de Amazon. Su correo de envío debe estar en esa lista.',
+    kOpenSettings: 'Abrir configuración',
+    kViaMail: 'Enviar con programa de correo',
+    kViaWeb: 'Enviar mediante la web de Amazon',
+    kAddrInvalid: 'Introduzca una dirección de Kindle válida.',
+    kMailHint: 'Correo listo: para {addr}, EPUB adjunto. Pulse <b>Enviar</b>; el libro aparecerá en su biblioteca de Kindle en unos minutos.',
+    kWebHint: 'Se está abriendo la página Send to Kindle de Amazon. Arrastre {file} (seleccionado en la carpeta) a la página.',
+    kAddrWarn: 'Nota: las direcciones de Kindle suelen terminar en <b>@kindle.com</b>.',
     shareTitle: 'Enviar / Compartir',
     shareMailApp: 'Programa de correo',
     shareCopy: 'Copiar archivo',
@@ -2210,6 +2306,22 @@ const LANGS = {
     pdfPwOpen: 'Ouvrir',
     encryptTitle: 'Ajouter / supprimer le mot de passe',
     printBtn: 'Imprimer', copyTextBtn: 'Copier le texte',
+    rbEpub: 'EPUB',
+    rbAzw3: 'AZW3',
+    rbKindle: 'Envoyer au Kindle',
+    exportEpub: 'Livre numérique (.epub)',
+    exportAzw3: 'Kindle (.azw3)',
+    kTitle: 'Envoyer au Kindle',
+    kDesc: 'Le PDF est converti en livre numérique adaptable (EPUB) et envoyé à votre bibliothèque Kindle.',
+    kAddrLabel: 'Votre adresse e-mail Kindle',
+    kAddrHelp: 'Votre adresse et la liste des expéditeurs approuvés se trouvent dans les Paramètres des documents personnels d’Amazon. Votre e-mail d’envoi doit figurer dans cette liste.',
+    kOpenSettings: 'Ouvrir les paramètres',
+    kViaMail: 'Envoyer avec le logiciel de messagerie',
+    kViaWeb: 'Envoyer via le site Amazon',
+    kAddrInvalid: 'Saisissez une adresse Kindle valide.',
+    kMailHint: 'E-mail prêt : à {addr}, EPUB en pièce jointe. Cliquez sur <b>Envoyer</b> ; le livre apparaîtra dans votre bibliothèque Kindle en quelques minutes.',
+    kWebHint: 'La page Send to Kindle d’Amazon s’ouvre. Faites glisser {file} (sélectionné dans le dossier) sur la page.',
+    kAddrWarn: 'Remarque : les adresses Kindle se terminent généralement par <b>@kindle.com</b>.',
     shareTitle: 'Envoyer / Partager',
     shareMailApp: 'Logiciel de messagerie',
     shareCopy: 'Copier le fichier',
@@ -2310,6 +2422,22 @@ const LANGS = {
     pdfPwOpen: 'Apri',
     encryptTitle: 'Aggiungi / rimuovi password',
     printBtn: 'Stampa', copyTextBtn: 'Copia testo',
+    rbEpub: 'EPUB',
+    rbAzw3: 'AZW3',
+    rbKindle: 'Invia a Kindle',
+    exportEpub: 'E-book (.epub)',
+    exportAzw3: 'Kindle (.azw3)',
+    kTitle: 'Invia a Kindle',
+    kDesc: 'Il PDF viene convertito in un e-book adattabile (EPUB) e inviato alla tua libreria Kindle.',
+    kAddrLabel: 'Il tuo indirizzo e-mail Kindle',
+    kAddrHelp: 'Trovi l’indirizzo e l’elenco dei mittenti approvati nelle Impostazioni documenti personali di Amazon. La tua e-mail di invio deve essere in quell’elenco.',
+    kOpenSettings: 'Apri impostazioni',
+    kViaMail: 'Invia con il programma di posta',
+    kViaWeb: 'Invia tramite il sito Amazon',
+    kAddrInvalid: 'Inserisci un indirizzo Kindle valido.',
+    kMailHint: 'E-mail pronta: a {addr}, EPUB allegato. Fai clic su <b>Invia</b>; il libro sarà nella tua libreria Kindle in pochi minuti.',
+    kWebHint: 'Si sta aprendo la pagina Send to Kindle di Amazon. Trascina {file} (selezionato nella cartella) sulla pagina.',
+    kAddrWarn: 'Nota: gli indirizzi Kindle di solito terminano con <b>@kindle.com</b>.',
     shareTitle: 'Invia / Condividi',
     shareMailApp: 'Programma di posta',
     shareCopy: 'Copia file',
@@ -2410,6 +2538,22 @@ const LANGS = {
     pdfPwOpen: 'Abrir',
     encryptTitle: 'Adicionar / remover senha',
     printBtn: 'Imprimir', copyTextBtn: 'Copiar texto',
+    rbEpub: 'EPUB',
+    rbAzw3: 'AZW3',
+    rbKindle: 'Enviar para Kindle',
+    exportEpub: 'E-book (.epub)',
+    exportAzw3: 'Kindle (.azw3)',
+    kTitle: 'Enviar para Kindle',
+    kDesc: 'O PDF é convertido em um e-book ajustável (EPUB) e enviado para sua biblioteca Kindle.',
+    kAddrLabel: 'Seu e-mail do Kindle',
+    kAddrHelp: 'Você encontra seu endereço e a lista de remetentes aprovados nas Configurações de documentos pessoais da Amazon. Seu e-mail de envio precisa estar nessa lista.',
+    kOpenSettings: 'Abrir configurações',
+    kViaMail: 'Enviar pelo programa de e-mail',
+    kViaWeb: 'Enviar pelo site da Amazon',
+    kAddrInvalid: 'Digite um endereço Kindle válido.',
+    kMailHint: 'E-mail pronto: para {addr}, EPUB anexado. Clique em <b>Enviar</b>; o livro aparecerá na sua biblioteca Kindle em alguns minutos.',
+    kWebHint: 'A página Send to Kindle da Amazon está abrindo. Arraste {file} (selecionado na pasta) para a página.',
+    kAddrWarn: 'Observação: endereços Kindle geralmente terminam com <b>@kindle.com</b>.',
     shareTitle: 'Enviar / Compartilhar',
     shareMailApp: 'Programa de e-mail',
     shareCopy: 'Copiar arquivo',
@@ -2510,6 +2654,22 @@ const LANGS = {
     pdfPwOpen: 'Открыть',
     encryptTitle: 'Добавить / удалить пароль',
     printBtn: 'Печать', copyTextBtn: 'Копировать текст',
+    rbEpub: 'EPUB',
+    rbAzw3: 'AZW3',
+    rbKindle: 'Отправить на Kindle',
+    exportEpub: 'Электронная книга (.epub)',
+    exportAzw3: 'Kindle (.azw3)',
+    kTitle: 'Отправить на Kindle',
+    kDesc: 'PDF преобразуется в электронную книгу с переносом текста (EPUB) и отправляется в вашу библиотеку Kindle.',
+    kAddrLabel: 'Ваш адрес электронной почты Kindle',
+    kAddrHelp: 'Адрес и список разрешённых отправителей находятся в настройках личных документов Amazon. Ваш адрес отправителя должен быть в этом списке.',
+    kOpenSettings: 'Открыть настройки',
+    kViaMail: 'Отправить через почтовую программу',
+    kViaWeb: 'Отправить через сайт Amazon',
+    kAddrInvalid: 'Введите корректный адрес Kindle.',
+    kMailHint: 'Письмо готово: кому {addr}, EPUB во вложении. Нажмите <b>Отправить</b>; книга появится в библиотеке Kindle через несколько минут.',
+    kWebHint: 'Открывается страница Send to Kindle от Amazon. Перетащите на неё файл {file} (выделен в папке).',
+    kAddrWarn: 'Примечание: адреса Kindle обычно заканчиваются на <b>@kindle.com</b>.',
     shareTitle: 'Отправить / Поделиться',
     shareMailApp: 'Почтовая программа',
     shareCopy: 'Копировать файл',
@@ -2902,7 +3062,8 @@ function setDocButtons(enabled) {
     'btn-shape-dd','btn-hl','btn-stamp','btn-watermark','btn-addimg',
     'btn-reverse','btn-addblank','btn-compress','btn-signature','btn-encrypt',
     'btn-print','btn-copy-text','btn-pages','qa-save','qa-print','qa-undo',
-    'btn-cv-docx','btn-cv-excel','btn-cv-pptx','btn-cv-images','btn-cv-jpg','btn-cv-txt'
+    'btn-cv-docx','btn-cv-excel','btn-cv-pptx','btn-cv-images','btn-cv-jpg','btn-cv-txt',
+    'btn-cv-epub','btn-cv-azw3','btn-kindle'
   ].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.disabled = !enabled;
@@ -4107,6 +4268,41 @@ async function doCompress() {
     note.textContent = '';
   }
   openModal('m-compress-done');
+}
+
+function openLink(key) { post('/api/open_link', { key }); }
+
+function openKindle() {
+  if (!S.pageCount) return;
+  let saved = '';
+  try { saved = localStorage.getItem('kindleAddr') || ''; } catch (e) {}
+  document.getElementById('kindle-addr').value = saved;
+  const h = document.getElementById('kindle-hint');
+  h.style.display = 'none'; h.innerHTML = '';
+  openModal('m-kindle');
+}
+
+async function kindleSend(method) {
+  const hint = document.getElementById('kindle-hint');
+  const show = html => { hint.innerHTML = html; hint.style.display = 'block'; };
+  const addr = document.getElementById('kindle-addr').value.trim();
+  if (method === 'mail') {
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(addr)) { toast(t('kAddrInvalid'), 'err'); return; }
+    try { localStorage.setItem('kindleAddr', addr); } catch (e) {}
+  }
+  spin(true);
+  const p = await post('/api/kindle_prepare', {});
+  if (!p.ok) { spin(false); toast(p.error || t('exportErr'), 'err'); return; }
+  const r = method === 'mail'
+    ? await post('/api/send_mail', { path: p.path, to: addr })
+    : await post('/api/share', { path: p.path, target: 'kindleweb' });
+  spin(false);
+  if (!r.ok) { toast(r.error || t('exportErr'), 'err'); return; }
+  const name = p.path.split(/[\\/]/).pop();
+  if (method === 'web') show(t('kWebHint').replace('{file}', '<b>' + name + '</b>'));
+  else if (r.mode === 'mail') show(t('kMailHint').replace('{addr}', '<b>' + addr + '</b>'));
+  else show(t('cmpMailFallback'));
+  if (method === 'mail' && !/@(free\.)?kindle\.(com|cn)$/i.test(addr)) show(hint.innerHTML + '<br>' + t('kAddrWarn'));
 }
 
 async function cmpReveal() {
