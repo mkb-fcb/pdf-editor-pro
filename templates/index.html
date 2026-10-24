@@ -1429,6 +1429,20 @@ body.has-file #sidebar {
   </div>
 </div>
 
+<!-- MODAL: AZW3 için Calibre yok -->
+<div class="modal-backdrop" id="m-azw3">
+  <div class="modal-card" style="width:460px">
+    <h3><svg class="ri" style="width:20px;height:20px;color:#92400e;vertical-align:-4px"><use href="#i-book-marked"/></svg> <span data-i18n="azTitle">AZW3 dosyası</span></h3>
+    <p style="font-size:14px;margin-bottom:10px;line-height:1.5" data-i18n="azNoNeed">Kindle'a göndermek için AZW3 gerekmez: <b>Kindle'a Gönder</b> e-kitabı EPUB olarak gönderir, Amazon onu Kindle'ınıza uygun biçime kendisi çevirir.</p>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.5" data-i18n="azUsb">Kindle'a USB kablosuyla dosya atmak istiyorsanız AZW3 gerekir. Bunun için ücretsiz Calibre programını kurun; kurulumdan sonra bu düğme doğrudan AZW3 kaydeder.</p>
+    <div class="modal-actions" style="flex-wrap:wrap">
+      <button class="btn-secondary" onclick="closeModal('m-azw3')" data-i18n="cmpClose">Kapat</button>
+      <button class="btn-secondary" onclick="openLink('calibre')"><svg class="ri" style="width:15px;height:15px"><use href="#i-external-link"/></svg><span data-i18n="azGetCalibre">Calibre'yi indir</span></button>
+      <button class="btn-primary" onclick="closeModal('m-azw3'); openKindle()"><svg class="ri" style="width:15px;height:15px"><use href="#i-tablet-smartphone"/></svg><span data-i18n="rbKindle">Kindle'a Gönder</span></button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: Kindle'a gönder -->
 <div class="modal-backdrop" id="m-kindle">
   <div class="modal-card" style="width:480px">
@@ -1842,6 +1856,10 @@ const LANGS = {
     pdfPwOpen: 'Aç',
     encryptTitle: 'Şifre Ekle / Kaldır',
     printBtn: 'Yazdır', copyTextBtn: 'Metni Kopyala',
+    azTitle: 'AZW3 dosyası',
+    azNoNeed: 'Kindle\'a göndermek için AZW3 gerekmez: <b>Kindle\'a Gönder</b> e-kitabı EPUB olarak gönderir, Amazon onu Kindle\'ınıza uygun biçime kendisi çevirir.',
+    azUsb: 'Kindle\'a USB kablosuyla dosya atmak istiyorsanız AZW3 gerekir. Bunun için ücretsiz Calibre programını kurun; kurulumdan sonra bu düğme doğrudan AZW3 kaydeder.',
+    azGetCalibre: 'Calibre\'yi indir',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Kindle\'a Gönder',
@@ -1958,6 +1976,10 @@ const LANGS = {
     pdfPwOpen: 'Open',
     encryptTitle: 'Add / Remove Password',
     printBtn: 'Print', copyTextBtn: 'Copy Text',
+    azTitle: 'AZW3 file',
+    azNoNeed: 'You don\'t need AZW3 to send to Kindle: <b>Send to Kindle</b> sends the e-book as EPUB and Amazon converts it for your Kindle.',
+    azUsb: 'AZW3 is only needed to copy files to a Kindle over USB. Install the free Calibre app; after that this button saves AZW3 directly.',
+    azGetCalibre: 'Download Calibre',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Send to Kindle',
@@ -2074,6 +2096,10 @@ const LANGS = {
     pdfPwOpen: 'Öffnen',
     encryptTitle: 'Passwort hinzufügen / entfernen',
     printBtn: 'Drucken', copyTextBtn: 'Text kopieren',
+    azTitle: 'AZW3-Datei',
+    azNoNeed: 'Zum Senden an den Kindle brauchen Sie kein AZW3: <b>An Kindle senden</b> schickt das E-Book als EPUB, Amazon wandelt es selbst für Ihren Kindle um.',
+    azUsb: 'AZW3 wird nur zum Kopieren per USB-Kabel benötigt. Installieren Sie das kostenlose Programm Calibre; danach speichert diese Schaltfläche direkt AZW3.',
+    azGetCalibre: 'Calibre herunterladen',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'An Kindle senden',
@@ -2190,6 +2216,10 @@ const LANGS = {
     pdfPwOpen: 'Abrir',
     encryptTitle: 'Añadir / quitar contraseña',
     printBtn: 'Imprimir', copyTextBtn: 'Copiar texto',
+    azTitle: 'Archivo AZW3',
+    azNoNeed: 'No necesita AZW3 para enviar a Kindle: <b>Enviar a Kindle</b> envía el libro en EPUB y Amazon lo convierte para su Kindle.',
+    azUsb: 'AZW3 solo hace falta para copiar archivos al Kindle por USB. Instale el programa gratuito Calibre; después este botón guardará AZW3 directamente.',
+    azGetCalibre: 'Descargar Calibre',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Enviar a Kindle',
@@ -2306,6 +2336,10 @@ const LANGS = {
     pdfPwOpen: 'Ouvrir',
     encryptTitle: 'Ajouter / supprimer le mot de passe',
     printBtn: 'Imprimer', copyTextBtn: 'Copier le texte',
+    azTitle: 'Fichier AZW3',
+    azNoNeed: 'Inutile d’avoir un AZW3 pour envoyer au Kindle : <b>Envoyer au Kindle</b> envoie le livre en EPUB et Amazon le convertit pour votre Kindle.',
+    azUsb: 'L’AZW3 n’est nécessaire que pour copier des fichiers sur un Kindle par câble USB. Installez le logiciel gratuit Calibre ; ce bouton enregistrera ensuite directement en AZW3.',
+    azGetCalibre: 'Télécharger Calibre',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Envoyer au Kindle',
@@ -2422,6 +2456,10 @@ const LANGS = {
     pdfPwOpen: 'Apri',
     encryptTitle: 'Aggiungi / rimuovi password',
     printBtn: 'Stampa', copyTextBtn: 'Copia testo',
+    azTitle: 'File AZW3',
+    azNoNeed: 'Per inviare a Kindle non serve AZW3: <b>Invia a Kindle</b> invia l’e-book in EPUB e Amazon lo converte per il tuo Kindle.',
+    azUsb: 'AZW3 serve solo per copiare file su Kindle tramite USB. Installa il programma gratuito Calibre; poi questo pulsante salverà direttamente in AZW3.',
+    azGetCalibre: 'Scarica Calibre',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Invia a Kindle',
@@ -2538,6 +2576,10 @@ const LANGS = {
     pdfPwOpen: 'Abrir',
     encryptTitle: 'Adicionar / remover senha',
     printBtn: 'Imprimir', copyTextBtn: 'Copiar texto',
+    azTitle: 'Arquivo AZW3',
+    azNoNeed: 'Você não precisa de AZW3 para enviar ao Kindle: <b>Enviar para Kindle</b> envia o e-book em EPUB e a Amazon o converte para o seu Kindle.',
+    azUsb: 'AZW3 só é necessário para copiar arquivos para o Kindle por cabo USB. Instale o programa gratuito Calibre; depois este botão salvará AZW3 diretamente.',
+    azGetCalibre: 'Baixar o Calibre',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Enviar para Kindle',
@@ -2654,6 +2696,10 @@ const LANGS = {
     pdfPwOpen: 'Открыть',
     encryptTitle: 'Добавить / удалить пароль',
     printBtn: 'Печать', copyTextBtn: 'Копировать текст',
+    azTitle: 'Файл AZW3',
+    azNoNeed: 'Для отправки на Kindle AZW3 не нужен: <b>Отправить на Kindle</b> отправляет книгу в EPUB, а Amazon сам преобразует её для вашего Kindle.',
+    azUsb: 'AZW3 нужен только для копирования файлов на Kindle по USB-кабелю. Установите бесплатную программу Calibre — после этого кнопка будет сразу сохранять AZW3.',
+    azGetCalibre: 'Скачать Calibre',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Отправить на Kindle',
@@ -2858,7 +2904,9 @@ async function doExport(format) {
     const ct = r.headers.get('Content-Type') || '';
     if (ct.includes('json') || !r.ok) {
       const data = await r.json().catch(() => ({}));
-      spin(false); toast(data.error || t('exportErr'), 'err'); return;
+      spin(false);
+      if (data.code === 'no_calibre') { openModal('m-azw3'); return; }
+      toast(data.error || t('exportErr'), 'err'); return;
     }
     const blob = await r.blob();
     const cd = r.headers.get('Content-Disposition') || '';

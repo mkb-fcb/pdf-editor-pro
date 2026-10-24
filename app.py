@@ -1171,8 +1171,9 @@ def api_export_azw3():
         return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
     exe = _find_ebook_convert()
     if not exe:
-        return jsonify({'ok': False, 'error': 'AZW3 için ücretsiz Calibre programı gerekiyor (calibre-ebook.com). '
-                                              "Kindle'a göndermek için EPUB yeterlidir."})
+        return jsonify({'ok': False, 'code': 'no_calibre',
+                        'error': 'AZW3 için ücretsiz Calibre programı gerekiyor (calibre-ebook.com). '
+                                 "Kindle'a göndermek için EPUB yeterlidir."})
     import subprocess
     with tempfile.TemporaryDirectory() as tmp:
         src, dst = os.path.join(tmp, 'book.epub'), os.path.join(tmp, 'book.azw3')
