@@ -1139,10 +1139,32 @@ def _find_ebook_convert():
     for base in (os.environ.get('ProgramFiles', r'C:\Program Files'),
                  os.environ.get('ProgramFiles(x86)', r'C:\Program Files (x86)'),
                  os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Programs')):
-        for sub in ('Calibre2', 'Calibre'):
+        for sub in ('Calibre2', 'Calibre', os.path.join('Calibre Portable', 'Calibre')):
             exe = os.path.join(base, sub, 'ebook-convert.exe')
             if os.path.isfile(exe):
                 return exe
+    # Installed to a custom folder: ask Windows' list of installed programs
+    import winreg
+    for root, path in ((winreg.HKEY_LOCAL_MACHINE, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall'),
+                       (winreg.HKEY_LOCAL_MACHINE, r'SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall'),
+                       (winreg.HKEY_CURRENT_USER, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')):
+        try:
+            key = winreg.OpenKey(root, path)
+        except OSError:
+            continue
+        with key:
+            for i in range(winreg.QueryInfoKey(key)[0]):
+                try:
+                    with winreg.OpenKey(key, winreg.EnumKey(key, i)) as sub:
+                        name = str(winreg.QueryValueEx(sub, 'DisplayName')[0])
+                        if 'calibre' not in name.lower():
+                            continue
+                        loc = str(winreg.QueryValueEx(sub, 'InstallLocation')[0])
+                except OSError:
+                    continue
+                exe = os.path.join(loc, 'ebook-convert.exe')
+                if os.path.isfile(exe):
+                    return exe
     return shutil.which('ebook-convert')
 
 
