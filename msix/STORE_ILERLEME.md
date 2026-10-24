@@ -48,6 +48,8 @@ Son güncelleme: 2026-10-09 (ara verildi)
 ## 2026-10-24
 - v1.0.4 Store'a sertifikaya gönderildi (onay bekleniyor). GitHub release v1.0.4 + site yayında; demo kurulumu artık tam sürümle aynı program (app_demo.py kaldırıldı).
 - v1.0.5 derlendi: PDF→EPUB, Kindle'a Gönder, Calibre varsa AZW3. Paketler: installer_output\PDFEditorPro_*_v1.0.5.*
-- [ ] Kullanıcı kurulum dosyasıyla test edecek
+- [x] Kullanıcı test etti (gerçek Kindle ile USB gönderim + çıkarma doğrulandı)
 - [ ] v1.0.4 onaylanınca Partner Center → Update → 1.0.5 paketi + "What's new" (store_metinleri.txt)
-- [ ] GitHub release v1.0.5, push, siteye EPUB/Kindle yeniliği + yayın, Gumroad dosyası
+- [x] GitHub release v1.0.5, push, site yayında (2026-10-24)
+- [ ] Gumroad: kurulum dosyasını v1.0.5 ile değiştir
+- [ ] Store 1.0.5: ekran görüntülerine images\store_v104	r_07_kindle / en_07_kindle eklenebilir
