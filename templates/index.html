@@ -2925,6 +2925,7 @@ function toggleLangMenu(e) {
 }
 function setLang(code) {
   currentLang = code;
+  fetch('/api/ui_lang', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({lang: code})}).catch(() => {});
   localStorage.setItem('lang', code);
   const labels = {tr:'TR',en:'EN',de:'DE',es:'ES',fr:'FR',it:'IT',pt:'PT',ru:'RU'};
   const lbl = document.getElementById('lang-label');

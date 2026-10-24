@@ -127,6 +127,40 @@ def _out_dir() -> Path:
     return d if d.exists() else Path.home()
 
 
+# Output file name suffixes in the UI language (set by the page via /api/ui_lang)
+FILE_SUFFIXES = {
+    'en': dict(edited='_edited', compressed='_compressed', encrypted='_encrypted', unlocked='_unlocked',
+               range='_pages{a}-{b}', page='page', pages='_pages', converted='_converted'),
+    'tr': dict(edited='_duzenlendi', compressed='_sikistirildi', encrypted='_sifrelendi', unlocked='_sifresiz',
+               range='_sayfa{a}-{b}', page='sayfa', pages='_sayfalar', converted='_donusturuldu'),
+    'de': dict(edited='_bearbeitet', compressed='_komprimiert', encrypted='_verschlüsselt', unlocked='_entsperrt',
+               range='_seiten{a}-{b}', page='seite', pages='_seiten', converted='_konvertiert'),
+    'es': dict(edited='_editado', compressed='_comprimido', encrypted='_cifrado', unlocked='_desbloqueado',
+               range='_páginas{a}-{b}', page='página', pages='_páginas', converted='_convertido'),
+    'fr': dict(edited='_modifié', compressed='_compressé', encrypted='_chiffré', unlocked='_déverrouillé',
+               range='_pages{a}-{b}', page='page', pages='_pages', converted='_converti'),
+    'it': dict(edited='_modificato', compressed='_compresso', encrypted='_crittografato', unlocked='_sbloccato',
+               range='_pagine{a}-{b}', page='pagina', pages='_pagine', converted='_convertito'),
+    'pt': dict(edited='_editado', compressed='_comprimido', encrypted='_criptografado', unlocked='_desbloqueado',
+               range='_páginas{a}-{b}', page='página', pages='_páginas', converted='_convertido'),
+    'ru': dict(edited='_изменён', compressed='_сжатый', encrypted='_зашифрован', unlocked='_без_пароля',
+               range='_стр{a}-{b}', page='стр', pages='_страницы', converted='_конвертирован'),
+}
+
+
+def _sfx(key, **kw):
+    table = FILE_SUFFIXES.get(state.get('ui_lang') or 'tr', FILE_SUFFIXES['tr'])
+    return table[key].format(**kw)
+
+
+@app.route('/api/ui_lang', methods=['POST'])
+def api_ui_lang():
+    lang = (request.json or {}).get('lang')
+    if lang in FILE_SUFFIXES:
+        state['ui_lang'] = lang
+    return jsonify({'ok': True})
+
+
 def _default_out(suffix_text: str) -> str:
     """<ad><sonek>.pdf — mevcut dosyanın üzerine yazmamak için (2), (3) ekler."""
     d = _out_dir()
@@ -863,7 +897,7 @@ def api_split():
     end = request.json.get('end', len(doc) - 1)
     path = request.json.get('path', '').strip().strip('"')
     if not path:
-        path = _default_out(f'_sayfa{start + 1}-{end + 1}')
+        path = _default_out(_sfx('range', a=start + 1, b=end + 1))
     try:
         new_doc = fitz.open()
         new_doc.insert_pdf(doc, from_page=start, to_page=end)
@@ -883,7 +917,7 @@ def api_save():
         return jsonify({'ok': False})
     path = request.json.get('path', '').strip().strip('"')
     if not path:
-        path = _default_out('_duzenlendi')
+        path = _default_out(_sfx('edited'))
     try:
         if is_demo():
             _save_with_watermark(doc, path)
@@ -929,7 +963,7 @@ def api_browse_save():
             parent=root,
             title='PDF Olarak Kaydet',
             initialdir=str(downloads),
-            initialfile=orig.stem + '_duzenlendi.pdf',
+            initialfile=orig.stem + _sfx('edited') + '.pdf',
             defaultextension='.pdf',
             filetypes=[('PDF Dosyaları', '*.pdf')]
         )
@@ -1107,11 +1141,11 @@ def api_export_images():
         with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
             for i, page in enumerate(src):
                 pix = page.get_pixmap(matrix=mat)
-                zf.writestr(f'sayfa_{i + 1:03d}.png', pix.tobytes('png'))
+                zf.writestr(f"{_sfx('page')}_{i + 1:03d}.png", pix.tobytes('png'))
         buf.seek(0)
         return send_file(buf, mimetype='application/zip',
                          as_attachment=True,
-                         download_name=f'{stem}_sayfalar.zip')
+                         download_name=f"{stem}{_sfx('pages')}.zip")
     finally:
         if src is not doc:
             src.close()
@@ -1699,7 +1733,7 @@ def api_compress():
     if level not in COMPRESS_LEVELS:
         level = 'medium'
     if not path:
-        path = _default_out('_sikistirildi')
+        path = _default_out(_sfx('compressed'))
     try:
         orig_kb = None
         if state.get('path') and os.path.exists(state['path']):
@@ -1937,7 +1971,7 @@ def api_encrypt():
     allow_copy  = data.get('allow_copy', False)
     if not user_pw and not owner_pw:
         return jsonify({'ok': False, 'error': 'En az bir şifre girilmeli'})
-    out_path = _default_out('_sifrelendi')
+    out_path = _default_out(_sfx('encrypted'))
     perms = fitz.PDF_PERM_ACCESSIBILITY
     if allow_print:
         perms |= fitz.PDF_PERM_PRINT | fitz.PDF_PERM_PRINT_HQ
@@ -1961,7 +1995,7 @@ def api_decrypt():
         return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
     data = request.json or {}
     password = data.get('password', '').strip()
-    out_path = _default_out('_sifresiz')
+    out_path = _default_out(_sfx('unlocked'))
     try:
         if doc.needs_pass:
             if not doc.authenticate(password):
@@ -2065,7 +2099,7 @@ def api_export_jpg():
             pix = page.get_pixmap(matrix=mat)
             if pix.alpha:
                 pix = fitz.Pixmap(fitz.csRGB, pix)
-            zf.writestr(f'sayfa_{i + 1:03d}.jpg', pix.tobytes('jpeg'))
+            zf.writestr(f"{_sfx('page')}_{i + 1:03d}.jpg", pix.tobytes('jpeg'))
     buf.seek(0)
     return send_file(buf, mimetype='application/zip',
                      as_attachment=True,
@@ -2128,7 +2162,7 @@ def api_convert_to_pdf():
 
         truncated = _demo_truncate(new_doc)
         push_history()
-        _swap_doc(new_doc, os.path.splitext(src)[0] + '_converted.pdf', reset_history=False)
+        _swap_doc(new_doc, os.path.splitext(src)[0] + _sfx('converted') + '.pdf', reset_history=False)
         sigs = detect_signatures(new_doc)
         fields = detect_form_fields(new_doc)
         return jsonify({'ok': True, 'pages': len(new_doc),
