@@ -43,23 +43,37 @@ def _body_size(pages):
     return sizes.most_common(1)[0][0] if sizes else 11.0
 
 
+def _in_margin(bbox, h):
+    return bbox[3] < h * 0.09 or bbox[1] > h * 0.91
+
+
+def _line_text(line):
+    return ''.join(s['text'] for s in line['spans']).strip()
+
+
 def _furniture(pages, heights):
-    """Text that repeats in the top/bottom margin of many pages (running headers, page numbers)."""
+    """Lines that repeat in the top/bottom margin of many pages (running headers, page numbers).
+    Line-level, because a header can share a text block with the page's first heading."""
     if len(pages) < 3:
         return set()
     seen = collections.Counter()
     for pd, h in zip(pages, heights):
         keys = set()
         for b in pd['blocks']:
-            if b['type'] != 0:
-                continue
-            y0, y1 = b['bbox'][1], b['bbox'][3]
-            if y1 < h * 0.09 or y0 > h * 0.91:
-                t = _norm(_block_text(b))
-                if t:
-                    keys.add(t)
+            for l in b.get('lines', []):
+                if _in_margin(l['bbox'], h):
+                    t = _norm(_line_text(l))
+                    if t:
+                        keys.add(t)
         seen.update(keys)
-    return {k for k, n in seen.items() if n >= max(2, len(pages) * 0.4)}
+    # 3 pages is enough: running headers often change per chapter ("Chapter 4. Functions")
+    need = 3 if len(pages) >= 6 else 2
+    return {k for k, n in seen.items() if n >= need}
+
+
+# "Chapter 3", "Bölüm IV: ...", "Глава 2" on a short line of its own -> chapter start
+CHAPTER_RE = re.compile(r'(?i)^(chapter|part|book|prologue|epilogue|bölüm|kısım|kitap|önsöz|kapitel|teil|chapitre|'
+                        r'partie|cap[ií]tulo|parte|capitolo|глава|часть)\b.{0,50}$')
 
 
 def _spans_html(line_spans):
@@ -138,6 +152,29 @@ def _table_html(rows):
         out.append(f'<tr>{cells}</tr>')
     out.append('</table>')
     return ''.join(out)
+
+
+def _reading_order(elems, width):
+    """Orders (bbox, kind, value) elements for reading. Two-column pages are read left
+    column then right column; full-width items (titles, wide images) split the page
+    into bands that are read top to bottom."""
+    by_pos = sorted(elems, key=lambda e: (round(e[0][1] / 3), e[0][0]))
+    mid = width / 2
+    left = [e for e in elems if e[0][2] <= mid + 15]
+    right = [e for e in elems if e[0][0] >= mid - 15]
+    text_len = lambda es: sum(len(_block_text(v)) for _, k, v in es if k == 'block')  # noqa: E731
+    if len(left) < 2 or len(right) < 2 or min(text_len(left), text_len(right)) < 200:
+        return by_pos  # single column
+    full = sorted((e for e in elems if e not in left and e not in right), key=lambda e: e[0][1])
+    out, top = [], float('-inf')
+    for f in full + [None]:
+        bottom = f[0][1] if f else float('inf')
+        band = lambda col: sorted((e for e in col if top <= e[0][1] < bottom), key=lambda e: e[0][1])  # noqa: E731
+        out += band(left) + band(right)
+        if f:
+            out.append(f)
+            top = f[0][1]
+    return out
 
 
 def _merge_near(rects, dx, dy):
@@ -237,9 +274,9 @@ def build_epub(doc, title=None, author=None, lang=None):
         regions = _page_regions(page, pd, book)
         inside = lambda bb: any(fitz.Rect(bb).intersect(r).get_area() > 0.6 * max(fitz.Rect(bb).get_area(), 1)  # noqa: E731
                                 for r, _, _ in regions)
-        elements = [((r.y0, r.x0), kind, val) for r, kind, val in regions]
-        elements += [((b['bbox'][1], b['bbox'][0]), 'block', b) for b in pd['blocks'] if not inside(b['bbox'])]
-        for _, kind, b in sorted(elements, key=lambda e: (round(e[0][0] / 3), e[0][1])):
+        elements = [(tuple(r), kind, val) for r, kind, val in regions]
+        elements += [(tuple(b['bbox']), 'block', b) for b in pd['blocks'] if not inside(b['bbox'])]
+        for _, kind, b in _reading_order(elements, page.rect.width):
             if kind != 'block':
                 book.items.append((kind, b))  # 'img' (rendered chart/drawing) or 'table'
                 continue
@@ -251,8 +288,19 @@ def build_epub(doc, title=None, author=None, lang=None):
                 if name:
                     book.items.append(('img', name))
                 continue
+            h = page.rect.height
+            lines = [l for l in b['lines']
+                     if not (_in_margin(l['bbox'], h) and _norm(_line_text(l)) in furniture)]
+            # A "Chapter N" line opens a chapter even when it is body-sized
+            if lines and not _in_margin(lines[0]['bbox'], h) and len(_line_text(lines[0])) <= 60 \
+                    and CHAPTER_RE.match(_line_text(lines[0])):
+                book.items.append(('h1', html.escape(XML_BAD.sub('', _line_text(lines[0])))))
+                lines = lines[1:]
+            if not lines:
+                continue
+            b = dict(b, lines=lines)
             raw = _block_text(b)
-            if _norm(raw) in furniture or re.fullmatch(r'[\d\s/\-–|]+|(sayfa|page)\s*\d+.*', raw.strip().lower()):
+            if re.fullmatch(r'[\d\s/\-–|]+|(sayfa|page)\s*\d+.*', raw.strip().lower()):
                 continue
             sizes = [s['size'] for l in b['lines'] for s in l['spans'] if s['text'].strip()]
             size = max(sizes) if sizes else body
