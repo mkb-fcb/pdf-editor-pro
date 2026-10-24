@@ -18,7 +18,7 @@ T = {
 "Pricing": ("Preise", "Precios", "Tarifs", "Prezzi", "Preços", "Цены"),
 "Demo": ("Demo", "Demo", "Démo", "Demo", "Demo", "Демо"),
 "FAQ": ("FAQ", "Preguntas", "FAQ", "FAQ", "Perguntas", "Вопросы"),
-"Buy Now — $19": ("Jetzt kaufen — $19", "Comprar — $19", "Acheter — $19", "Acquista — $19", "Comprar — $19", "Купить — $19"),
+"Buy Now — $9.99": ("Jetzt kaufen — $9.99", "Comprar — $9.99", "Acheter — $9.99", "Acquista — $9.99", "Comprar — $9.99", "Купить — $9.99"),
 "<b>NEW</b> v1.0.5 — PDF to e-book, send to Kindle →": (
     "<b>NEU</b> v1.0.5 — PDF zu E-Book, an Kindle senden →", "<b>NUEVO</b> v1.0.5 — PDF a libro electrónico, enviar a Kindle →",
     "<b>NOUVEAU</b> v1.0.5 — PDF en livre numérique, envoi au Kindle →", "<b>NOVITÀ</b> v1.0.5 — Da PDF a e-book, invio a Kindle →",
@@ -36,9 +36,9 @@ T = {
     "Unisci, dividi, ruota, proteggi e annota i PDF direttamente sul desktop. Niente cloud, niente canoni mensili: tuo per sempre.",
     "Una, divida, gire, criptografe e anote PDFs direto na sua área de trabalho. Sem nuvem, sem mensalidade — seu para sempre.",
     "Объединяйте, разделяйте, поворачивайте, шифруйте и комментируйте PDF прямо на компьютере. Без облака и ежемесячных платежей — навсегда ваш."),
-"⬇ Download for Windows &nbsp;·&nbsp; $19": ("⬇ Für Windows laden &nbsp;·&nbsp; $19", "⬇ Descargar para Windows &nbsp;·&nbsp; $19",
-    "⬇ Télécharger pour Windows &nbsp;·&nbsp; $19", "⬇ Scarica per Windows &nbsp;·&nbsp; $19", "⬇ Baixar para Windows &nbsp;·&nbsp; $19",
-    "⬇ Скачать для Windows &nbsp;·&nbsp; $19"),
+"⬇ Download for Windows &nbsp;·&nbsp; $9.99": ("⬇ Für Windows laden &nbsp;·&nbsp; $9.99", "⬇ Descargar para Windows &nbsp;·&nbsp; $9.99",
+    "⬇ Télécharger pour Windows &nbsp;·&nbsp; $9.99", "⬇ Scarica per Windows &nbsp;·&nbsp; $9.99", "⬇ Baixar para Windows &nbsp;·&nbsp; $9.99",
+    "⬇ Скачать для Windows &nbsp;·&nbsp; $9.99"),
 "Try Free Demo →": ("Kostenlose Demo →", "Demo gratis →", "Démo gratuite →", "Demo gratuita →", "Demo grátis →", "Бесплатная демо →"),
 "One-time payment &nbsp;·&nbsp; Lifetime license &nbsp;·&nbsp; Free updates &nbsp;·&nbsp; Free demo available": (
     "Einmalzahlung &nbsp;·&nbsp; Lebenslange Lizenz &nbsp;·&nbsp; Kostenlose Updates &nbsp;·&nbsp; Kostenlose Demo",
@@ -377,8 +377,8 @@ T = {
     "Unisciti ai professionisti che hanno lasciato abbonamenti costosi per uno strumento davvero loro.",
     "Junte-se aos profissionais que trocaram assinaturas caras por uma ferramenta que é realmente deles.",
     "Присоединяйтесь к профессионалам, сменившим дорогие подписки на инструмент, который действительно им принадлежит."),
-"⬇ Download PDF Editor Pro — $19": ("⬇ PDF Editor Pro laden — $19", "⬇ Descargar PDF Editor Pro — $19", "⬇ Télécharger PDF Editor Pro — $19",
-    "⬇ Scarica PDF Editor Pro — $19", "⬇ Baixar PDF Editor Pro — $19", "⬇ Скачать PDF Editor Pro — $19"),
+"⬇ Download PDF Editor Pro — $9.99": ("⬇ PDF Editor Pro laden — $9.99", "⬇ Descargar PDF Editor Pro — $9.99", "⬇ Télécharger PDF Editor Pro — $9.99",
+    "⬇ Scarica PDF Editor Pro — $9.99", "⬇ Baixar PDF Editor Pro — $9.99", "⬇ Скачать PDF Editor Pro — $9.99"),
 "One-time payment &nbsp;·&nbsp; Instant delivery &nbsp;·&nbsp; 14-day refund guarantee": (
     "Einmalzahlung &nbsp;·&nbsp; Sofortige Lieferung &nbsp;·&nbsp; 14 Tage Geld-zurück", "Pago único &nbsp;·&nbsp; Entrega inmediata &nbsp;·&nbsp; Reembolso en 14 días",
     "Paiement unique &nbsp;·&nbsp; Livraison immédiate &nbsp;·&nbsp; Remboursement sous 14 jours", "Pagamento unico &nbsp;·&nbsp; Consegna immediata &nbsp;·&nbsp; Rimborso entro 14 giorni",

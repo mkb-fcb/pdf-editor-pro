@@ -27,11 +27,11 @@
   </COMPANY_INFO>
   <PROGRAM_INFO>
     <Program_Name>PDF Editor Pro</Program_Name>
-    <Program_Version>1.0.5</Program_Version>
+    <Program_Version>1.0.6</Program_Version>
     <Program_Release_Month>10</Program_Release_Month>
     <Program_Release_Day>24</Program_Release_Day>
     <Program_Release_Year>2026</Program_Release_Year>
-    <Program_Cost_Dollars>19</Program_Cost_Dollars>
+    <Program_Cost_Dollars>9.99</Program_Cost_Dollars>
     <Program_Cost_Other_Code></Program_Cost_Other_Code>
     <Program_Cost_Other></Program_Cost_Other>
     <Program_Type>Shareware</Program_Type>
@@ -40,9 +40,9 @@
     <Program_OS_Support>Win11,Win10,Win8,Win7</Program_OS_Support>
     <Program_Language>English,Turkish,German,French,Spanish,Italian,Portuguese,Russian</Program_Language>
     <File_Info>
-      <File_Size_Bytes>85842104</File_Size_Bytes>
-      <File_Size_K>83830</File_Size_K>
-      <File_Size_MB>81.87</File_Size_MB>
+      <File_Size_Bytes>85838790</File_Size_Bytes>
+      <File_Size_K>83826</File_Size_K>
+      <File_Size_MB>81.86</File_Size_MB>
     </File_Info>
     <Expire_Info>
       <Has_Expire_Info>Y</Has_Expire_Info>
@@ -62,7 +62,7 @@
         <Char_Desc_45>Professional PDF editor for Windows — merge, split, compress</Char_Desc_45>
         <Char_Desc_80>PDF Editor Pro: merge, split, rotate, compress and encrypt PDF files on Windows.</Char_Desc_80>
         <Char_Desc_250>PDF Editor Pro is a lightweight yet powerful PDF editing tool for Windows. Merge multiple PDFs, split by page range, rotate pages, compress file size, add or remove password protection, and reorder pages — all from a clean native interface without subscriptions.</Char_Desc_250>
-        <Char_Desc_450>PDF Editor Pro is a lightweight yet powerful PDF editing tool for Windows. Merge multiple PDFs, split by page range, rotate pages, compress file size, add or remove password protection, and reorder pages — all from a clean native interface. No subscription, no cloud upload required. Supports 8 languages: English, Turkish, German, French, Spanish, Italian, Portuguese, Russian. Works on Windows 10 and 11. Demo version allows up to 3 pages; full version is $19 (individual) or $80 (corporate, 5 PCs).</Char_Desc_450>
+        <Char_Desc_450>PDF Editor Pro is a lightweight yet powerful PDF editing tool for Windows. Merge multiple PDFs, split by page range, rotate pages, compress file size, add or remove password protection, and reorder pages — all from a clean native interface. No subscription, no cloud upload required. Supports 8 languages: English, Turkish, German, French, Spanish, Italian, Portuguese, Russian. Works on Windows 10 and 11. Demo version allows up to 3 pages; full version is $9.99 (individual) or $29.99 (corporate, 5 PCs).</Char_Desc_450>
         <Char_Desc_2000>PDF Editor Pro is a fast, lightweight PDF editing application built specifically for Windows. It requires no internet connection for core features and does not upload your documents to any cloud service — everything runs locally on your machine.
 
 Key Features:
@@ -83,8 +83,8 @@ Technical details:
 
 Licensing:
 - Demo: Free, up to 3 pages, watermark on save
-- Individual: $19 one-time, 1 PC
-- Corporate: $80 one-time, up to 5 PCs
+- Individual: $9.99 one-time, 1 PC
+- Corporate: $29.99 one-time, up to 5 PCs
 - License delivered by email instantly after purchase (Gumroad)
 
 Website: https://mkbsoft.net</Char_Desc_2000>
@@ -100,7 +100,7 @@ Website: https://mkbsoft.net</Char_Desc_2000>
       <Application_XML_File_URL>https://raw.githubusercontent.com/mkb-fcb/pdf-editor-pro/main/pad.xml</Application_XML_File_URL>
     </Application_URLs>
     <Download_URLs>
-      <Primary_Download_URL>https://github.com/mkb-fcb/pdf-editor-pro/releases/download/v1.0.5/PDFEditorPro_Demo_v1.0.5.exe</Primary_Download_URL>
+      <Primary_Download_URL>https://github.com/mkb-fcb/pdf-editor-pro/releases/download/v1.0.6/PDFEditorPro_Demo_v1.0.6.exe</Primary_Download_URL>
       <Secondary_Download_URL>https://mkbsoft.net</Secondary_Download_URL>
       <Additional_Download_URL_1></Additional_Download_URL_1>
       <Additional_Download_URL_2></Additional_Download_URL_2>
