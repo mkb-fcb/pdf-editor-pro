@@ -1170,7 +1170,7 @@ def _find_ebook_convert():
 
 def _epub_bytes(doc):
     from epub_export import build_epub
-    return build_epub(doc, title=_doc_stem())
+    return build_epub(doc, fallback_title=_doc_stem())
 
 
 @app.route('/api/export/epub')

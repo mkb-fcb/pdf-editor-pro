@@ -236,16 +236,75 @@ def _detect_lang(doc):
     return 'tr' if sum(c in TR_CHARS for c in sample) > 5 else 'en'
 
 
-def build_epub(doc, title=None, author=None, lang=None):
-    """Returns the EPUB file as bytes."""
+NAME_RE = re.compile(r"^[^\W\d_][\w.'’-]*(\s+[^\W\d_][\w.'’-]*){1,3}$")
+NAME_PARTICLES = {'de', 'da', 'di', 'du', 'van', 'von', 'der', 'den', 'la', 'le', 'bin', 'ibn', 'al', 'el', 'y'}
+
+
+def _looks_like_name(t):
+    """'Allen Downey', 'Ursula K. Le Guin', 'Ahmet Hamdi Tanpınar' - not 'Casual wear' or 'MAJOR THEME'."""
+    if len(t) > 40 or t.isupper() or not NAME_RE.match(t):
+        return False
+    return all(w[0].isupper() or w.lower() in NAME_PARTICLES for w in t.split())
+
+
+def _meaningful(text):
+    """Metadata titles like 'SS27_REPORT-2' or 'Microsoft Word - x.docx' are file names, not titles."""
+    t = (text or '').strip()
+    return bool(t) and '_' not in t and not re.search(r'(?i)microsoft|\.docx?$|\.pdf$|untitled|adsız', t)
+
+
+def _page_lines(pd, furniture, height):
+    out = []
+    for b in pd['blocks']:
+        for l in b.get('lines', []):
+            t = _line_text(l)
+            sizes = [s['size'] for s in l['spans'] if s['text'].strip()]
+            if t and sizes and not (_in_margin(l['bbox'], height) and _norm(t) in furniture):
+                out.append((max(sizes), t))
+    return out
+
+
+def _cover_title_author(pages, body, furniture, heights):
+    """Title = largest line on page 1. Author = a name-like line in a large font on the first
+    three pages (cover / title page) that is not followed by body text, i.e. not a heading."""
+    first = _page_lines(pages[0], furniture, heights[0])
+    if not first:
+        return None, None
+    top = max(s for s, _ in first)
+    if top < body * 1.5:
+        return None, None
+    title = ' '.join(t for s, t in first if s >= top - 0.5)
+    if not 2 <= len(title) <= 120:
+        return None, None
+    title_key = _norm(title)
+    for pd, h in zip(pages[:3], heights[:3]):
+        lines = _page_lines(pd, furniture, h)
+        # only on a cover/title page (one that shows the title), a few lines below the title
+        at = next((k for k, (_, t) in enumerate(lines) if _norm(t) and _norm(t) in title_key), None)
+        if at is None:
+            continue
+        for k, (s, t) in enumerate(lines[at + 1:at + 6], start=at + 1):
+            nxt = lines[k + 1] if k + 1 < len(lines) else None
+            if body * 1.2 <= s < top - 0.5 and _looks_like_name(t) \
+                    and t.lower() not in title.lower() \
+                    and (nxt is None or nxt[0] > body * 1.1 or '@' in nxt[1] or '://' in nxt[1]):
+                return title, t
+    return title, None
+
+
+def build_epub(doc, title=None, author=None, lang=None, fallback_title='Belge'):
+    """Returns the EPUB file as bytes. Title/author: arguments, else meaningful PDF metadata,
+    else read from the cover page, else fallback_title."""
     pages = [p.get_text('dict', flags=fitz.TEXTFLAGS_DICT & ~fitz.TEXT_PRESERVE_LIGATURES) for p in doc]
     heights = [p.rect.height for p in doc]
     body = _body_size(pages)
     furniture = _furniture(pages, heights)
     lang = lang or _detect_lang(doc)
     meta = doc.metadata or {}
-    title = (title or meta.get('title') or 'Belge').strip()
-    author = (author or meta.get('author') or '').strip()
+    cover_title, cover_author = _cover_title_author(pages, body, furniture, heights) if pages else (None, None)
+    title = (title or (meta.get('title') if _meaningful(meta.get('title')) else None)
+             or cover_title or fallback_title.replace('_', ' ')).strip()
+    author = (author or (meta.get('author') or '').strip() or cover_author or '').strip()
 
     # Chapter starts from bookmarks: page index -> title
     toc_starts = {}
