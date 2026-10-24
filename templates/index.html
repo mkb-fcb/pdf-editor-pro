@@ -652,6 +652,13 @@ body.has-file #sidebar {
 .share-ic { width: 34px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center;
             justify-content: center; color: #fff; font-weight: 800; font-size: 15px; }
 .share-ic .ri { width: 19px; height: 19px; }
+.kusb { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 14px; background: #f8fafc; }
+.kusb.found { border-color: #5eead4; background: #f0fdfa; }
+.kusb-row { display: flex; align-items: center; gap: 10px; }
+.kusb-status { flex: 1; font-size: 13px; line-height: 1.4; }
+.kusb-status b { color: #0f766e; }
+.kusb-note { font-size: 12px; color: var(--text-muted); margin-top: 8px; line-height: 1.45; }
+.kusb-or { font-size: 12px; color: var(--text-muted); text-align: center; margin: 4px 0 10px; }
 #share-hint { display: none; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46;
               border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-bottom: 12px; line-height: 1.45; }
 
@@ -1026,6 +1033,9 @@ body.has-file #sidebar {
   <symbol id="i-book-marked" viewBox="0 0 24 24"><path d="M10 2v7.751a.25.25 0 00.407.195l2.28-1.834a.5.5 0 01.627 0l2.28 1.834A.25.25 0 0016 9.751V2" /> <path d="M4 19.5v-15A2.5 2.5 0 016.5 2H19a1 1 0 011 1v18a1 1 0 01-1 1H6.5a1 1 0 010-5H20" /></symbol>
   <symbol id="i-tablet-smartphone" viewBox="0 0 24 24"><rect width="10" height="14" x="3" y="8" rx="2" /> <path d="M5 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-2.4" /> <path d="M8 18h.01" /></symbol>
   <symbol id="i-external-link" viewBox="0 0 24 24"><path d="M15 3h6v6" /> <path d="M10 14 21 3" /> <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></symbol>
+  <symbol id="i-usb" viewBox="0 0 24 24"><circle cx="10" cy="7" r="1" /> <circle cx="4" cy="20" r="1" /> <path d="M4.7 19.3 19 5" /> <path d="m21 3-3 1 2 2Z" /> <path d="M9.26 7.68 5 12l2 5" /> <path d="m10 14 5 2 3.5-3.5" /> <path d="m18 12 1-1 1 1-1 1Z" /></symbol>
+  <symbol id="i-refresh-cw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /> <path d="M8 16H3v5" /></symbol>
+  <symbol id="i-log-out" viewBox="0 0 24 24"><path d="m16 17 5-5-5-5" /> <path d="M21 12H9" /> <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /></symbol>
 </svg>
 <div id="toolbar">
   <div class="tb-brand" title="PDF Editor Pro — MKBSoft">
@@ -1448,6 +1458,17 @@ body.has-file #sidebar {
   <div class="modal-card" style="width:480px">
     <h3><svg class="ri" style="width:20px;height:20px;color:#0f766e;vertical-align:-4px"><use href="#i-tablet-smartphone"/></svg> <span data-i18n="kTitle">Kindle'a Gönder</span></h3>
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px" data-i18n="kDesc">PDF, ekrana göre akan bir e-kitaba (EPUB) dönüştürülür ve Kindle kitaplığınıza gönderilir.</p>
+    <div class="kusb" id="kusb">
+      <div class="kusb-row">
+        <svg class="ri" style="width:22px;height:22px;color:#0f766e"><use href="#i-usb"/></svg>
+        <div class="kusb-status" id="kusb-status"></div>
+        <button class="btn-secondary" id="kusb-rescan" onclick="kindleUsbScan(false)" title="Yeniden ara" style="padding:5px 8px"><svg class="ri" style="width:15px;height:15px"><use href="#i-refresh-cw"/></svg></button>
+        <button class="btn-primary" id="kusb-send" onclick="kindleUsbSend()" style="display:none"><span data-i18n="kUsbSend">USB ile gönder</span></button>
+        <button class="btn-secondary" id="kusb-eject" onclick="kindleUsbEject()" style="display:none"><svg class="ri" style="width:15px;height:15px"><use href="#i-log-out"/></svg><span data-i18n="kUsbEject">Çıkar</span></button>
+      </div>
+      <div class="kusb-note" id="kusb-note" style="display:none"></div>
+    </div>
+    <div class="kusb-or" data-i18n="kOrWireless">veya kablosuz gönderin</div>
     <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px" data-i18n="kAddrLabel">Kindle e-posta adresiniz</label>
     <input type="email" id="kindle-addr" placeholder="adiniz_123@kindle.com" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;margin-bottom:6px">
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.5">
@@ -1856,6 +1877,19 @@ const LANGS = {
     pdfPwOpen: 'Aç',
     encryptTitle: 'Şifre Ekle / Kaldır',
     printBtn: 'Yazdır', copyTextBtn: 'Metni Kopyala',
+    kUsbSend: 'USB ile gönder',
+    kUsbEject: 'Çıkar',
+    kOrWireless: 'veya kablosuz gönderin',
+    kUsbSearching: 'USB ile bağlı Kindle aranıyor…',
+    kUsbNone: 'USB ile bağlı Kindle bulunamadı.',
+    kUsbFound: 'Bağlı Kindle bulundu: {name}',
+    kUsbCopying: '{name} cihazına kopyalanıyor…',
+    kUsbDone: '✓ {file} dosyası {name} cihazına kopyalandı.',
+    kUsbPdfNote: 'Calibre kurulu olmadığı için PDF olduğu gibi kopyalanacak (Kindle açar ama metin ekrana göre akmaz). Akıcı e-kitap için ücretsiz Calibre\'yi kurun.',
+    kUsbEjectHint: 'Kitap Kindle\'ın kitaplığında görünür. Kabloyu çıkarmadan önce <b>Çıkar</b>\'a basın.',
+    kUsbMtpHint: 'Kitap Kindle kitaplığında birkaç saniye içinde görünür.',
+    kUsbEjected: 'Kindle güvenle çıkarıldı; kabloyu çıkarabilirsiniz.',
+    kUsbEjectFail: 'Kindle çıkarılamadı; açık bir dosya olabilir. Windows\'un "Donanımı Güvenle Kaldır" simgesini kullanın.',
     azTitle: 'AZW3 dosyası',
     azNoNeed: 'Kindle\'a göndermek için AZW3 gerekmez: <b>Kindle\'a Gönder</b> e-kitabı EPUB olarak gönderir, Amazon onu Kindle\'ınıza uygun biçime kendisi çevirir.',
     azUsb: 'Kindle\'a USB kablosuyla dosya atmak istiyorsanız AZW3 gerekir. Bunun için ücretsiz Calibre programını kurun; kurulumdan sonra bu düğme doğrudan AZW3 kaydeder.',
@@ -1976,6 +2010,19 @@ const LANGS = {
     pdfPwOpen: 'Open',
     encryptTitle: 'Add / Remove Password',
     printBtn: 'Print', copyTextBtn: 'Copy Text',
+    kUsbSend: 'Send via USB',
+    kUsbEject: 'Eject',
+    kOrWireless: 'or send wirelessly',
+    kUsbSearching: 'Looking for a Kindle connected by USB…',
+    kUsbNone: 'No Kindle connected by USB.',
+    kUsbFound: 'Kindle found: {name}',
+    kUsbCopying: 'Copying to {name}…',
+    kUsbDone: '✓ {file} copied to {name}.',
+    kUsbPdfNote: 'Calibre isn\'t installed, so the PDF is copied as is (Kindle opens it, but the text won\'t reflow). Install the free Calibre app for a reflowable e-book.',
+    kUsbEjectHint: 'The book appears in your Kindle library. Click <b>Eject</b> before unplugging the cable.',
+    kUsbMtpHint: 'The book appears in your Kindle library within a few seconds.',
+    kUsbEjected: 'Kindle safely ejected; you can unplug the cable.',
+    kUsbEjectFail: 'Couldn\'t eject the Kindle; a file may be open. Use Windows\' "Safely Remove Hardware" icon.',
     azTitle: 'AZW3 file',
     azNoNeed: 'You don\'t need AZW3 to send to Kindle: <b>Send to Kindle</b> sends the e-book as EPUB and Amazon converts it for your Kindle.',
     azUsb: 'AZW3 is only needed to copy files to a Kindle over USB. Install the free Calibre app; after that this button saves AZW3 directly.',
@@ -2096,6 +2143,19 @@ const LANGS = {
     pdfPwOpen: 'Öffnen',
     encryptTitle: 'Passwort hinzufügen / entfernen',
     printBtn: 'Drucken', copyTextBtn: 'Text kopieren',
+    kUsbSend: 'Per USB senden',
+    kUsbEject: 'Auswerfen',
+    kOrWireless: 'oder drahtlos senden',
+    kUsbSearching: 'Suche nach per USB verbundenem Kindle…',
+    kUsbNone: 'Kein per USB verbundener Kindle gefunden.',
+    kUsbFound: 'Kindle gefunden: {name}',
+    kUsbCopying: 'Wird auf {name} kopiert…',
+    kUsbDone: '✓ {file} wurde auf {name} kopiert.',
+    kUsbPdfNote: 'Calibre ist nicht installiert, daher wird das PDF unverändert kopiert (der Kindle öffnet es, der Text fließt aber nicht um). Für ein umfließendes E-Book das kostenlose Calibre installieren.',
+    kUsbEjectHint: 'Das Buch erscheint in Ihrer Kindle-Bibliothek. Klicken Sie vor dem Abziehen des Kabels auf <b>Auswerfen</b>.',
+    kUsbMtpHint: 'Das Buch erscheint in wenigen Sekunden in Ihrer Kindle-Bibliothek.',
+    kUsbEjected: 'Kindle sicher ausgeworfen; Sie können das Kabel abziehen.',
+    kUsbEjectFail: 'Kindle konnte nicht ausgeworfen werden; evtl. ist eine Datei geöffnet. Nutzen Sie „Hardware sicher entfernen“.',
     azTitle: 'AZW3-Datei',
     azNoNeed: 'Zum Senden an den Kindle brauchen Sie kein AZW3: <b>An Kindle senden</b> schickt das E-Book als EPUB, Amazon wandelt es selbst für Ihren Kindle um.',
     azUsb: 'AZW3 wird nur zum Kopieren per USB-Kabel benötigt. Installieren Sie das kostenlose Programm Calibre; danach speichert diese Schaltfläche direkt AZW3.',
@@ -2216,6 +2276,19 @@ const LANGS = {
     pdfPwOpen: 'Abrir',
     encryptTitle: 'Añadir / quitar contraseña',
     printBtn: 'Imprimir', copyTextBtn: 'Copiar texto',
+    kUsbSend: 'Enviar por USB',
+    kUsbEject: 'Expulsar',
+    kOrWireless: 'o enviar de forma inalámbrica',
+    kUsbSearching: 'Buscando un Kindle conectado por USB…',
+    kUsbNone: 'No hay ningún Kindle conectado por USB.',
+    kUsbFound: 'Kindle encontrado: {name}',
+    kUsbCopying: 'Copiando a {name}…',
+    kUsbDone: '✓ {file} copiado a {name}.',
+    kUsbPdfNote: 'Calibre no está instalado, así que se copia el PDF tal cual (el Kindle lo abre, pero el texto no se adapta). Instale el programa gratuito Calibre para un libro adaptable.',
+    kUsbEjectHint: 'El libro aparece en su biblioteca de Kindle. Pulse <b>Expulsar</b> antes de desconectar el cable.',
+    kUsbMtpHint: 'El libro aparecerá en su biblioteca de Kindle en unos segundos.',
+    kUsbEjected: 'Kindle expulsado de forma segura; puede desconectar el cable.',
+    kUsbEjectFail: 'No se pudo expulsar el Kindle; puede haber un archivo abierto. Use «Quitar hardware de forma segura» de Windows.',
     azTitle: 'Archivo AZW3',
     azNoNeed: 'No necesita AZW3 para enviar a Kindle: <b>Enviar a Kindle</b> envía el libro en EPUB y Amazon lo convierte para su Kindle.',
     azUsb: 'AZW3 solo hace falta para copiar archivos al Kindle por USB. Instale el programa gratuito Calibre; después este botón guardará AZW3 directamente.',
@@ -2336,6 +2409,19 @@ const LANGS = {
     pdfPwOpen: 'Ouvrir',
     encryptTitle: 'Ajouter / supprimer le mot de passe',
     printBtn: 'Imprimer', copyTextBtn: 'Copier le texte',
+    kUsbSend: 'Envoyer par USB',
+    kUsbEject: 'Éjecter',
+    kOrWireless: 'ou envoyer sans fil',
+    kUsbSearching: 'Recherche d’un Kindle connecté en USB…',
+    kUsbNone: 'Aucun Kindle connecté en USB.',
+    kUsbFound: 'Kindle trouvé : {name}',
+    kUsbCopying: 'Copie vers {name}…',
+    kUsbDone: '✓ {file} copié sur {name}.',
+    kUsbPdfNote: 'Calibre n’est pas installé : le PDF est copié tel quel (le Kindle l’ouvre, mais le texte ne s’adapte pas). Installez le logiciel gratuit Calibre pour un livre adaptable.',
+    kUsbEjectHint: 'Le livre apparaît dans votre bibliothèque Kindle. Cliquez sur <b>Éjecter</b> avant de débrancher le câble.',
+    kUsbMtpHint: 'Le livre apparaîtra dans votre bibliothèque Kindle dans quelques secondes.',
+    kUsbEjected: 'Kindle éjecté en toute sécurité ; vous pouvez débrancher le câble.',
+    kUsbEjectFail: 'Impossible d’éjecter le Kindle ; un fichier est peut-être ouvert. Utilisez « Retirer le périphérique en toute sécurité ».',
     azTitle: 'Fichier AZW3',
     azNoNeed: 'Inutile d’avoir un AZW3 pour envoyer au Kindle : <b>Envoyer au Kindle</b> envoie le livre en EPUB et Amazon le convertit pour votre Kindle.',
     azUsb: 'L’AZW3 n’est nécessaire que pour copier des fichiers sur un Kindle par câble USB. Installez le logiciel gratuit Calibre ; ce bouton enregistrera ensuite directement en AZW3.',
@@ -2456,6 +2542,19 @@ const LANGS = {
     pdfPwOpen: 'Apri',
     encryptTitle: 'Aggiungi / rimuovi password',
     printBtn: 'Stampa', copyTextBtn: 'Copia testo',
+    kUsbSend: 'Invia via USB',
+    kUsbEject: 'Espelli',
+    kOrWireless: 'oppure invia senza fili',
+    kUsbSearching: 'Ricerca di un Kindle collegato via USB…',
+    kUsbNone: 'Nessun Kindle collegato via USB.',
+    kUsbFound: 'Kindle trovato: {name}',
+    kUsbCopying: 'Copia su {name}…',
+    kUsbDone: '✓ {file} copiato su {name}.',
+    kUsbPdfNote: 'Calibre non è installato, quindi il PDF viene copiato così com’è (il Kindle lo apre, ma il testo non si adatta). Installa il programma gratuito Calibre per un e-book adattabile.',
+    kUsbEjectHint: 'Il libro compare nella tua libreria Kindle. Fai clic su <b>Espelli</b> prima di scollegare il cavo.',
+    kUsbMtpHint: 'Il libro comparirà nella libreria Kindle entro pochi secondi.',
+    kUsbEjected: 'Kindle espulso in sicurezza; puoi scollegare il cavo.',
+    kUsbEjectFail: 'Impossibile espellere il Kindle; potrebbe esserci un file aperto. Usa «Rimozione sicura dell’hardware».',
     azTitle: 'File AZW3',
     azNoNeed: 'Per inviare a Kindle non serve AZW3: <b>Invia a Kindle</b> invia l’e-book in EPUB e Amazon lo converte per il tuo Kindle.',
     azUsb: 'AZW3 serve solo per copiare file su Kindle tramite USB. Installa il programma gratuito Calibre; poi questo pulsante salverà direttamente in AZW3.',
@@ -2576,6 +2675,19 @@ const LANGS = {
     pdfPwOpen: 'Abrir',
     encryptTitle: 'Adicionar / remover senha',
     printBtn: 'Imprimir', copyTextBtn: 'Copiar texto',
+    kUsbSend: 'Enviar por USB',
+    kUsbEject: 'Ejetar',
+    kOrWireless: 'ou envie sem fio',
+    kUsbSearching: 'Procurando um Kindle conectado por USB…',
+    kUsbNone: 'Nenhum Kindle conectado por USB.',
+    kUsbFound: 'Kindle encontrado: {name}',
+    kUsbCopying: 'Copiando para {name}…',
+    kUsbDone: '✓ {file} copiado para {name}.',
+    kUsbPdfNote: 'O Calibre não está instalado, então o PDF é copiado como está (o Kindle abre, mas o texto não se ajusta). Instale o programa gratuito Calibre para um e-book ajustável.',
+    kUsbEjectHint: 'O livro aparece na sua biblioteca Kindle. Clique em <b>Ejetar</b> antes de desconectar o cabo.',
+    kUsbMtpHint: 'O livro aparecerá na biblioteca Kindle em alguns segundos.',
+    kUsbEjected: 'Kindle ejetado com segurança; você pode desconectar o cabo.',
+    kUsbEjectFail: 'Não foi possível ejetar o Kindle; pode haver um arquivo aberto. Use "Remover hardware com segurança" do Windows.',
     azTitle: 'Arquivo AZW3',
     azNoNeed: 'Você não precisa de AZW3 para enviar ao Kindle: <b>Enviar para Kindle</b> envia o e-book em EPUB e a Amazon o converte para o seu Kindle.',
     azUsb: 'AZW3 só é necessário para copiar arquivos para o Kindle por cabo USB. Instale o programa gratuito Calibre; depois este botão salvará AZW3 diretamente.',
@@ -2696,6 +2808,19 @@ const LANGS = {
     pdfPwOpen: 'Открыть',
     encryptTitle: 'Добавить / удалить пароль',
     printBtn: 'Печать', copyTextBtn: 'Копировать текст',
+    kUsbSend: 'Отправить по USB',
+    kUsbEject: 'Извлечь',
+    kOrWireless: 'или отправьте без проводов',
+    kUsbSearching: 'Поиск Kindle, подключённого по USB…',
+    kUsbNone: 'Kindle, подключённый по USB, не найден.',
+    kUsbFound: 'Найден Kindle: {name}',
+    kUsbCopying: 'Копирование на {name}…',
+    kUsbDone: '✓ Файл {file} скопирован на {name}.',
+    kUsbPdfNote: 'Calibre не установлен, поэтому PDF копируется как есть (Kindle его откроет, но текст не будет перетекать). Установите бесплатную программу Calibre для удобной электронной книги.',
+    kUsbEjectHint: 'Книга появится в библиотеке Kindle. Перед отключением кабеля нажмите <b>Извлечь</b>.',
+    kUsbMtpHint: 'Книга появится в библиотеке Kindle через несколько секунд.',
+    kUsbEjected: 'Kindle безопасно извлечён; можно отключить кабель.',
+    kUsbEjectFail: 'Не удалось извлечь Kindle; возможно, открыт файл. Используйте «Безопасное извлечение устройства».',
     azTitle: 'Файл AZW3',
     azNoNeed: 'Для отправки на Kindle AZW3 не нужен: <b>Отправить на Kindle</b> отправляет книгу в EPUB, а Amazon сам преобразует её для вашего Kindle.',
     azUsb: 'AZW3 нужен только для копирования файлов на Kindle по USB-кабелю. Установите бесплатную программу Calibre — после этого кнопка будет сразу сохранять AZW3.',
@@ -4320,6 +4445,55 @@ async function doCompress() {
 
 function openLink(key) { post('/api/open_link', { key }); }
 
+let KUSB = null;
+
+function kusbShow(html, state) {
+  document.getElementById('kusb-status').innerHTML = html;
+  document.getElementById('kusb').classList.toggle('found', state === 'found' || state === 'done');
+  document.getElementById('kusb-send').style.display = state === 'found' ? '' : 'none';
+  document.getElementById('kusb-eject').style.display = state === 'done' && KUSB && KUSB.kind === 'drive' ? '' : 'none';
+  document.getElementById('kusb-rescan').style.display = state === 'busy' ? 'none' : '';
+}
+
+function kusbNote(html) {
+  const n = document.getElementById('kusb-note');
+  n.innerHTML = html || '';
+  n.style.display = html ? 'block' : 'none';
+}
+
+// Looks for a USB Kindle; with autoSend the book is copied right away (button pressed with a Kindle plugged in)
+async function kindleUsbScan(autoSend) {
+  kusbNote('');
+  kusbShow(t('kUsbSearching'), 'busy');
+  const r = await fetch('/api/kindle_usb').then(x => x.json()).catch(() => ({ ok: false }));
+  KUSB = r.ok && r.found ? r : null;
+  if (!KUSB) { kusbShow(t('kUsbNone'), 'none'); return; }
+  kusbShow(t('kUsbFound').replace('{name}', '<b>' + KUSB.name + '</b>'), 'found');
+  if (!KUSB.calibre) kusbNote(t('kUsbPdfNote'));
+  if (autoSend) kindleUsbSend();
+}
+
+async function kindleUsbSend() {
+  if (!KUSB) return;
+  kusbShow(t('kUsbCopying').replace('{name}', '<b>' + KUSB.name + '</b>'), 'busy');
+  const r = await post('/api/kindle_usb_send', {});
+  if (!r.ok) {
+    if (r.code === 'no_kindle') { KUSB = null; kusbShow(t('kUsbNone'), 'none'); }
+    else { kusbShow(t('kUsbFound').replace('{name}', '<b>' + KUSB.name + '</b>'), 'found'); }
+    toast(r.error || t('exportErr'), 'err');
+    return;
+  }
+  KUSB.kind = r.kind;
+  kusbShow(t('kUsbDone').replace('{file}', '<b>' + r.file + '</b>').replace('{name}', '<b>' + r.name + '</b>'), 'done');
+  kusbNote(r.kind === 'drive' ? t('kUsbEjectHint') : t('kUsbMtpHint'));
+}
+
+async function kindleUsbEject() {
+  const r = await post('/api/kindle_usb_eject', {});
+  if (r.ok) { KUSB = null; kusbShow(t('kUsbEjected'), 'none'); kusbNote(''); }
+  else toast(t('kUsbEjectFail'), 'err');
+}
+
 function openKindle() {
   if (!S.pageCount) return;
   let saved = '';
@@ -4328,6 +4502,7 @@ function openKindle() {
   const h = document.getElementById('kindle-hint');
   h.style.display = 'none'; h.innerHTML = '';
   openModal('m-kindle');
+  kindleUsbScan(true);
 }
 
 async function kindleSend(method) {

@@ -1230,6 +1230,59 @@ def api_kindle_prepare():
     return jsonify({'ok': True, 'path': path, 'size_kb': len(data) // 1024})
 
 
+@app.route('/api/kindle_usb')
+def api_kindle_usb():
+    import kindle_usb
+    k = kindle_usb.find_kindle()
+    return jsonify({'ok': True, 'found': bool(k), 'name': (k or {}).get('name', ''),
+                    'kind': (k or {}).get('kind', ''), 'calibre': bool(_find_ebook_convert())})
+
+
+@app.route('/api/kindle_usb_send', methods=['POST'])
+def api_kindle_usb_send():
+    """Copies the open document to a USB-connected Kindle: AZW3 when Calibre is installed
+    (reflowable), otherwise the PDF itself (Kindle can't open sideloaded EPUB)."""
+    import kindle_usb
+    import subprocess
+    doc = state['doc']
+    if not doc:
+        return jsonify({'ok': False, 'error': 'Dosya açık değil'})
+    if is_demo():
+        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    k = kindle_usb.find_kindle()
+    if not k:
+        return jsonify({'ok': False, 'code': 'no_kindle', 'error': 'Bağlı Kindle bulunamadı'})
+    exe = _find_ebook_convert()
+    stem = re.sub(r'[\\/:*?"<>|]+', '_', _doc_stem())
+    with tempfile.TemporaryDirectory() as tmp:
+        if exe:
+            src, out = os.path.join(tmp, 'book.epub'), os.path.join(tmp, stem + '.azw3')
+            with open(src, 'wb') as f:
+                f.write(_epub_bytes(doc))
+            r = subprocess.run([exe, src, out], capture_output=True, timeout=600,
+                               creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+            if r.returncode != 0 or not os.path.isfile(out):
+                return jsonify({'ok': False, 'error': 'Calibre dönüştürmesi başarısız oldu.'})
+            fmt = 'azw3'
+        else:
+            out = os.path.join(tmp, stem + '.pdf')
+            doc.save(out, garbage=3, deflate=True)
+            fmt = 'pdf'
+        try:
+            name = kindle_usb.copy_to_kindle(k, out)
+        except Exception as e:
+            return jsonify({'ok': False, 'error': f'Kindle\'a kopyalanamadı: {e}'})
+    state['kindle_usb'] = k
+    return jsonify({'ok': True, 'name': k['name'], 'kind': k['kind'], 'file': name, 'format': fmt})
+
+
+@app.route('/api/kindle_usb_eject', methods=['POST'])
+def api_kindle_usb_eject():
+    import kindle_usb
+    k = state.get('kindle_usb') or kindle_usb.find_kindle()
+    return jsonify({'ok': bool(k) and kindle_usb.eject(k)})
+
+
 @app.route('/api/open_link', methods=['POST'])
 def api_open_link():
     links = {

@@ -55,7 +55,7 @@ Without a license the app runs as a free demo: documents up to 3 pages, saved fi
 
 --- What's new in this version ---
 • PDF to e-book: convert PDFs to EPUB with reflowing text, headings, chapters, images, charts and tables.
-• Send to Kindle: send the e-book to your Kindle library with your email program or Amazon's web page.
+• Send to Kindle: copies straight to a Kindle connected by USB, or sends the e-book with your email program or Amazon's web page.
 • AZW3 export for Kindle when the free Calibre app is installed.
 • Fixes for the free demo installer.
 
@@ -129,7 +129,7 @@ Lisans girilmeden uygulama ücretsiz demo olarak çalışır: en fazla 3 sayfal�
 
 --- What's new in this version ---
 • PDF'ten e-kitaba: PDF'leri EPUB'a dönüştürün; metin ekrana göre akar, başlıklar, bölümler, resimler, grafikler ve tablolar korunur.
-• Kindle'a Gönder: e-kitabı e-posta programınızla veya Amazon'un web sayfasıyla Kindle kitaplığınıza gönderin.
+• Kindle'a Gönder: USB ile bağlı Kindle'a doğrudan kopyalar ya da e-kitabı e-posta programınızla veya Amazon'un web sayfasıyla gönderir.
 • Ücretsiz Calibre programı kuruluysa Kindle için AZW3 dışa aktarma.
 • Ücretsiz demo kurulumu için düzeltmeler.
 
