@@ -1,0 +1,102 @@
+GUMROAD METİNLERİ — PDF Editor Pro (v1.0.6, fiyat $9.99 / $29.99)
+Her başlığın altındaki metni Gumroad'daki ilgili kutuya yapıştırın.
+=====================================================================
+
+
+--- Ürün adı (Name) ---
+PDF Editor Pro
+
+
+--- Özet (Summary — "Bunu satın alın" düğmesinin altındaki kısa satır) ---
+Professional PDF editor for Windows — edit, merge, compress, convert to e-book and send to Kindle. / Windows için profesyonel PDF düzenleyici.
+
+
+--- Açıklama (Description) ---
+PDF Editor Pro — Professional PDF editing for Windows. One-time payment, no subscription, no cloud — works 100% offline.
+Windows için profesyonel PDF düzenleyici. Tek seferlik ödeme, abonelik yok, bulut yok — tamamen çevrimdışı çalışır.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ FEATURES / ÖZELLİKLER
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- Edit existing text directly on the page / Sayfadaki metni doğrudan düzenleme
+- Merge & split PDF files / PDF birleştirme ve bölme
+- Organize pages: see all pages, delete or rotate several at once / Sayfaları düzenleme: tümünü gör, topluca sil veya döndür
+- Add text, images, shapes, highlights, stamps & watermarks / Metin, görsel, şekil, vurgu, damga ve filigran ekleme
+- Find & replace text / Metin bulma ve değiştirme
+- Compress PDFs with quality levels / Kalite seçenekli PDF küçültme
+- Send by email, Gmail, Outlook.com, WhatsApp, Telegram, Teams, LinkedIn / E-posta, Gmail, Outlook.com, WhatsApp, Telegram, Teams, LinkedIn ile gönderme
+- Export to Word, Excel, PowerPoint, PNG, JPG, TXT / Word, Excel, PowerPoint, PNG, JPG, TXT'ye dönüştürme
+- PDF to e-book (EPUB) & Send to Kindle — by USB, email or Amazon's web page / PDF'ten e-kitaba (EPUB) ve Kindle'a gönderme — USB, e-posta veya Amazon web sayfasıyla
+- Encrypt & unlock PDFs / Şifreleme ve kilit kaldırma
+- Convert images to PDF / Görselden PDF oluşturma
+- 8 language interface / 8 dil arayüzü: EN, TR, DE, ES, FR, IT, PT, RU
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💳 LICENSING / LİSANS
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- Individual: $9.99 one-time — 1 PC / Bireysel: tek seferlik $9.99 — 1 bilgisayar
+- Corporate: $29.99 one-time — up to 5 PCs / Kurumsal: tek seferlik $29.99 — 5 bilgisayara kadar
+- License key sent to your email instantly / Lisans anahtarı anında e-postanıza gelir
+- Free updates forever / Süresiz ücretsiz güncellemeler
+- 14-day refund if it doesn't work on your PC / Bilgisayarınızda çalışmazsa 14 gün içinde iade
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💻 HOW IT WORKS / NASIL ÇALIŞIR
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Download and install / İndirip kurun
+2. Enter the license key from your email via "Enter License" / E-postanıza gelen anahtarı "Lisans Gir" ile girin
+3. Done — the full version is yours / Bitti — tam sürüm sizin
+
+Requirements / Gereksinimler: Windows 10 or 11 (64-bit)
+Support / Destek: destek@mkbsoft.net
+Website: mkbsoft.net
+
+
+=====================================================================
+SEÇENEKLER (Versions / Tiers) — her seçeneğin kendi açıklaması
+=====================================================================
+
+--- Kurumsal Lisans (5 bilgisayar) — Fiyat: 29.99 ---
+Corporate License — up to 5 PCs / Kurumsal Lisans — 5 bilgisayara kadar
+• Lifetime license for up to 5 PCs / 5 bilgisayar için ömür boyu lisans
+• All features, no page limit / Tüm özellikler, sayfa sınırı yok
+• Free updates forever / Süresiz ücretsiz güncellemeler
+• Priority email support / Öncelikli e-posta desteği
+• Invoice available / Fatura kesilebilir
+
+
+--- Bireysel Lisans (1 bilgisayar) — Fiyat: 9.99 ---
+Individual License — 1 PC / Bireysel Lisans — 1 bilgisayar
+• Lifetime license for 1 PC / 1 bilgisayar için ömür boyu lisans
+• All features, no page limit / Tüm özellikler, sayfa sınırı yok
+• Free updates forever / Süresiz ücretsiz güncellemeler
+• Email support / E-posta desteği
+
+
+--- Demo — Ücretsiz — Fiyat: 0 ---
+Free Demo / Ücretsiz Demo
+• Documents up to 3 pages / En fazla 3 sayfalık belgeler
+• Saved files carry a "DEMO" watermark / Kaydedilen dosyalarda "DEMO" filigranı
+• Password protection, printing, Word/Excel/PowerPoint/JPG/EPUB export and Send to Kindle are in the full version / Şifreleme, yazdırma, Word/Excel/PowerPoint/JPG/EPUB dışa aktarma ve Kindle'a gönderme tam sürümdedir
+• Enter a license key any time to unlock the full version — no reinstall needed / İstediğiniz an lisans anahtarı girerek tam sürüme geçin — yeniden kurulum gerekmez
+
+
+=====================================================================
+DOSYALAR (Content)
+=====================================================================
+Eski kurulum dosyasını silin, şunu yükleyin:
+  installer_output\PDFEditorPro_Kurulum_v1.0.6.exe
+(Demo ile tam sürüm artık aynı program; tek dosya yeterli.)
+
+KAPAK GÖRSELİ (Cover)
+Eski "$19 LIMITED TIME OFFER" görselini kaldırıp şunu yükleyin:
+  images\gumroad_cover_1280x720.png
