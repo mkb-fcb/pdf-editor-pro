@@ -53,3 +53,10 @@ Son güncelleme: 2026-10-09 (ara verildi)
 - [x] GitHub release v1.0.5, push, site yayında (2026-10-24)
 - [ ] Gumroad: kurulum dosyasını v1.0.5 ile değiştir
 - [ ] Store 1.0.5: ekran görüntülerine images\store_v104	r_07_kindle / en_07_kindle eklenebilir
+
+## 2026-10-24 (akşam)
+- Fiyat: bireysel $9.99 (1 PC), kurumsal $29.99 (5 PC). Lisans sunucusu eşiği 2000 sent (kullanıcı deploy etti), Gumroad fiyat/metin/kapak/dosya güncellendi.
+- v1.0.6 yayında: GitHub release, site (8 dil, yeni fiyatlar), pad.xml. Dosya adları arayüz dilinde; MSIX 8 dil bildiriyor.
+- [ ] Store: v1.0.4 onaylanınca Update → PDFEditorPro_Store_v1.0.6.msix (1.0.5 atlanır) + What's new (store_metinleri.txt)
+- [ ] Store: Add/remove languages → DE, ES, FR, IT, PT-BR, RU; metinler msix/store_metinleri_diller.txt, görseller images/site_shots/<dil>_*.png
+- [ ] Store listing açıklamalarındaki fiyatlar 9.99/29.99 (store_metinleri.txt EN/TR güncel)
