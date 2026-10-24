@@ -102,7 +102,31 @@
       "name": "Is there a refund policy?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. If PDF Editor Pro doesn't work on your system, contact us within 30 days of purchase for a full refund — no questions asked."
+        "text": "Yes. If PDF Editor Pro doesn't work on your system, contact us within 14 days of purchase for a full refund — no questions asked."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I read a PDF on my Kindle?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Open the PDF and click Convert → Send to Kindle. If your Kindle is connected by USB, the book is copied straight onto it; otherwise it's sent by email or through Amazon's Send to Kindle page."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need Calibre?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. EPUB conversion and wireless Send to Kindle are built in. The free Calibre app is only needed for AZW3 files, which Kindle uses when you copy books over USB."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which languages does the app support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "English, Turkish, German, Spanish, French, Italian, Portuguese and Russian. You can switch the language at any time from the top-right corner."
       }
     }
   ]
@@ -209,6 +233,51 @@
   }
 
   .nav-cta:hover { background: var(--blue-dark) !important; color: #fff !important; }
+
+  .lang-select { display: inline-flex; align-items: center; gap: 6px; background: var(--bg3); border: 1px solid var(--border);
+                 border-radius: 8px; padding: 0 8px; color: var(--text2); cursor: pointer; }
+  .lang-select select { border: none; background: transparent; font: inherit; font-size: 13px; font-weight: 600;
+                        color: var(--text); padding: 6px 2px; cursor: pointer; outline: none; }
+  #ebook { background: var(--bg); }
+  .eb-compare { display: flex; align-items: center; justify-content: center; gap: 28px; margin: 48px 0 8px; }
+  .eb-compare figure { margin: 0; text-align: center; }
+  .eb-compare figcaption { margin-top: 12px; font-size: 14px; font-weight: 600; color: var(--text2); }
+  .eb-pdf { width: 300px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,.10); background: #fff; }
+  .eb-pdf img, .eb-device img { width: 100%; height: auto; display: block; }
+  .eb-device { width: 300px; padding: 22px 16px 40px; background: #1f2937; border-radius: 26px; box-shadow: 0 18px 50px rgba(0,0,0,.25); }
+  .eb-device img { border-radius: 4px; }
+  .eb-arrow { font-size: 36px; color: var(--blue); font-weight: 800; }
+  .eb-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+  .eb-step { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .eb-step b { display: inline-flex; width: 30px; height: 30px; border-radius: 50%; background: var(--blue); color: #fff;
+               align-items: center; justify-content: center; font-size: 14px; margin-bottom: 12px; }
+  .eb-step h3 { font-size: 16px; margin-bottom: 6px; }
+  .eb-step p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+  .eb-table-wrap { overflow-x: auto; margin-top: 32px; }
+  .eb-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .eb-table th, .eb-table td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .eb-table th { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--text2); background: var(--bg2); }
+  .eb-note { margin-top: 14px; font-size: 13px; color: var(--text2); }
+  #gallery { background: var(--bg2); }
+  .gal { margin-top: 40px; }
+  .gal-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .gal-tab { border: 1px solid var(--border); background: #fff; border-radius: 100px; padding: 7px 14px; font: inherit;
+             font-size: 14px; font-weight: 600; color: var(--text2); cursor: pointer; }
+  .gal-tab:hover { border-color: #93c5fd; color: var(--text); }
+  .gal-tab.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .gal-frame { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: #fff;
+               box-shadow: 0 18px 60px rgba(0,0,0,.10), 0 3px 12px rgba(0,0,0,.05); }
+  .gal-frame img { width: 100%; height: auto; display: block; }
+  .gal-cap { margin-top: 14px; font-size: 15px; color: var(--text2); text-align: center; }
+  #languages { background: var(--bg); }
+  .lang-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 40px; }
+  .lang-card { border: 2px solid var(--border); background: #fff; border-radius: 12px; padding: 8px 8px 10px; cursor: pointer;
+               font: inherit; transition: border-color .15s, transform .15s; }
+  .lang-card:hover { border-color: #93c5fd; transform: translateY(-2px); }
+  .lang-card.active { border-color: var(--blue); }
+  .lang-card img { width: 100%; height: auto; display: block; border-radius: 6px; border: 1px solid var(--border); }
+  .lang-card span { display: block; margin-top: 8px; font-weight: 700; font-size: 14px; color: var(--text); }
+  .lang-hint { margin-top: 16px; font-size: 13px; color: var(--text2); }
 
   .lang-toggle {
     display: flex;
@@ -893,6 +962,10 @@
     .nav-links { display: none; }
     .features-grid { grid-template-columns: 1fr; }
     .new-row, .new-row.flip, .new-mini { grid-template-columns: 1fr; gap: 24px; }
+    .eb-compare { flex-direction: column; gap: 16px; }
+    .eb-arrow { transform: rotate(90deg); }
+    .eb-steps { grid-template-columns: 1fr; }
+    .lang-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .new-row.flip .new-shot { order: 0; }
     .steps { grid-template-columns: 1fr; }
     .steps::before { display: none; }
@@ -920,10 +993,19 @@
       <li><a href="#faq" data-en="FAQ" data-tr="SSS">FAQ</a></li>
       <li><a href="https://kamilicious12.gumroad.com/l/qxshwx" class="nav-cta" data-en="Buy Now — $19" data-tr="Satın Al — $19">Buy Now — $19</a></li>
     </ul>
-    <div class="lang-toggle">
-      <button onclick="setLang('en')" id="btn-en" class="active">EN</button>
-      <button onclick="setLang('tr')" id="btn-tr">TR</button>
-    </div>
+    <label class="lang-select" title="Language">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM4.08 9h1.95c.09-1.55.38-2.97.84-4.12A6 6 0 004.08 9zM10 4c-.08 0-.23.03-.47.26-.24.24-.5.63-.74 1.18-.39.91-.67 2.14-.76 3.56h3.94c-.09-1.42-.37-2.65-.76-3.56-.24-.55-.5-.94-.74-1.18C10.23 4.03 10.08 4 10 4zm3.97 5c-.09-1.55-.38-2.97-.84-4.12A6 6 0 0115.92 9h-1.95zm-2 2H8.03c.09 1.41.38 2.65.77 3.56.24.55.5.94.74 1.18.23.23.39.26.46.26.08 0 .23-.03.47-.26.24-.24.5-.63.74-1.18.39-.91.67-2.15.76-3.56zm1.16 4.12c.46-1.15.75-2.57.84-4.12h1.95a6 6 0 01-2.79 4.12zm-6.26 0A6 6 0 014.08 11h1.95c.09 1.55.38 2.97.84 4.12z" clip-rule="evenodd"/></svg>
+      <select id="lang-select" onchange="setLang(this.value)" aria-label="Language">
+        <option value="en">English</option>
+        <option value="tr">Türkçe</option>
+        <option value="de">Deutsch</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="it">Italiano</option>
+        <option value="pt">Português</option>
+        <option value="ru">Русский</option>
+      </select>
+    </label>
   </div>
 </nav>
 
@@ -951,7 +1033,7 @@
       <div class="dot dot-g"></div>
     </div>
     <div class="screenshot-content real">
-      <img class="lang-img" src="/img/en_01_main.webp" data-src-en="/img/en_01_main.webp" data-src-tr="/img/tr_01_main.webp" alt="PDF Editor Pro main window with the ribbon toolbar" width="1366" height="768">
+      <img data-shot="01_main" src="/img/shots/en_01_main.webp" alt="PDF Editor Pro main window with the ribbon toolbar" width="1366" height="768">
     </div>
   </div>
 </div>
@@ -987,7 +1069,7 @@
     <p class="section-sub" data-en="Read your PDFs comfortably on an e-reader: text reflows to the screen and the font size is yours to choose." data-tr="PDF'lerini e-okuyucuda rahatça oku: metin ekrana göre akar, yazı boyutunu sen seçersin.">Read your PDFs comfortably on an e-reader: text reflows to the screen and the font size is yours to choose.</p>
 
     <div class="new-row">
-      <div class="new-shot" style="max-width:520px;justify-self:center"><img class="lang-img" src="/img/en_07_kindle.webp" data-src-en="/img/en_07_kindle.webp" data-src-tr="/img/tr_07_kindle.webp" alt="Send to Kindle dialog" width="520" height="554" loading="lazy"></div>
+      <div class="new-shot" style="max-width:520px;justify-self:center"><img data-shot="07_kindle_crop" src="/img/shots/en_07_kindle_crop.webp" alt="Send to Kindle dialog" width="520" height="572" loading="lazy"></div>
       <div class="new-text">
         <h3 data-en="E-book &amp; Send to Kindle" data-tr="E-kitap ve Kindle'a Gönder">E-book &amp; Send to Kindle</h3>
         <p data-en="Turn any text PDF into a real e-book with chapters, headings, images, charts and tables — then send it to your Kindle in one click." data-tr="Metin içeren her PDF'i bölümleri, başlıkları, resimleri, grafikleri ve tablolarıyla gerçek bir e-kitaba dönüştür; sonra tek tıkla Kindle'ına gönder.">Turn any text PDF into a real e-book with chapters, headings, images, charts and tables — then send it to your Kindle in one click.</p>
@@ -1003,7 +1085,7 @@
     <h3 style="font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:0" data-en="Shrink it, send it, tidy it up." data-tr="Küçült, gönder, düzenle.">Shrink it, send it, tidy it up.</h3>
 
     <div class="new-row">
-      <div class="new-shot" style="max-width:520px;justify-self:center"><img class="lang-img" src="/img/en_04_share.webp" data-src-en="/img/en_04_share.webp" data-src-tr="/img/tr_04_share.webp" alt="Compress result with share options" width="520" height="585" loading="lazy"></div>
+      <div class="new-shot" style="max-width:520px;justify-self:center"><img data-shot="04_share_crop" src="/img/shots/en_04_share_crop.webp" alt="Compress result with share options" width="520" height="585" loading="lazy"></div>
       <div class="new-text">
         <h3 data-en="Compress &amp; send" data-tr="Küçült ve gönder">Compress &amp; send</h3>
         <p data-en="Too big for email? Pick a quality level and a 6 MB scan becomes a few hundred KB. Then send it straight away." data-tr="E-posta için çok mu büyük? Bir kalite seviyesi seç; 6 MB'lık tarama birkaç yüz KB'a iner. Sonra hemen gönder.">Too big for email? Pick a quality level and a 6 MB scan becomes a few hundred KB. Then send it straight away.</p>
@@ -1016,7 +1098,7 @@
     </div>
 
     <div class="new-row flip">
-      <div class="new-shot"><img class="lang-img" src="/img/en_02_pages.webp" data-src-en="/img/en_02_pages.webp" data-src-tr="/img/tr_02_pages.webp" alt="Organize Pages grid with selected pages" width="1366" height="768" loading="lazy"></div>
+      <div class="new-shot"><img data-shot="02_pages" src="/img/shots/en_02_pages.webp" alt="Organize Pages grid with selected pages" width="1366" height="768" loading="lazy"></div>
       <div class="new-text">
         <h3 data-en="Organize pages at a glance" data-tr="Sayfaları tek bakışta düzenle">Organize pages at a glance</h3>
         <p data-en="See every page as a numbered thumbnail. Tick the ones you don't need and delete or rotate them all at once." data-tr="Tüm sayfaları numaralı küçük resimler olarak gör. İstemediklerini işaretle, hepsini tek seferde sil veya döndür.">See every page as a numbered thumbnail. Tick the ones you don't need and delete or rotate them all at once.</p>
@@ -1032,6 +1114,114 @@
       <div><strong data-en="Scroll through pages" data-tr="Tekerlekle sayfa geçişi">Scroll through pages</strong><span data-en="Keep scrolling with the mouse wheel to move to the next or previous page." data-tr="Fare tekerleğini çevirmeye devam et, sonraki veya önceki sayfaya geç.">Keep scrolling with the mouse wheel to move to the next or previous page.</span></div>
       <div><strong data-en="Sharper app icon" data-tr="Daha net simge">Sharper app icon</strong><span data-en="Crisp on the taskbar, desktop and window title at every size." data-tr="Görev çubuğunda, masaüstünde ve pencere başlığında her boyutta net.">Crisp on the taskbar, desktop and window title at every size.</span></div>
     </div>
+  </div>
+</section>
+
+<!-- E-BOOK -->
+<section id="ebook">
+  <div class="section-inner">
+    <div class="section-label" data-en="PDF to e-book" data-tr="PDF'ten e-kitaba">PDF to e-book</div>
+    <h2 class="section-title" data-en="Small print? Read it as a book." data-tr="Yazılar küçük mü? Kitap gibi oku.">Small print? Read it as a book.</h2>
+    <p class="section-sub" data-en="A PDF page has a fixed layout, so on an e-reader or phone the text stays tiny. As an e-book, the text flows to fit the screen and you choose the font size." data-tr="PDF sayfasının düzeni sabittir; e-okuyucuda veya telefonda yazılar küçük kalır. E-kitapta metin ekrana göre akar ve yazı boyutunu sen seçersin.">A PDF page has a fixed layout, so on an e-reader or phone the text stays tiny. As an e-book, the text flows to fit the screen and you choose the font size.</p>
+    <div class="eb-compare">
+      <figure>
+        <div class="eb-pdf"><img data-shot="pdfpage" src="/img/shots/en_pdfpage.webp" alt="" width="794" height="1123" loading="lazy"></div>
+        <figcaption data-en="PDF page" data-tr="PDF sayfası">PDF page</figcaption>
+      </figure>
+      <div class="eb-arrow" aria-hidden="true">→</div>
+      <figure>
+        <div class="eb-device"><img data-shot="ereader" src="/img/shots/en_ereader.webp" alt="" width="630" height="900" loading="lazy"></div>
+        <figcaption data-en="Same page as an e-book" data-tr="Aynı sayfa e-kitap olarak">Same page as an e-book</figcaption>
+      </figure>
+    </div>
+    <div class="eb-steps">
+      <div class="eb-step"><b>1</b><h3 data-en="Open the PDF" data-tr="PDF'i aç">Open the PDF</h3><p data-en="Any PDF that contains text: books, reports, articles." data-tr="Metin içeren her PDF: kitaplar, raporlar, makaleler.">Any PDF that contains text: books, reports, articles.</p></div>
+      <div class="eb-step"><b>2</b><h3 data-en="Convert → EPUB or Send to Kindle" data-tr="Dönüştür → EPUB veya Kindle'a Gönder">Convert → EPUB or Send to Kindle</h3><p data-en="Chapters, headings, images, charts and tables are kept; page numbers and running headers are removed." data-tr="Bölümler, başlıklar, resimler, grafikler ve tablolar korunur; sayfa numaraları ve sayfa üstü yazılar atılır.">Chapters, headings, images, charts and tables are kept; page numbers and running headers are removed.</p></div>
+      <div class="eb-step"><b>3</b><h3 data-en="Read anywhere" data-tr="Her yerde oku">Read anywhere</h3><p data-en="On Kindle, Kobo, Apple Books, Google Play Books or any EPUB reader." data-tr="Kindle, Kobo, Apple Books, Google Play Kitaplar veya herhangi bir EPUB okuyucuda.">On Kindle, Kobo, Apple Books, Google Play Books or any EPUB reader.</p></div>
+    </div>
+    <div class="eb-table-wrap">
+      <table class="eb-table">
+        <thead><tr><th data-en="Format" data-tr="Biçim">Format</th><th data-en="Best for" data-tr="Ne için">Best for</th><th data-en="Note" data-tr="Not">Note</th></tr></thead>
+        <tbody>
+          <tr><td><b>EPUB</b></td><td data-en="Kobo, Apple Books, Google Play Books — and Kindle via Send to Kindle (email or web)" data-tr="Kobo, Apple Books, Google Play Kitaplar — ve Send to Kindle (e-posta veya web) ile Kindle">Kobo, Apple Books, Google Play Books — and Kindle via Send to Kindle (email or web)</td><td data-en="Built in, nothing else to install" data-tr="Programda hazır, başka bir şey kurmak gerekmez">Built in, nothing else to install</td></tr>
+          <tr><td><b>AZW3</b></td><td data-en="Kindle connected by USB" data-tr="USB ile bağlı Kindle">Kindle connected by USB</td><td data-en="Needs the free Calibre app" data-tr="Ücretsiz Calibre programı gerekir">Needs the free Calibre app</td></tr>
+          <tr><td><b>PDF</b></td><td data-en="Kindle by USB without Calibre" data-tr="Calibre olmadan USB ile Kindle">Kindle by USB without Calibre</td><td data-en="Opens on Kindle, but the text doesn't reflow" data-tr="Kindle'da açılır ama metin ekrana göre akmaz">Opens on Kindle, but the text doesn't reflow</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="eb-note" data-en="Scanned PDFs (photos of pages) have no text to reflow; their pages are kept as images." data-tr="Taranmış PDF'lerde (sayfa fotoğrafları) akacak metin yoktur; sayfaları resim olarak korunur.">Scanned PDFs (photos of pages) have no text to reflow; their pages are kept as images.</p>
+  </div>
+</section>
+
+<!-- SCREENSHOTS -->
+<section id="gallery">
+  <div class="section-inner">
+    <div class="section-label" data-en="Screenshots" data-tr="Ekran görüntüleri">Screenshots</div>
+    <h2 class="section-title" data-en="Take a look inside" data-tr="İçeriye bir göz at">Take a look inside</h2>
+    <p class="section-sub" data-en="Screenshots follow the language you choose at the top of the page." data-tr="Ekran görüntüleri, sayfanın üstünde seçtiğin dile göre değişir.">Screenshots follow the language you choose at the top of the page.</p>
+    <div class="gal">
+      <div class="gal-tabs" role="tablist">
+        <button class="gal-tab active" onclick="galShow(0)" data-en="Main window" data-tr="Ana ekran">Main window</button>
+        <button class="gal-tab" onclick="galShow(1)" data-en="Organize pages" data-tr="Sayfaları düzenle">Organize pages</button>
+        <button class="gal-tab" onclick="galShow(2)" data-en="Compress" data-tr="Küçült">Compress</button>
+        <button class="gal-tab" onclick="galShow(3)" data-en="Share" data-tr="Paylaş">Share</button>
+        <button class="gal-tab" onclick="galShow(4)" data-en="Convert" data-tr="Dönüştür">Convert</button>
+        <button class="gal-tab" onclick="galShow(5)" data-en="Protect" data-tr="Koru">Protect</button>
+        <button class="gal-tab" onclick="galShow(6)" data-en="Send to Kindle" data-tr="Kindle'a Gönder">Send to Kindle</button>
+      </div>
+      <div class="gal-frame"><img id="gal-img" data-shot="01_main" src="/img/shots/en_01_main.webp" alt="PDF Editor Pro screenshot" width="1366" height="768" loading="lazy"></div>
+        <p class="gal-cap" data-i="0" data-en="Tabbed ribbon with clear, coloured tools; page thumbnails on the left." data-tr="Anlaşılır, renkli araçlarla sekmeli şerit; solda sayfa küçük resimleri.">Tabbed ribbon with clear, coloured tools; page thumbnails on the left.</p>
+        <p class="gal-cap" data-i="1" hidden data-en="Select pages in the grid and delete or rotate them all at once." data-tr="Sayfaları ızgarada seç, hepsini tek seferde sil veya döndür.">Select pages in the grid and delete or rotate them all at once.</p>
+        <p class="gal-cap" data-i="2" hidden data-en="Choose a quality level to make big PDFs small enough for email." data-tr="Büyük PDF'leri e-postaya sığacak kadar küçültmek için kalite seviyesini seç.">Choose a quality level to make big PDFs small enough for email.</p>
+        <p class="gal-cap" data-i="3" hidden data-en="Send the result by email, Gmail, Outlook.com, WhatsApp, Telegram, Teams or LinkedIn." data-tr="Sonucu e-posta, Gmail, Outlook.com, WhatsApp, Telegram, Teams veya LinkedIn ile gönder.">Send the result by email, Gmail, Outlook.com, WhatsApp, Telegram, Teams or LinkedIn.</p>
+        <p class="gal-cap" data-i="4" hidden data-en="Export to Word, Excel, PowerPoint, images, text, EPUB and AZW3." data-tr="Word, Excel, PowerPoint, resim, metin, EPUB ve AZW3 olarak dışa aktar.">Export to Word, Excel, PowerPoint, images, text, EPUB and AZW3.</p>
+        <p class="gal-cap" data-i="5" hidden data-en="Add an open password and restrict editing, printing or copying." data-tr="Açma şifresi ekle; düzenleme, yazdırma veya kopyalamayı kısıtla.">Add an open password and restrict editing, printing or copying.</p>
+        <p class="gal-cap" data-i="6" hidden data-en="Copy the e-book to a USB-connected Kindle, or send it wirelessly." data-tr="E-kitabı USB ile bağlı Kindle'a kopyala ya da kablosuz gönder.">Copy the e-book to a USB-connected Kindle, or send it wirelessly.</p>
+    </div>
+  </div>
+</section>
+
+<!-- LANGUAGES -->
+<section id="languages">
+  <div class="section-inner" style="text-align:center">
+    <div class="section-label" data-en="8 languages" data-tr="8 dil">8 languages</div>
+    <h2 class="section-title" data-en="Speaks your language" data-tr="Senin dilini konuşur">Speaks your language</h2>
+    <p class="section-sub" style="margin:0 auto" data-en="The whole app — menus, dialogs and messages — is available in English, Turkish, German, Spanish, French, Italian, Portuguese and Russian. Switch any time with one click." data-tr="Uygulamanın tamamı — menüler, pencereler ve mesajlar — Türkçe, İngilizce, Almanca, İspanyolca, Fransızca, İtalyanca, Portekizce ve Rusça olarak kullanılabilir. Tek tıkla istediğin zaman değiştir.">The whole app — menus, dialogs and messages — is available in English, Turkish, German, Spanish, French, Italian, Portuguese and Russian. Switch any time with one click.</p>
+    <div class="lang-grid">
+      <button class="lang-card" data-lang="en" onclick="setLang('en'); document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">
+        <img src="/img/shots/en_01_main.webp" alt="PDF Editor Pro — English" width="1366" height="768" loading="lazy">
+        <span>English</span>
+      </button>
+      <button class="lang-card" data-lang="tr" onclick="setLang('tr'); document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">
+        <img src="/img/shots/tr_01_main.webp" alt="PDF Editor Pro — Türkçe" width="1366" height="768" loading="lazy">
+        <span>Türkçe</span>
+      </button>
+      <button class="lang-card" data-lang="de" onclick="setLang('de'); document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">
+        <img src="/img/shots/de_01_main.webp" alt="PDF Editor Pro — Deutsch" width="1366" height="768" loading="lazy">
+        <span>Deutsch</span>
+      </button>
+      <button class="lang-card" data-lang="es" onclick="setLang('es'); document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">
+        <img src="/img/shots/es_01_main.webp" alt="PDF Editor Pro — Español" width="1366" height="768" loading="lazy">
+        <span>Español</span>
+      </button>
+      <button class="lang-card" data-lang="fr" onclick="setLang('fr'); document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">
+        <img src="/img/shots/fr_01_main.webp" alt="PDF Editor Pro — Français" width="1366" height="768" loading="lazy">
+        <span>Français</span>
+      </button>
+      <button class="lang-card" data-lang="it" onclick="setLang('it'); document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">
+        <img src="/img/shots/it_01_main.webp" alt="PDF Editor Pro — Italiano" width="1366" height="768" loading="lazy">
+        <span>Italiano</span>
+      </button>
+      <button class="lang-card" data-lang="pt" onclick="setLang('pt'); document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">
+        <img src="/img/shots/pt_01_main.webp" alt="PDF Editor Pro — Português" width="1366" height="768" loading="lazy">
+        <span>Português</span>
+      </button>
+      <button class="lang-card" data-lang="ru" onclick="setLang('ru'); document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">
+        <img src="/img/shots/ru_01_main.webp" alt="PDF Editor Pro — Русский" width="1366" height="768" loading="lazy">
+        <span>Русский</span>
+      </button>
+    </div>
+    <p class="lang-hint" data-en="Click a language to see this website in it, too." data-tr="Bir dile tıkla, bu site de o dilde görünsün.">Click a language to see this website in it, too.</p>
   </div>
 </section>
 
@@ -1243,6 +1433,27 @@
         </button>
         <div class="faq-a" data-en="Yes. If PDF Editor Pro doesn't work on your system, contact us within 14 days of purchase for a full refund — no questions asked." data-tr="Evet. PDF Editor Pro sisteminizde çalışmazsa, satın alma tarihinden itibaren 14 gün içinde iletişime geçin, tam iade yapılır — soru sorulmaz.">Yes. If PDF Editor Pro doesn't work on your system, contact us within 14 days of purchase for a full refund — no questions asked.</div>
       </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-en="How do I read a PDF on my Kindle?" data-tr="Bir PDF'i Kindle'da nasıl okurum?">How do I read a PDF on my Kindle?</span>
+          <span class="arrow">+</span>
+        </button>
+        <div class="faq-a" data-en="Open the PDF and click Convert → Send to Kindle. If your Kindle is connected by USB, the book is copied straight onto it; otherwise it's sent by email or through Amazon's Send to Kindle page." data-tr="PDF'i aç ve Dönüştür → Kindle'a Gönder'e tıkla. Kindle USB ile bağlıysa kitap doğrudan cihaza kopyalanır; değilse e-postayla veya Amazon'un Send to Kindle sayfasıyla gönderilir.">Open the PDF and click Convert → Send to Kindle. If your Kindle is connected by USB, the book is copied straight onto it; otherwise it's sent by email or through Amazon's Send to Kindle page.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-en="Do I need Calibre?" data-tr="Calibre gerekli mi?">Do I need Calibre?</span>
+          <span class="arrow">+</span>
+        </button>
+        <div class="faq-a" data-en="No. EPUB conversion and wireless Send to Kindle are built in. The free Calibre app is only needed for AZW3 files, which Kindle uses when you copy books over USB." data-tr="Hayır. EPUB dönüştürme ve kablosuz Kindle'a gönderim programda hazır. Ücretsiz Calibre yalnızca AZW3 dosyaları için gerekir; Kindle'a USB ile kitap kopyalarken bu biçim kullanılır.">No. EPUB conversion and wireless Send to Kindle are built in. The free Calibre app is only needed for AZW3 files, which Kindle uses when you copy books over USB.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-en="Which languages does the app support?" data-tr="Uygulama hangi dilleri destekliyor?">Which languages does the app support?</span>
+          <span class="arrow">+</span>
+        </button>
+        <div class="faq-a" data-en="English, Turkish, German, Spanish, French, Italian, Portuguese and Russian. You can switch the language at any time from the top-right corner." data-tr="Türkçe, İngilizce, Almanca, İspanyolca, Fransızca, İtalyanca, Portekizce ve Rusça. Dili istediğin zaman sağ üst köşeden değiştirebilirsin.">English, Turkish, German, Spanish, French, Italian, Portuguese and Russian. You can switch the language at any time from the top-right corner.</div>
+      </div>
     </div>
   </div>
 </section>
@@ -1256,7 +1467,7 @@
     <div class="demo-box">
       <span class="demo-icon">🎯</span>
       <h3 data-en="PDF Editor Pro Demo" data-tr="PDF Editör Pro Demo">PDF Editor Pro Demo</h3>
-      <p data-en="In the demo you can open, edit, merge, split and rotate. Limits: documents of up to 3 pages and a watermark on saved files. Password protection, printing and Word/Excel/PowerPoint/JPG export are in the full version only." data-tr="Demoda açabilir, düzenleyebilir, birleştirebilir, bölebilir ve döndürebilirsin. Sınırlar: en fazla 3 sayfa ve kaydedilen dosyalarda filigran. Şifreleme, yazdırma ve Word/Excel/PowerPoint/JPG dışa aktarma yalnızca tam sürümde.">In the demo you can open, edit, merge, split and rotate. Limits: documents of up to 3 pages and a watermark on saved files. Password protection, printing and Word/Excel/PowerPoint/JPG export are in the full version only.</p>
+      <p data-en="In the demo you can open, edit, merge, split and rotate. Limits: documents of up to 3 pages and a watermark on saved files. Password protection, printing, Word/Excel/PowerPoint/JPG/EPUB export and Send to Kindle are in the full version only." data-tr="Demoda açabilir, düzenleyebilir, birleştirebilir, bölebilir ve döndürebilirsin. Sınırlar: en fazla 3 sayfa ve kaydedilen dosyalarda filigran. Şifreleme, yazdırma, Word/Excel/PowerPoint/JPG/EPUB dışa aktarma ve Kindle'a gönderim yalnızca tam sürümde.">In the demo you can open, edit, merge, split and rotate. Limits: documents of up to 3 pages and a watermark on saved files. Password protection, printing, Word/Excel/PowerPoint/JPG/EPUB export and Send to Kindle are in the full version only.</p>
       <div class="demo-limits">
         <div class="demo-limit-item">📄 <span data-en="3-page limit" data-tr="3 sayfa sınırı">3-page limit</span></div>
         <div class="demo-limit-item">🏷 <span data-en="Watermark on save" data-tr="Kayıtta filigran">Watermark on save</span></div>
@@ -1288,6 +1499,8 @@
       PDF Editor Pro by MKBSoft
     </div>
     <ul class="footer-links">
+      <li><a href="#gallery" data-en="Screenshots" data-tr="Ekran Görüntüleri">Screenshots</a></li>
+      <li><a href="#ebook" data-en="E-book" data-tr="E-kitap">E-book</a></li>
       <li><a href="#features">Features</a></li>
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#faq">FAQ</a></li>
@@ -1297,6 +1510,7 @@
   </div>
 </footer>
 
+<script src="/i18n.js"></script>
 <script>
 function toggleFaq(btn) {
   const item = btn.closest('.faq-item');
@@ -1305,27 +1519,52 @@ function toggleFaq(btn) {
   if (!isOpen) item.classList.add('open');
 }
 
+const SITE_LANGS = ['en', 'tr', 'de', 'es', 'fr', 'it', 'pt', 'ru'];
+const SITE_TITLES = {
+  en: 'PDF Editor Pro — Professional PDF Editing for Windows',
+  tr: 'PDF Editor Pro — Windows için Profesyonel PDF Düzenleyici',
+  de: 'PDF Editor Pro — Professionelle PDF-Bearbeitung für Windows',
+  es: 'PDF Editor Pro — Edición profesional de PDF para Windows',
+  fr: 'PDF Editor Pro — Édition PDF professionnelle pour Windows',
+  it: 'PDF Editor Pro — Modifica PDF professionale per Windows',
+  pt: 'PDF Editor Pro — Edição profissional de PDF para Windows',
+  ru: 'PDF Editor Pro — Профессиональный редактор PDF для Windows'
+};
+
 function setLang(lang) {
+  if (!SITE_LANGS.includes(lang)) lang = 'en';
   document.documentElement.lang = lang;
+  const dict = (window.SITE_I18N || {})[lang] || {};
   document.querySelectorAll('[data-en]').forEach(el => {
-    el.innerHTML = el.dataset[lang];
+    const v = lang === 'en' ? el.dataset.en : lang === 'tr' ? el.dataset.tr : dict[el.dataset.en];
+    el.innerHTML = v || el.dataset.en;
   });
-  document.querySelectorAll('img.lang-img').forEach(img => {
-    const src = lang === 'tr' ? img.dataset.srcTr : img.dataset.srcEn;
+  document.querySelectorAll('img[data-shot]').forEach(img => {
+    const src = `/img/shots/${lang}_${img.dataset.shot}.webp`;
     if (img.getAttribute('src') !== src) img.src = src;
   });
-  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-  document.getElementById('btn-tr').classList.toggle('active', lang === 'tr');
-  document.title = lang === 'tr'
-    ? 'PDF Editor Pro — Windows için Profesyonel PDF Düzenleyici'
-    : 'PDF Editor Pro — Professional PDF Editing for Windows';
-  localStorage.setItem('lang', lang);
+  document.querySelectorAll('.lang-card').forEach(c => c.classList.toggle('active', c.dataset.lang === lang));
+  const sel = document.getElementById('lang-select');
+  if (sel) sel.value = lang;
+  document.title = SITE_TITLES[lang];
+  try { localStorage.setItem('lang', lang); } catch (e) {}
 }
 
-(function() {
-  const saved = localStorage.getItem('lang');
-  const browser = navigator.language.startsWith('tr') ? 'tr' : 'en';
-  setLang(saved || browser);
+const GAL_SHOTS = ['01_main', '02_pages', '03_compress', '04_share', '05_convert', '06_protect', '07_kindle'];
+function galShow(i) {
+  document.querySelectorAll('.gal-tab').forEach((t, k) => t.classList.toggle('active', k === i));
+  document.querySelectorAll('.gal-cap').forEach(c => { c.hidden = +c.dataset.i !== i; });
+  const img = document.getElementById('gal-img');
+  img.dataset.shot = GAL_SHOTS[i];
+  img.src = `/img/shots/${document.documentElement.lang || 'en'}_${GAL_SHOTS[i]}.webp`;
+}
+
+(function () {
+  let saved = null;
+  try { saved = localStorage.getItem('lang'); } catch (e) {}
+  const browser = (navigator.languages || [navigator.language || 'en'])
+    .map(l => (l || '').slice(0, 2).toLowerCase()).find(l => SITE_LANGS.includes(l));
+  setLang(saved || browser || 'en');
 })();
 </script>
 
