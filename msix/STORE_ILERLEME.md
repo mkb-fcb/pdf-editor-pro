@@ -44,3 +44,10 @@ Son güncelleme: 2026-10-09 (ara verildi)
 - [ ] Partner Center → Update → Packages: 1.0.3'ü kaldır, 1.0.4'ü yükle → Store listings (TR+EN) "What's new" güncelle (store_metinleri.txt) + ekran görüntülerini images\store_v104\ (tr_*/en_* 01–06) ile değiştir → Submit
 - [ ] Gumroad: kurulum dosyasını v1.0.4 ile değiştir
 - [ ] GitHub release v1.0.4 (demo + kurulum), website yeniden yayınla
+
+## 2026-10-24
+- v1.0.4 Store'a sertifikaya gönderildi (onay bekleniyor). GitHub release v1.0.4 + site yayında; demo kurulumu artık tam sürümle aynı program (app_demo.py kaldırıldı).
+- v1.0.5 derlendi: PDF→EPUB, Kindle'a Gönder, Calibre varsa AZW3. Paketler: installer_output\PDFEditorPro_*_v1.0.5.*
+- [ ] Kullanıcı kurulum dosyasıyla test edecek
+- [ ] v1.0.4 onaylanınca Partner Center → Update → 1.0.5 paketi + "What's new" (store_metinleri.txt)
+- [ ] GitHub release v1.0.5, push, siteye EPUB/Kindle yeniliği + yayın, Gumroad dosyası
