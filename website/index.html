@@ -1330,7 +1330,7 @@
       <iframe id="yt-frame" src="https://www.youtube-nocookie.com/embed/UDoxql62qK8" title="PDF Editor Pro — demo video" frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
     </div>
-    <div class="vid-langs"><button class="vid-lang" data-vlang="en" onclick="showVideo('en')">English</button><button class="vid-lang" data-vlang="tr" onclick="showVideo('tr')">Türkçe</button><button class="vid-lang" data-vlang="es" onclick="showVideo('es')">Español</button><button class="vid-lang" data-vlang="fr" onclick="showVideo('fr')">Français</button><button class="vid-lang" data-vlang="it" onclick="showVideo('it')">Italiano</button><button class="vid-lang" data-vlang="pt" onclick="showVideo('pt')">Português</button><button class="vid-lang" data-vlang="ru" onclick="showVideo('ru')">Русский</button></div>
+    <div class="vid-langs"><button class="vid-lang" data-vlang="en" onclick="showVideo('en')">English</button><button class="vid-lang" data-vlang="tr" onclick="showVideo('tr')">Türkçe</button><button class="vid-lang" data-vlang="de" onclick="showVideo('de')">Deutsch</button><button class="vid-lang" data-vlang="es" onclick="showVideo('es')">Español</button><button class="vid-lang" data-vlang="fr" onclick="showVideo('fr')">Français</button><button class="vid-lang" data-vlang="it" onclick="showVideo('it')">Italiano</button><button class="vid-lang" data-vlang="pt" onclick="showVideo('pt')">Português</button><button class="vid-lang" data-vlang="ru" onclick="showVideo('ru')">Русский</button></div>
   </div>
 </section>
 
@@ -1549,7 +1549,7 @@ function setLang(lang) {
   try { localStorage.setItem('lang', lang); } catch (e) {}
 }
 
-const SITE_VIDEOS = {en: 'UDoxql62qK8', tr: 'Mb9A51Lgb9I', de: null, es: 'mh86FYa6Eb0', fr: 'yd0NelENLn8', it: '3MV8G-7DZf0', pt: 'h75Pno2yG4Q', ru: 'uw06CtlESSM'};  // DE: add the ID when the German video is uploaded
+const SITE_VIDEOS = {en: 'UDoxql62qK8', tr: 'Mb9A51Lgb9I', de: 'nG1L9S54GLw', es: 'mh86FYa6Eb0', fr: 'yd0NelENLn8', it: '3MV8G-7DZf0', pt: 'h75Pno2yG4Q', ru: 'uw06CtlESSM'};
 function showVideo(lang) {
   const code = SITE_VIDEOS[lang] ? lang : 'en';
   const f = document.getElementById('yt-frame');
