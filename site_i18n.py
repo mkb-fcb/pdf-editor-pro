@@ -232,10 +232,10 @@ T = {
 "See It in Action": ("In Aktion sehen", "Míralo en acción", "Voir en action", "Guardalo in azione", "Veja em ação", "Посмотрите в работе"),
 "Watch the demo video": ("Demo-Video ansehen", "Mira el vídeo de demostración", "Regardez la vidéo de démonstration", "Guarda il video dimostrativo",
     "Assista ao vídeo de demonstração", "Смотрите демо-видео"),
-"See how PDF Editor Pro handles real-world PDF tasks in under 2 minutes.": (
-    "Sehen Sie in unter 2 Minuten, wie PDF Editor Pro echte PDF-Aufgaben erledigt.", "Descubre en menos de 2 minutos cómo PDF Editor Pro resuelve tareas reales con PDF.",
-    "Découvrez en moins de 2 minutes comment PDF Editor Pro gère de vraies tâches PDF.", "Scopri in meno di 2 minuti come PDF Editor Pro gestisce attività reali sui PDF.",
-    "Veja em menos de 2 minutos como o PDF Editor Pro resolve tarefas reais com PDF.", "Узнайте менее чем за 2 минуты, как PDF Editor Pro справляется с реальными задачами."),
+"See PDF Editor Pro in action — in under a minute, in your language.": (
+    "PDF Editor Pro in Aktion — in unter einer Minute, in Ihrer Sprache.", "Mira PDF Editor Pro en acción: en menos de un minuto y en tu idioma.",
+    "Découvrez PDF Editor Pro en action — en moins d’une minute, dans votre langue.", "Guarda PDF Editor Pro in azione: in meno di un minuto, nella tua lingua.",
+    "Veja o PDF Editor Pro em ação — em menos de um minuto, no seu idioma.", "PDF Editor Pro в работе — меньше чем за минуту, на вашем языке."),
 "Simple, honest pricing": ("Einfache, ehrliche Preise", "Precios claros y honestos", "Des prix simples et honnêtes", "Prezzi semplici e onesti",
     "Preços simples e honestos", "Простые и честные цены"),
 "Pay once, own it forever. No subscriptions, no hidden fees, no surprises.": (

@@ -258,6 +258,13 @@
   .eb-table th, .eb-table td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
   .eb-table th { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--text2); background: var(--bg2); }
   .eb-note { margin-top: 14px; font-size: 13px; color: var(--text2); }
+  .vid-wrap { position: relative; max-width: 900px; margin: 0 auto; padding-bottom: min(56.25%, 506px); border-radius: 14px;
+              overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,.14); background: #0f1c2f; }
+  .vid-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .vid-langs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 18px; }
+  .vid-lang { border: 1px solid var(--border); background: #fff; border-radius: 100px; padding: 6px 14px; font: inherit;
+              font-size: 13px; font-weight: 600; color: var(--text2); cursor: pointer; }
+  .vid-lang.active { background: var(--blue); border-color: var(--blue); color: #fff; }
   #gallery { background: var(--bg2); }
   .gal { margin-top: 40px; }
   .gal-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
@@ -1318,21 +1325,12 @@
   <div class="section-inner" style="text-align:center">
     <div class="section-label" data-en="See It in Action" data-tr="Uygulamayı Görün">See It in Action</div>
     <h2 class="section-title" data-en="Watch the demo video" data-tr="Demo videoyu izleyin">Watch the demo video</h2>
-    <p class="section-sub" style="margin:0 auto 40px" data-en="See how PDF Editor Pro handles real-world PDF tasks in under 2 minutes." data-tr="PDF Editor Pro'nun gerçek PDF işlemlerini 2 dakikada nasıl yaptığını görün.">See how PDF Editor Pro handles real-world PDF tasks in under 2 minutes.</p>
-    <div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap">
-      <div style="flex:1;min-width:280px;max-width:560px">
-        <div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:8px;text-align:left">🇹🇷 Türkçe</div>
-        <div style="position:relative;padding-bottom:56.25%;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12)">
-          <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/SU2up_-NRRA" title="PDF Editor Pro — Türkçe Tanıtım" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-      </div>
-      <div style="flex:1;min-width:280px;max-width:560px">
-        <div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:8px;text-align:left">🇬🇧 English</div>
-        <div style="position:relative;padding-bottom:56.25%;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12)">
-          <iframe style="position:absolute;top:0;left:0;width:100%;height:100%" src="https://www.youtube.com/embed/WK2GkHM9lNE" title="PDF Editor Pro — English Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-      </div>
+    <p class="section-sub" style="margin:0 auto 40px" data-en="See PDF Editor Pro in action — in under a minute, in your language." data-tr="PDF Editor Pro'yu bir dakikadan kısa sürede, kendi dilinde iş başında gör.">See PDF Editor Pro in action — in under a minute, in your language.</p>
+    <div class="vid-wrap">
+      <iframe id="yt-frame" src="https://www.youtube-nocookie.com/embed/UDoxql62qK8" title="PDF Editor Pro — demo video" frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
     </div>
+    <div class="vid-langs"><button class="vid-lang" data-vlang="en" onclick="showVideo('en')">English</button><button class="vid-lang" data-vlang="tr" onclick="showVideo('tr')">Türkçe</button><button class="vid-lang" data-vlang="es" onclick="showVideo('es')">Español</button><button class="vid-lang" data-vlang="fr" onclick="showVideo('fr')">Français</button><button class="vid-lang" data-vlang="it" onclick="showVideo('it')">Italiano</button><button class="vid-lang" data-vlang="pt" onclick="showVideo('pt')">Português</button><button class="vid-lang" data-vlang="ru" onclick="showVideo('ru')">Русский</button></div>
   </div>
 </section>
 
@@ -1544,10 +1542,20 @@ function setLang(lang) {
     if (img.getAttribute('src') !== src) img.src = src;
   });
   document.querySelectorAll('.lang-card').forEach(c => c.classList.toggle('active', c.dataset.lang === lang));
+  if (typeof showVideo === 'function') showVideo(lang);
   const sel = document.getElementById('lang-select');
   if (sel) sel.value = lang;
   document.title = SITE_TITLES[lang];
   try { localStorage.setItem('lang', lang); } catch (e) {}
+}
+
+const SITE_VIDEOS = {en: 'UDoxql62qK8', tr: 'Mb9A51Lgb9I', de: null, es: 'mh86FYa6Eb0', fr: 'yd0NelENLn8', it: '3MV8G-7DZf0', pt: 'h75Pno2yG4Q', ru: 'uw06CtlESSM'};  // DE: add the ID when the German video is uploaded
+function showVideo(lang) {
+  const code = SITE_VIDEOS[lang] ? lang : 'en';
+  const f = document.getElementById('yt-frame');
+  const src = 'https://www.youtube-nocookie.com/embed/' + SITE_VIDEOS[code];
+  if (f && f.getAttribute('src') !== src) f.src = src;
+  document.querySelectorAll('.vid-lang').forEach(b => b.classList.toggle('active', b.dataset.vlang === code));
 }
 
 const GAL_SHOTS = ['01_main', '02_pages', '03_compress', '04_share', '05_convert', '06_protect', '07_kindle'];
