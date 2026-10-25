@@ -94,7 +94,8 @@ images\screenshot_04_export.png
 --- Store logos ---
 1:1 Box art (1080x1080) .... images\store_logo_1080x1080.png
 1:1 App tile icon (300x300)  images\store_logo_300x300.png
-2:3 Poster art (720x1080) .. images\store_poster_720x1080.png
+2:3 Poster art (720x1080) .. images\store_posters\<dil>_poster_720x1080.png  (en_, tr_, de_, es_, fr_, it_, pt_, ru_; $9.99)
+(Logo dosyaları 8 dilde aynı; poster ve ekran görüntüleri her dilin kendisi: images\site_shots\<dil>_01…07)
 
 
 #####################################################################
