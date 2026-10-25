@@ -276,6 +276,21 @@ def _sys_font_ratio(fontfile):
     return _FONT_RATIO_CACHE[fontfile]
 
 
+def _span_at(page_dict, rect):
+    """The text span that overlaps rect the most (font, flags, color, size), or None."""
+    best, best_area = None, 0
+    for b in page_dict.get('blocks', []):
+        for l in b.get('lines', []):
+            for s in l.get('spans', []):
+                if not s.get('text', '').strip():
+                    continue
+                inter = fitz.Rect(s['bbox']) & rect
+                area = inter.width * inter.height if not inter.is_empty else 0
+                if area > best_area:
+                    best, best_area = s, area
+    return best
+
+
 def resolve_font(pdf_fontname, flags=0):
     """PDF font adı + flags'ten Windows font dosyasını bul."""
     name = pdf_fontname or ''
@@ -675,9 +690,11 @@ def api_findreplace():
 
             hits = [max(hits, key=overlap)]
 
-        # Collect sizes and baselines BEFORE redaction removes the text.
+        # Collect sizes, baselines and the original span style BEFORE redaction removes the text.
         page_dict = page.get_text('dict')
-        sizes     = [forced_size if forced_size else size_at_rect(page, r) for r in hits]
+        spans     = [_span_at(page_dict, r) for r in hits]
+        # The span's own size; the bbox-based estimate came out ~9% too large and overlapped neighbours
+        sizes     = [forced_size or (s['size'] if s else 0) or size_at_rect(page, r) for r, s in zip(hits, spans)]
         baselines = [_get_baseline_y(page, r, page_dict) for r in hits]
 
         for rect in hits:
@@ -685,12 +702,21 @@ def api_findreplace():
         page.apply_redactions(graphics=0)
 
         if repl:
-            for rect, sz, fallback_bl in zip(hits, sizes, baselines):
+            for rect, sz, fallback_bl, span in zip(hits, sizes, baselines, spans):
                 bl_y  = provided_baseline if provided_baseline is not None else fallback_bl
-                color = tuple(provided_color) if provided_color else (0, 0, 0)
+                # Global replace: keep each occurrence's own font, weight, style and colour
+                hit_font, hit_flags = (pdf_font, font_flags) if pdf_font else \
+                    ((span['font'], span['flags']) if span else (None, 0))
+                if provided_color:
+                    color = tuple(provided_color)
+                elif span:
+                    c = span['color']
+                    color = (((c >> 16) & 255) / 255, ((c >> 8) & 255) / 255, (c & 255) / 255)
+                else:
+                    color = (0, 0, 0)
                 kw = {'fontsize': sz, 'color': color}
-                if pdf_font:
-                    ff, fn, _, _ = resolve_font(pdf_font, font_flags)
+                if hit_font:
+                    ff, fn, _, _ = resolve_font(hit_font, hit_flags)
                     if ff:
                         kw['fontfile'] = ff
                         kw['fontname'] = fn
@@ -700,6 +726,14 @@ def api_findreplace():
                 elif UNICODE_FONT:
                     kw['fontfile'] = UNICODE_FONT
                     kw['fontname'] = UNICODE_FONTNAME
+                # Longer replacement than the original: shrink it (to 75% at most) so it doesn't run into the next word
+                try:
+                    width = fitz.Font(fontfile=kw['fontfile']).text_length(repl, fontsize=kw['fontsize']) \
+                        if kw.get('fontfile') else fitz.get_text_length(repl, fontsize=kw['fontsize'])
+                    if width > rect.width * 1.02:
+                        kw['fontsize'] *= max(0.75, rect.width / width)
+                except Exception:
+                    pass
                 page.insert_text(fitz.Point(rect.x0, bl_y), repl, **kw)
         total += len(hits)
 

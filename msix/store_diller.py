@@ -36,6 +36,7 @@ Ohne Lizenz läuft die App als kostenlose Demo: Dokumente bis 3 Seiten, gespeich
   new='''• PDF zu E-Book: PDFs in EPUB umwandeln — mit umfließendem Text, Überschriften, Kapiteln, Bildern, Diagrammen und Tabellen.
 • An Kindle senden: direkt auf einen per USB verbundenen Kindle kopieren oder per E-Mail-Programm bzw. Amazon-Webseite senden.
 • AZW3-Export für Kindle, wenn das kostenlose Calibre installiert ist.
+• Suchen & Ersetzen behält Schriftart, Stärke, Größe und Farbe bei.
 • Dateinamen gespeicherter Dateien in der gewählten Sprache.''',
   feat=['Vorhandenen Text direkt auf der PDF-Seite bearbeiten', 'Seiten zusammenführen, teilen, drehen und sortieren',
         'Text, Bilder, Formen, Markierungen, Stempel und Wasserzeichen hinzufügen', 'PDF nach Word, Excel, PowerPoint, Bilder oder Text exportieren',
@@ -70,6 +71,7 @@ Sin licencia, la app funciona como demo gratuita: documentos de hasta 3 páginas
   new='''• PDF a libro electrónico: convierte PDF a EPUB con texto adaptable, títulos, capítulos, imágenes, gráficos y tablas.
 • Enviar a Kindle: copia directamente a un Kindle conectado por USB o envía el libro con tu programa de correo o la web de Amazon.
 • Exportación AZW3 para Kindle si está instalado el programa gratuito Calibre.
+• Buscar y reemplazar conserva la fuente, el grosor, el tamaño y el color originales.
 • Nombres de archivo guardados en el idioma elegido.''',
   feat=['Edita el texto existente directamente en la página', 'Une, divide, gira y reordena páginas',
         'Añade texto, imágenes, formas, resaltados, sellos y marcas de agua', 'Exporta PDF a Word, Excel, PowerPoint, imágenes o texto',
@@ -104,6 +106,7 @@ Sans licence, l’application fonctionne en démo gratuite : documents de 3 page
   new='''• PDF en livre numérique : convertissez vos PDF en EPUB avec texte adaptable, titres, chapitres, images, graphiques et tableaux.
 • Envoyer au Kindle : copie directe sur un Kindle branché en USB, ou envoi par votre messagerie ou le site d’Amazon.
 • Export AZW3 pour Kindle lorsque le logiciel gratuit Calibre est installé.
+• Rechercher et remplacer conserve la police, la graisse, la taille et la couleur d’origine.
 • Noms des fichiers enregistrés dans la langue choisie.''',
   feat=['Modifiez le texte existant directement sur la page', 'Fusionnez, divisez, pivotez et réorganisez les pages',
         'Ajoutez texte, images, formes, surlignages, tampons et filigranes', 'Exportez vers Word, Excel, PowerPoint, images ou texte',
@@ -138,6 +141,7 @@ Senza licenza l’app funziona come demo gratuita: documenti fino a 3 pagine, fi
   new='''• Da PDF a e-book: converti i PDF in EPUB con testo adattabile, titoli, capitoli, immagini, grafici e tabelle.
 • Invia a Kindle: copia direttamente su un Kindle collegato via USB, oppure invia l’e-book con il programma di posta o il sito di Amazon.
 • Esportazione AZW3 per Kindle se è installato il programma gratuito Calibre.
+• Trova e sostituisci mantiene carattere, spessore, dimensione e colore originali.
 • Nomi dei file salvati nella lingua scelta.''',
   feat=['Modifica il testo esistente direttamente sulla pagina', 'Unisci, dividi, ruota e riordina le pagine',
         'Aggiungi testo, immagini, forme, evidenziazioni, timbri e filigrane', 'Esporta PDF in Word, Excel, PowerPoint, immagini o testo',
@@ -172,6 +176,7 @@ Sem licença, o app funciona como demo grátis: documentos de até 3 páginas, a
   new='''• PDF para e-book: converta PDFs em EPUB com texto ajustável, títulos, capítulos, imagens, gráficos e tabelas.
 • Enviar para Kindle: copia direto para um Kindle conectado por USB ou envia o e-book pelo seu programa de e-mail ou pelo site da Amazon.
 • Exportação AZW3 para Kindle quando o programa gratuito Calibre está instalado.
+• Localizar e substituir mantém a fonte, o peso, o tamanho e a cor originais.
 • Nomes dos arquivos salvos no idioma escolhido.''',
   feat=['Edite o texto existente direto na página', 'Una, divida, gire e reordene páginas',
         'Adicione texto, imagens, formas, destaques, carimbos e marcas d’água', 'Exporte PDF para Word, Excel, PowerPoint, imagens ou texto',
@@ -206,6 +211,7 @@ Sem licença, o app funciona como demo grátis: documentos de até 3 páginas, a
   new='''• PDF в электронную книгу: конвертация PDF в EPUB с переносом текста, заголовками, главами, изображениями, диаграммами и таблицами.
 • Отправка на Kindle: копирование прямо на Kindle, подключённый по USB, или отправка книги через почтовую программу или сайт Amazon.
 • Экспорт в AZW3 для Kindle, если установлена бесплатная программа Calibre.
+• Поиск и замена сохраняет исходный шрифт, начертание, размер и цвет.
 • Имена сохранённых файлов на выбранном языке.''',
   feat=['Правка существующего текста прямо на странице', 'Объединение, разделение, поворот и порядок страниц',
         'Текст, изображения, фигуры, выделения, штампы и водяные знаки', 'Экспорт PDF в Word, Excel, PowerPoint, изображения или текст',
