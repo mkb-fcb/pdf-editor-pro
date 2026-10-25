@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>PDF Editör Pro — Aktivasyon</title>
+<title>PDF Editor Pro</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -109,30 +109,104 @@ input::placeholder { text-transform: none; letter-spacing: 0; color: #94a3b8; fo
 <body>
 <div class="card">
   <div class="logo">📄</div>
-  <h1>PDF Editör Pro</h1>
-  <p class="subtitle">Tam sürümü açmak için lisans anahtarınızı girin.</p>
+  <h1>PDF Editor Pro</h1>
+  <p class="subtitle" data-i18n="sub">Tam sürümü açmak için lisans anahtarınızı girin.</p>
 
   <div class="form-group">
-    <label>Lisans Anahtarı</label>
+    <label data-i18n="label">Lisans Anahtarı</label>
     <input type="text" id="key-input" placeholder="BILIR-XXXX-XXXX-XXXX" maxlength="20"
            oninput="formatKey(this)" onkeydown="if(event.key==='Enter') doActivate()">
   </div>
 
-  <button class="btn" id="activate-btn" onclick="doActivate()">Aktivasyonu Başlat</button>
+  <button class="btn" id="activate-btn" onclick="doActivate()" data-i18n="btn">Aktivasyonu Başlat</button>
 
   <div class="msg" id="msg"></div>
 
-  <a href="/" style="display:block;margin-top:14px;text-align:center;font-size:13px;color:#64748b">
+  <a href="#" onclick="buyLicense(); return false"
+     style="display:block;margin-top:14px;text-align:center;font-size:14px;font-weight:600;color:#2563eb" data-i18n="buy">Lisans satın al — $9.99 →</a>
+  <a href="/" style="display:block;margin-top:10px;text-align:center;font-size:13px;color:#64748b" data-i18n="demo">
     Lisansınız yok mu? Demo olarak devam edin (3 sayfa, filigranlı kayıt) →
   </a>
 
   <div class="footer">
-    Lisans anahtarınızı satın aldığınız emailde bulabilirsiniz.<br>
-    Sorun mu var? <a href="mailto:destek@mkbsoft.net">destek@mkbsoft.net</a>
+    <span data-i18n="foot">Lisans anahtarınızı satın aldığınız emailde bulabilirsiniz.</span><br>
+    <span data-i18n="help">Sorun mu var?</span> <a href="mailto:destek@mkbsoft.net">destek@mkbsoft.net</a>
   </div>
 </div>
 
 <script>
+const L = {
+  tr: {sub:'Tam sürümü açmak için lisans anahtarınızı girin.', label:'Lisans Anahtarı', btn:'Aktivasyonu Başlat',
+       buy:'Lisans satın al — $9.99 →', demo:'Lisansınız yok mu? Demo olarak devam edin (3 sayfa, filigranlı kayıt) →',
+       foot:'Lisans anahtarınızı satın aldığınız emailde bulabilirsiniz.', help:'Sorun mu var?', empty:'Lütfen lisans anahtarınızı girin.',
+       format:'Geçersiz anahtar formatı. Örnek: BILIR-XXXX-XXXX-XXXX', checking:'Doğrulanıyor...', okMsg:'Aktivasyon başarılı! Yönlendiriliyorsunuz...',
+       fail:'Aktivasyon başarısız', net:'Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edin.', invalid:'Geçersiz lisans anahtarı.',
+       revoked:'Bu lisans iptal edilmiş.', limit:'Bu lisans izin verilen bilgisayar sayısına ulaştı.'},
+  en: {sub:'Enter your license key to unlock the full version.', label:'License key', btn:'Activate',
+       buy:'Buy a license — $9.99 →', demo:'No license? Continue with the demo (3 pages, watermarked saves) →',
+       foot:'You will find your license key in your purchase email.', help:'Need help?', empty:'Please enter your license key.',
+       format:'Invalid key format. Example: BILIR-XXXX-XXXX-XXXX', checking:'Checking...', okMsg:'Activated! Redirecting...',
+       fail:'Activation failed', net:'Could not reach the server. Please check your internet connection.', invalid:'Invalid license key.',
+       revoked:'This license has been revoked.', limit:'This license has reached its computer limit.'},
+  de: {sub:'Geben Sie Ihren Lizenzschlüssel ein, um die Vollversion freizuschalten.', label:'Lizenzschlüssel', btn:'Aktivieren',
+       buy:'Lizenz kaufen — $9.99 →', demo:'Keine Lizenz? Mit der Demo fortfahren (3 Seiten, Wasserzeichen) →',
+       foot:'Ihren Lizenzschlüssel finden Sie in der Kauf-E-Mail.', help:'Brauchen Sie Hilfe?', empty:'Bitte geben Sie Ihren Lizenzschlüssel ein.',
+       format:'Ungültiges Format. Beispiel: BILIR-XXXX-XXXX-XXXX', checking:'Wird geprüft...', okMsg:'Aktiviert! Weiterleitung...',
+       fail:'Aktivierung fehlgeschlagen', net:'Server nicht erreichbar. Bitte prüfen Sie Ihre Internetverbindung.', invalid:'Ungültiger Lizenzschlüssel.',
+       revoked:'Diese Lizenz wurde widerrufen.', limit:'Diese Lizenz hat ihr Computer-Limit erreicht.'},
+  es: {sub:'Introduce tu clave de licencia para desbloquear la versión completa.', label:'Clave de licencia', btn:'Activar',
+       buy:'Comprar licencia — $9.99 →', demo:'¿Sin licencia? Continuar con la demo (3 páginas, marca de agua) →',
+       foot:'Encontrarás la clave en el correo de tu compra.', help:'¿Necesitas ayuda?', empty:'Introduce tu clave de licencia.',
+       format:'Formato no válido. Ejemplo: BILIR-XXXX-XXXX-XXXX', checking:'Comprobando...', okMsg:'¡Activado! Redirigiendo...',
+       fail:'La activación falló', net:'No se pudo conectar con el servidor. Comprueba tu conexión a Internet.', invalid:'Clave de licencia no válida.',
+       revoked:'Esta licencia ha sido revocada.', limit:'Esta licencia alcanzó su límite de equipos.'},
+  fr: {sub:'Saisissez votre clé de licence pour débloquer la version complète.', label:'Clé de licence', btn:'Activer',
+       buy:'Acheter une licence — $9.99 →', demo:'Pas de licence ? Continuer avec la démo (3 pages, filigrane) →',
+       foot:'Votre clé se trouve dans l’e-mail d’achat.', help:'Besoin d’aide ?', empty:'Veuillez saisir votre clé de licence.',
+       format:'Format invalide. Exemple : BILIR-XXXX-XXXX-XXXX', checking:'Vérification...', okMsg:'Activé ! Redirection...',
+       fail:'Échec de l’activation', net:'Serveur injoignable. Vérifiez votre connexion Internet.', invalid:'Clé de licence invalide.',
+       revoked:'Cette licence a été révoquée.', limit:'Cette licence a atteint sa limite d’ordinateurs.'},
+  it: {sub:'Inserisci la chiave di licenza per sbloccare la versione completa.', label:'Chiave di licenza', btn:'Attiva',
+       buy:'Acquista una licenza — $9.99 →', demo:'Nessuna licenza? Continua con la demo (3 pagine, filigrana) →',
+       foot:'Trovi la chiave nell’e-mail di acquisto.', help:'Serve aiuto?', empty:'Inserisci la chiave di licenza.',
+       format:'Formato non valido. Esempio: BILIR-XXXX-XXXX-XXXX', checking:'Verifica...', okMsg:'Attivato! Reindirizzamento...',
+       fail:'Attivazione non riuscita', net:'Server non raggiungibile. Controlla la connessione a Internet.', invalid:'Chiave di licenza non valida.',
+       revoked:'Questa licenza è stata revocata.', limit:'Questa licenza ha raggiunto il limite di computer.'},
+  pt: {sub:'Digite sua chave de licença para liberar a versão completa.', label:'Chave de licença', btn:'Ativar',
+       buy:'Comprar licença — $9.99 →', demo:'Sem licença? Continue com a demo (3 páginas, marca d’água) →',
+       foot:'Sua chave está no e-mail da compra.', help:'Precisa de ajuda?', empty:'Digite sua chave de licença.',
+       format:'Formato inválido. Exemplo: BILIR-XXXX-XXXX-XXXX', checking:'Verificando...', okMsg:'Ativado! Redirecionando...',
+       fail:'Falha na ativação', net:'Não foi possível acessar o servidor. Verifique sua conexão.', invalid:'Chave de licença inválida.',
+       revoked:'Esta licença foi revogada.', limit:'Esta licença atingiu o limite de computadores.'},
+  ru: {sub:'Введите лицензионный ключ, чтобы открыть полную версию.', label:'Лицензионный ключ', btn:'Активировать',
+       buy:'Купить лицензию — $9.99 →', demo:'Нет лицензии? Продолжить в демо-режиме (3 страницы, водяной знак) →',
+       foot:'Ключ указан в письме о покупке.', help:'Нужна помощь?', empty:'Введите лицензионный ключ.',
+       format:'Неверный формат. Пример: BILIR-XXXX-XXXX-XXXX', checking:'Проверка...', okMsg:'Активировано! Перенаправление...',
+       fail:'Ошибка активации', net:'Не удалось связаться с сервером. Проверьте подключение к Интернету.', invalid:'Неверный лицензионный ключ.',
+       revoked:'Эта лицензия отозвана.', limit:'Эта лицензия достигла лимита компьютеров.'},
+};
+const SERVER_LANG = '{{ lang }}';
+let lang = SERVER_LANG || 'tr';
+try { lang = localStorage.getItem('lang') || lang; } catch (_) {}
+if (!L[lang]) lang = 'en';
+const tr = k => L[lang][k] || L.en[k];
+document.documentElement.lang = lang;
+document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = tr(el.dataset.i18n); });
+
+function buyLicense() {
+  fetch('/api/open_link', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'buy' }) });
+}
+
+// Worker/license.py messages arrive in Turkish; map the known ones to the UI language
+function localizeError(e) {
+  e = e || '';
+  if (/Gecersiz lisans|Gecersiz veya iptal/i.test(e)) return tr('invalid');
+  if (/iptal edilmis/i.test(e)) return tr('revoked');
+  if (/makine limit/i.test(e)) return tr('limit');
+  if (/ulaşılamadı|Bağlantı/i.test(e)) return tr('net');
+  return lang === 'tr' ? e : tr('fail');
+}
+
 function formatKey(input) {
   let v = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
   // Remove existing "BILIR" prefix if user types it manually
@@ -149,16 +223,16 @@ async function doActivate() {
   const btn = document.getElementById('activate-btn');
 
   if (!raw) {
-    showMsg('Lütfen lisans anahtarınızı girin.', 'err');
+    showMsg(tr('empty'), 'err');
     return;
   }
   if (raw.length < 20) {
-    showMsg('Geçersiz anahtar formatı. Örnek: BILIR-XXXX-XXXX-XXXX', 'err');
+    showMsg(tr('format'), 'err');
     return;
   }
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Doğrulanıyor...';
+  btn.innerHTML = '<span class="spinner"></span>' + tr('checking');
 
   const r = await fetch('/api/activate', {
     method: 'POST',
@@ -167,12 +241,12 @@ async function doActivate() {
   }).then(x => x.json()).catch(() => ({ ok: false, error: 'Bağlantı hatası' }));
 
   if (r.ok) {
-    showMsg('✓ ' + (r.message || 'Aktivasyon başarılı! Yönlendiriliyorsunuz...'), 'ok');
+    showMsg('✓ ' + tr('okMsg'), 'ok');
     setTimeout(() => { window.location.href = '/'; }, 1800);
   } else {
-    showMsg(r.error || 'Aktivasyon başarısız', 'err');
+    showMsg(localizeError(r.error), 'err');
     btn.disabled = false;
-    btn.textContent = 'Aktivasyonu Başlat';
+    btn.textContent = tr('btn');
   }
 }
 

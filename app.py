@@ -153,6 +153,76 @@ def _sfx(key, **kw):
     return table[key].format(**kw)
 
 
+# ── Store rating prompt + buy link ──────────────────────
+BUY_URL = 'https://kamilicious12.gumroad.com/l/qxshwx'
+STORE_REVIEW_URL = 'ms-windows-store://review/?ProductId=9PJJ019JKTP9'
+# MSIX installs live under ...\WindowsApps\; PDFEDITOR_FORCE_RATE=1 shows the prompt in dev/EXE builds
+IS_STORE = 'windowsapps' in sys.executable.lower() or os.environ.get('PDFEDITOR_FORCE_RATE') == '1'
+PROMPTS_FILE = os.path.join(os.environ.get('APPDATA', os.path.expanduser('~')), 'PDFEditorPro', 'prompts.json')
+_launch_counted = False
+
+
+def _prompts_load() -> dict:
+    try:
+        import json
+        with open(PROMPTS_FILE, encoding='utf-8') as f:
+            d = json.load(f)
+        if isinstance(d, dict):
+            return d
+    except Exception:
+        pass
+    return {}
+
+
+def _prompts_save(d: dict):
+    try:
+        import json
+        os.makedirs(os.path.dirname(PROMPTS_FILE), exist_ok=True)
+        with open(PROMPTS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(d, f)
+    except Exception:
+        pass
+
+
+def _count_launch():
+    global _launch_counted
+    if _launch_counted:
+        return
+    _launch_counted = True
+    d = _prompts_load()
+    d.setdefault('first', time.time())
+    d['launches'] = d.get('launches', 0) + 1
+    _prompts_save(d)
+
+
+@app.route('/api/rate_prompt', methods=['POST'])
+def api_rate_prompt():
+    """event='saved' after a successful save → {show}; action='rate'|'later'|'never' from the dialog."""
+    data = request.json or {}
+    d = _prompts_load()
+    action = data.get('action')
+    if action == 'rate':
+        d['rate'] = 'done'
+        _prompts_save(d)
+        try:
+            os.startfile(STORE_REVIEW_URL)
+        except Exception:
+            webbrowser.open('https://apps.microsoft.com/detail/9PJJ019JKTP9')
+        return jsonify({'ok': True})
+    if action in ('later', 'never'):
+        d['rate'] = 'never' if action == 'never' else 'pending'
+        d['next_at'] = d.get('saves', 0) + 6
+        _prompts_save(d)
+        return jsonify({'ok': True})
+    d['saves'] = d.get('saves', 0) + 1
+    _prompts_save(d)
+    # Ask only engaged users at a good moment: licensed after 3 saves, demo users after 5 saves and 3 launches
+    need = d.get('next_at') or (5 if is_demo() else 3)
+    show = (IS_STORE and d.get('rate', 'pending') == 'pending' and d['saves'] >= need
+            and d.get('launches', 0) >= (3 if is_demo() else 2))
+    return jsonify({'ok': True, 'show': show})
+
+
 @app.route('/api/ui_lang', methods=['POST'])
 def api_ui_lang():
     lang = (request.json or {}).get('lang')
@@ -378,6 +448,7 @@ def _has_underline(bbox, drawings):
 @app.route('/')
 def index():
     demo = is_demo()
+    _count_launch()
     resp = make_response(render_template('index.html', demo_mode=demo, can_activate=demo))
     resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     resp.headers['Pragma'] = 'no-cache'
@@ -389,7 +460,7 @@ def index():
 def activate_page():
     if not is_demo():
         return redirect('/')
-    return render_template('activate.html')
+    return render_template('activate.html', lang=state.get('ui_lang') or '')
 
 
 @app.route('/api/activate', methods=['POST'])
@@ -1356,6 +1427,7 @@ def api_open_link():
     links = {
         'kindle_settings': 'https://www.amazon.com/hz/mycd/myx#/home/settings/pdoc',
         'calibre': 'https://calibre-ebook.com/download_windows',
+        'buy': BUY_URL,
     }
     url = links.get((request.json or {}).get('key'))
     if not url:

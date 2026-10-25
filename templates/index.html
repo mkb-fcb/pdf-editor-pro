@@ -981,7 +981,7 @@ body.has-file #sidebar {
   </span>
   <span style="display:flex;gap:6px">
     {% if can_activate %}<a href="/activate" style="background:#0891b2" data-i18n="demoBannerActivate">🔑 Lisans Gir</a>{% endif %}
-    <a href="https://mkbsoft.net/#pricing" target="_blank" data-i18n="demoBannerBuy">Tam Sürümü Satın Al — $9.99</a>
+    <a href="#" onclick="openLink('buy'); return false" data-i18n="demoBannerBuy">Tam Sürümü Satın Al — $9.99</a>
   </span>
 </div>
 {% endif %}
@@ -1453,6 +1453,20 @@ body.has-file #sidebar {
   </div>
 </div>
 
+<!-- MODAL: Store puanı -->
+<div class="modal-backdrop" id="m-rate">
+  <div class="modal-card" style="width:440px;text-align:center">
+    <div style="font-size:34px;letter-spacing:4px;color:#f59e0b;margin:4px 0 6px">★★★★★</div>
+    <h3 style="justify-content:center" data-i18n="rateTitle">PDF Editor Pro işinize yarıyor mu?</h3>
+    <p style="font-size:14px;line-height:1.5;margin:8px 0 18px" data-i18n="rateDesc">Microsoft Store'da birkaç saniyelik bir puan, küçük bağımsız bir geliştirici için çok şey ifade ediyor. Teşekkürler!</p>
+    <div class="modal-actions" style="justify-content:center;flex-wrap:wrap">
+      <button class="btn-secondary" onclick="rateAction('never')" data-i18n="rateNever">Bir daha sorma</button>
+      <button class="btn-secondary" onclick="rateAction('later')" data-i18n="rateLater">Daha sonra</button>
+      <button class="btn-primary" onclick="rateAction('rate')" data-i18n="rateNow">Puan ver</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: Kindle'a gönder -->
 <div class="modal-backdrop" id="m-kindle">
   <div class="modal-card" style="width:480px">
@@ -1894,6 +1908,11 @@ const LANGS = {
     azNoNeed: 'Kindle\'a göndermek için AZW3 gerekmez: <b>Kindle\'a Gönder</b> e-kitabı EPUB olarak gönderir, Amazon onu Kindle\'ınıza uygun biçime kendisi çevirir.',
     azUsb: 'Kindle\'a USB kablosuyla dosya atmak istiyorsanız AZW3 gerekir. Bunun için ücretsiz Calibre programını kurun; kurulumdan sonra bu düğme doğrudan AZW3 kaydeder.',
     azGetCalibre: 'Calibre\'yi indir',
+    rateTitle: 'PDF Editor Pro işinize yarıyor mu?',
+    rateDesc: 'Microsoft Store\'da birkaç saniyelik bir puan, küçük bağımsız bir geliştirici için çok şey ifade ediyor. Teşekkürler!',
+    rateNow: 'Puan ver',
+    rateLater: 'Daha sonra',
+    rateNever: 'Bir daha sorma',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Kindle\'a Gönder',
@@ -2027,6 +2046,11 @@ const LANGS = {
     azNoNeed: 'You don\'t need AZW3 to send to Kindle: <b>Send to Kindle</b> sends the e-book as EPUB and Amazon converts it for your Kindle.',
     azUsb: 'AZW3 is only needed to copy files to a Kindle over USB. Install the free Calibre app; after that this button saves AZW3 directly.',
     azGetCalibre: 'Download Calibre',
+    rateTitle: 'Is PDF Editor Pro helping you?',
+    rateDesc: 'A quick rating on the Microsoft Store means a lot to a small independent developer. Thank you!',
+    rateNow: 'Rate now',
+    rateLater: 'Later',
+    rateNever: 'Don\'t ask again',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Send to Kindle',
@@ -2160,6 +2184,11 @@ const LANGS = {
     azNoNeed: 'Zum Senden an den Kindle brauchen Sie kein AZW3: <b>An Kindle senden</b> schickt das E-Book als EPUB, Amazon wandelt es selbst für Ihren Kindle um.',
     azUsb: 'AZW3 wird nur zum Kopieren per USB-Kabel benötigt. Installieren Sie das kostenlose Programm Calibre; danach speichert diese Schaltfläche direkt AZW3.',
     azGetCalibre: 'Calibre herunterladen',
+    rateTitle: 'Hilft Ihnen PDF Editor Pro?',
+    rateDesc: 'Eine kurze Bewertung im Microsoft Store bedeutet einem kleinen unabhängigen Entwickler sehr viel. Danke!',
+    rateNow: 'Jetzt bewerten',
+    rateLater: 'Später',
+    rateNever: 'Nicht mehr fragen',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'An Kindle senden',
@@ -2293,6 +2322,11 @@ const LANGS = {
     azNoNeed: 'No necesita AZW3 para enviar a Kindle: <b>Enviar a Kindle</b> envía el libro en EPUB y Amazon lo convierte para su Kindle.',
     azUsb: 'AZW3 solo hace falta para copiar archivos al Kindle por USB. Instale el programa gratuito Calibre; después este botón guardará AZW3 directamente.',
     azGetCalibre: 'Descargar Calibre',
+    rateTitle: '¿Te resulta útil PDF Editor Pro?',
+    rateDesc: 'Una valoración rápida en Microsoft Store significa mucho para un pequeño desarrollador independiente. ¡Gracias!',
+    rateNow: 'Valorar',
+    rateLater: 'Más tarde',
+    rateNever: 'No volver a preguntar',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Enviar a Kindle',
@@ -2426,6 +2460,11 @@ const LANGS = {
     azNoNeed: 'Inutile d’avoir un AZW3 pour envoyer au Kindle : <b>Envoyer au Kindle</b> envoie le livre en EPUB et Amazon le convertit pour votre Kindle.',
     azUsb: 'L’AZW3 n’est nécessaire que pour copier des fichiers sur un Kindle par câble USB. Installez le logiciel gratuit Calibre ; ce bouton enregistrera ensuite directement en AZW3.',
     azGetCalibre: 'Télécharger Calibre',
+    rateTitle: 'PDF Editor Pro vous est-il utile ?',
+    rateDesc: 'Une note rapide sur le Microsoft Store compte beaucoup pour un petit développeur indépendant. Merci !',
+    rateNow: 'Noter',
+    rateLater: 'Plus tard',
+    rateNever: 'Ne plus demander',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Envoyer au Kindle',
@@ -2559,6 +2598,11 @@ const LANGS = {
     azNoNeed: 'Per inviare a Kindle non serve AZW3: <b>Invia a Kindle</b> invia l’e-book in EPUB e Amazon lo converte per il tuo Kindle.',
     azUsb: 'AZW3 serve solo per copiare file su Kindle tramite USB. Installa il programma gratuito Calibre; poi questo pulsante salverà direttamente in AZW3.',
     azGetCalibre: 'Scarica Calibre',
+    rateTitle: 'PDF Editor Pro ti è utile?',
+    rateDesc: 'Una valutazione veloce sul Microsoft Store significa molto per un piccolo sviluppatore indipendente. Grazie!',
+    rateNow: 'Valuta ora',
+    rateLater: 'Più tardi',
+    rateNever: 'Non chiedere più',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Invia a Kindle',
@@ -2692,6 +2736,11 @@ const LANGS = {
     azNoNeed: 'Você não precisa de AZW3 para enviar ao Kindle: <b>Enviar para Kindle</b> envia o e-book em EPUB e a Amazon o converte para o seu Kindle.',
     azUsb: 'AZW3 só é necessário para copiar arquivos para o Kindle por cabo USB. Instale o programa gratuito Calibre; depois este botão salvará AZW3 diretamente.',
     azGetCalibre: 'Baixar o Calibre',
+    rateTitle: 'O PDF Editor Pro está ajudando você?',
+    rateDesc: 'Uma avaliação rápida na Microsoft Store significa muito para um pequeno desenvolvedor independente. Obrigado!',
+    rateNow: 'Avaliar',
+    rateLater: 'Mais tarde',
+    rateNever: 'Não perguntar novamente',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Enviar para Kindle',
@@ -2825,6 +2874,11 @@ const LANGS = {
     azNoNeed: 'Для отправки на Kindle AZW3 не нужен: <b>Отправить на Kindle</b> отправляет книгу в EPUB, а Amazon сам преобразует её для вашего Kindle.',
     azUsb: 'AZW3 нужен только для копирования файлов на Kindle по USB-кабелю. Установите бесплатную программу Calibre — после этого кнопка будет сразу сохранять AZW3.',
     azGetCalibre: 'Скачать Calibre',
+    rateTitle: 'PDF Editor Pro вам помогает?',
+    rateDesc: 'Быстрая оценка в Microsoft Store очень важна для небольшого независимого разработчика. Спасибо!',
+    rateNow: 'Оценить',
+    rateLater: 'Позже',
+    rateNever: 'Больше не спрашивать',
     rbEpub: 'EPUB',
     rbAzw3: 'AZW3',
     rbKindle: 'Отправить на Kindle',
@@ -3970,6 +4024,7 @@ async function doSplit() {
   spin(false);
   if (!r.ok) { toast(r.error, 'err'); return; }
   toast(`Kaydedildi: ${r.path}`, 'ok');
+  ratePing();
 }
 
 // ── save ──────────────────────────────────────────────────
@@ -3983,6 +4038,7 @@ async function doSave() {
   if (!r.ok) { toast(r.error || 'Kayıt başarısız', 'err'); return; }
   const sigNote = r.stripped_signatures > 0 ? ` · ${r.stripped_signatures} dijital imza kaldırıldı` : '';
   toast(`Kaydedildi: ${r.path}${sigNote}`, 'ok');
+  ratePing();
 }
 
 // ── convert to pdf ───────────────────────────────────────
@@ -4445,6 +4501,16 @@ async function doCompress() {
 }
 
 function openLink(key) { post('/api/open_link', { key }); }
+
+// Store rating: counted after successful saves; the backend decides when (Store build, engaged user, not dismissed)
+async function ratePing() {
+  const r = await post('/api/rate_prompt', { event: 'saved' }).catch(() => null);
+  if (r && r.show) setTimeout(() => openModal('m-rate'), 1200);
+}
+function rateAction(action) {
+  closeModal('m-rate');
+  post('/api/rate_prompt', { action });
+}
 
 let KUSB = null;
 
