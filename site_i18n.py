@@ -232,6 +232,13 @@ T = {
 "See It in Action": ("In Aktion sehen", "Míralo en acción", "Voir en action", "Guardalo in azione", "Veja em ação", "Посмотрите в работе"),
 "Watch the demo video": ("Demo-Video ansehen", "Mira el vídeo de demostración", "Regardez la vidéo de démonstration", "Guarda il video dimostrativo",
     "Assista ao vídeo de demonstração", "Смотрите демо-видео"),
+"Step-by-step guide: how to send a PDF to Kindle →": (
+    "Schritt-für-Schritt-Anleitung: PDF an Kindle senden →", "Guía paso a paso: cómo enviar un PDF a Kindle →",
+    "Guide pas à pas : comment envoyer un PDF sur Kindle →", "Guida passo passo: come inviare un PDF a Kindle →",
+    "Guia passo a passo: como enviar um PDF para o Kindle →", "Пошаговое руководство: как отправить PDF на Kindle →"),
+"Send PDF to Kindle": (
+    "PDF an Kindle senden", "Enviar PDF a Kindle", "Envoyer un PDF sur Kindle", "Inviare PDF a Kindle",
+    "Enviar PDF para o Kindle", "Отправить PDF на Kindle"),
 "See PDF Editor Pro in action — in under a minute, in your language.": (
     "PDF Editor Pro in Aktion — in unter einer Minute, in Ihrer Sprache.", "Mira PDF Editor Pro en acción: en menos de un minuto y en tu idioma.",
     "Découvrez PDF Editor Pro en action — en moins d’une minute, dans votre langue.", "Guarda PDF Editor Pro in azione: in meno di un minuto, nella tua lingua.",

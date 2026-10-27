@@ -51,7 +51,7 @@ CONVERT & PROTECT
 Multilingual interface: English, Turkish, German, French, Spanish, Italian, Portuguese and Russian.
 
 FREE DEMO & FULL VERSION
-Without a license the app runs as a free demo: documents up to 3 pages, saved files carry a "DEMO" watermark, and password protection and Word/Excel/PowerPoint/JPG/EPUB export are disabled. To unlock the full version, buy a license key at https://mkbsoft.net and enter it via the "Enter License" button. Individual license: $9.99 one-time for 1 PC. Corporate license: $29.99 one-time for up to 5 PCs. No subscription.
+The app is free to download and runs as a demo without a license: documents up to 3 pages, saved files carry a "DEMO" watermark, and password protection and Word/Excel/PowerPoint/JPG/EPUB export are disabled. To unlock the full version, buy a license key at https://mkbsoft.net and enter it via the "Enter License" button. Individual license: $9.99 one-time for 1 PC. Corporate license: $29.99 one-time for up to 5 PCs. No subscription. The license is sold outside the Microsoft Store.
 
 --- What's new in this version ---
 • PDF to e-book: convert PDFs to EPUB with reflowing text, headings, chapters, images, charts and tables.
@@ -180,8 +180,8 @@ Without a license the app runs as a free demo (max 3 pages, watermark on saved f
 
 Steps:
 1. Launch "PDF Editor Pro".
-2. The editor opens in demo mode with an orange banner at the top. Click "Lisans Gir" (Enter License) in that banner.
-3. Enter the key above and click "Aktivasyonu Başlat" (Start Activation). An internet connection is needed for this one-time activation. The banner disappears and the full version is unlocked.
+2. The editor opens in demo mode with an orange banner at the top. Click "Lisans Gir" (Enter License) in that banner. The license screen follows the interface language.
+3. Enter the key above and click "Aktivasyonu Başlat" / "Activate". An internet connection is needed for this one-time activation. The banner disappears and the full version is unlocked.
 4. Click the open button and choose any PDF file to test editing, merging, splitting, compressing, exporting and password protection.
 
 The interface opens in Turkish by default. To switch to English, click the "TR" language button in the toolbar and choose "English".

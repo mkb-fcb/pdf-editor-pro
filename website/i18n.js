@@ -67,6 +67,7 @@ window.SITE_I18N = {
   "Kindle by USB without Calibre": "Kindle per USB ohne Calibre",
   "Opens on Kindle, but the text doesn't reflow": "Öffnet sich auf dem Kindle, der Text fließt aber nicht um",
   "Scanned PDFs (photos of pages) have no text to reflow; their pages are kept as images.": "Gescannte PDFs (Fotos von Seiten) enthalten keinen umfließbaren Text; ihre Seiten bleiben als Bilder erhalten.",
+  "Step-by-step guide: how to send a PDF to Kindle →": "Schritt-für-Schritt-Anleitung: PDF an Kindle senden →",
   "Screenshots": "Screenshots",
   "Take a look inside": "Ein Blick hinein",
   "Screenshots follow the language you choose at the top of the page.": "Die Screenshots folgen der Sprache, die Sie oben auf der Seite wählen.",
@@ -178,7 +179,8 @@ window.SITE_I18N = {
   "Join professionals who've switched from expensive subscriptions to a tool they actually own.": "Schließen Sie sich Profis an, die von teuren Abos zu einem Werkzeug gewechselt sind, das ihnen wirklich gehört.",
   "⬇ Download PDF Editor Pro — $9.99": "⬇ PDF Editor Pro laden — $9.99",
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Einmalzahlung &nbsp;·&nbsp; Sofortige Lieferung &nbsp;·&nbsp; 14 Tage Geld-zurück",
-  "E-book": "E-Book"
+  "E-book": "E-Book",
+  "Send PDF to Kindle": "PDF an Kindle senden"
  },
  "es": {
   "What's new": "Novedades",
@@ -247,6 +249,7 @@ window.SITE_I18N = {
   "Kindle by USB without Calibre": "Kindle por USB sin Calibre",
   "Opens on Kindle, but the text doesn't reflow": "Se abre en Kindle, pero el texto no se adapta",
   "Scanned PDFs (photos of pages) have no text to reflow; their pages are kept as images.": "Los PDF escaneados (fotos de páginas) no tienen texto que adaptar; sus páginas se conservan como imágenes.",
+  "Step-by-step guide: how to send a PDF to Kindle →": "Guía paso a paso: cómo enviar un PDF a Kindle →",
   "Screenshots": "Capturas",
   "Take a look inside": "Echa un vistazo",
   "Screenshots follow the language you choose at the top of the page.": "Las capturas siguen el idioma que eliges arriba en la página.",
@@ -358,7 +361,8 @@ window.SITE_I18N = {
   "Join professionals who've switched from expensive subscriptions to a tool they actually own.": "Únete a los profesionales que han dejado las suscripciones caras por una herramienta que de verdad es suya.",
   "⬇ Download PDF Editor Pro — $9.99": "⬇ Descargar PDF Editor Pro — $9.99",
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Pago único &nbsp;·&nbsp; Entrega inmediata &nbsp;·&nbsp; Reembolso en 14 días",
-  "E-book": "Libro electrónico"
+  "E-book": "Libro electrónico",
+  "Send PDF to Kindle": "Enviar PDF a Kindle"
  },
  "fr": {
   "What's new": "Nouveautés",
@@ -427,6 +431,7 @@ window.SITE_I18N = {
   "Kindle by USB without Calibre": "Kindle en USB sans Calibre",
   "Opens on Kindle, but the text doesn't reflow": "S’ouvre sur le Kindle, mais le texte ne s’adapte pas",
   "Scanned PDFs (photos of pages) have no text to reflow; their pages are kept as images.": "Les PDF numérisés (photos de pages) n’ont pas de texte à adapter ; leurs pages sont conservées en images.",
+  "Step-by-step guide: how to send a PDF to Kindle →": "Guide pas à pas : comment envoyer un PDF sur Kindle →",
   "Screenshots": "Captures d’écran",
   "Take a look inside": "Jetez un œil à l’intérieur",
   "Screenshots follow the language you choose at the top of the page.": "Les captures suivent la langue choisie en haut de la page.",
@@ -538,7 +543,8 @@ window.SITE_I18N = {
   "Join professionals who've switched from expensive subscriptions to a tool they actually own.": "Rejoignez les professionnels passés d’abonnements coûteux à un outil qui leur appartient vraiment.",
   "⬇ Download PDF Editor Pro — $9.99": "⬇ Télécharger PDF Editor Pro — $9.99",
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Paiement unique &nbsp;·&nbsp; Livraison immédiate &nbsp;·&nbsp; Remboursement sous 14 jours",
-  "E-book": "Livre numérique"
+  "E-book": "Livre numérique",
+  "Send PDF to Kindle": "Envoyer un PDF sur Kindle"
  },
  "it": {
   "What's new": "Novità",
@@ -607,6 +613,7 @@ window.SITE_I18N = {
   "Kindle by USB without Calibre": "Kindle via USB senza Calibre",
   "Opens on Kindle, but the text doesn't reflow": "Si apre su Kindle, ma il testo non si adatta",
   "Scanned PDFs (photos of pages) have no text to reflow; their pages are kept as images.": "I PDF scansionati (foto di pagine) non hanno testo da adattare; le loro pagine restano come immagini.",
+  "Step-by-step guide: how to send a PDF to Kindle →": "Guida passo passo: come inviare un PDF a Kindle →",
   "Screenshots": "Screenshot",
   "Take a look inside": "Dai un’occhiata",
   "Screenshots follow the language you choose at the top of the page.": "Gli screenshot seguono la lingua scelta in alto nella pagina.",
@@ -718,7 +725,8 @@ window.SITE_I18N = {
   "Join professionals who've switched from expensive subscriptions to a tool they actually own.": "Unisciti ai professionisti che hanno lasciato abbonamenti costosi per uno strumento davvero loro.",
   "⬇ Download PDF Editor Pro — $9.99": "⬇ Scarica PDF Editor Pro — $9.99",
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Pagamento unico &nbsp;·&nbsp; Consegna immediata &nbsp;·&nbsp; Rimborso entro 14 giorni",
-  "E-book": "E-book"
+  "E-book": "E-book",
+  "Send PDF to Kindle": "Inviare PDF a Kindle"
  },
  "pt": {
   "What's new": "Novidades",
@@ -787,6 +795,7 @@ window.SITE_I18N = {
   "Kindle by USB without Calibre": "Kindle por USB sem Calibre",
   "Opens on Kindle, but the text doesn't reflow": "Abre no Kindle, mas o texto não se ajusta",
   "Scanned PDFs (photos of pages) have no text to reflow; their pages are kept as images.": "PDFs escaneados (fotos de páginas) não têm texto para ajustar; as páginas são mantidas como imagens.",
+  "Step-by-step guide: how to send a PDF to Kindle →": "Guia passo a passo: como enviar um PDF para o Kindle →",
   "Screenshots": "Capturas de tela",
   "Take a look inside": "Dê uma olhada",
   "Screenshots follow the language you choose at the top of the page.": "As capturas seguem o idioma escolhido no topo da página.",
@@ -898,7 +907,8 @@ window.SITE_I18N = {
   "Join professionals who've switched from expensive subscriptions to a tool they actually own.": "Junte-se aos profissionais que trocaram assinaturas caras por uma ferramenta que é realmente deles.",
   "⬇ Download PDF Editor Pro — $9.99": "⬇ Baixar PDF Editor Pro — $9.99",
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Pagamento único &nbsp;·&nbsp; Entrega imediata &nbsp;·&nbsp; Reembolso em 14 dias",
-  "E-book": "E-book"
+  "E-book": "E-book",
+  "Send PDF to Kindle": "Enviar PDF para o Kindle"
  },
  "ru": {
   "What's new": "Что нового",
@@ -967,6 +977,7 @@ window.SITE_I18N = {
   "Kindle by USB without Calibre": "Kindle по USB без Calibre",
   "Opens on Kindle, but the text doesn't reflow": "Открывается на Kindle, но текст не перетекает",
   "Scanned PDFs (photos of pages) have no text to reflow; their pages are kept as images.": "В отсканированных PDF (фото страниц) нет текста для переноса; их страницы сохраняются как изображения.",
+  "Step-by-step guide: how to send a PDF to Kindle →": "Пошаговое руководство: как отправить PDF на Kindle →",
   "Screenshots": "Скриншоты",
   "Take a look inside": "Загляните внутрь",
   "Screenshots follow the language you choose at the top of the page.": "Скриншоты меняются вместе с языком, выбранным вверху страницы.",
@@ -1078,6 +1089,7 @@ window.SITE_I18N = {
   "Join professionals who've switched from expensive subscriptions to a tool they actually own.": "Присоединяйтесь к профессионалам, сменившим дорогие подписки на инструмент, который действительно им принадлежит.",
   "⬇ Download PDF Editor Pro — $9.99": "⬇ Скачать PDF Editor Pro — $9.99",
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Разовый платёж &nbsp;·&nbsp; Мгновенная доставка &nbsp;·&nbsp; Возврат в течение 14 дней",
-  "E-book": "Эл. книги"
+  "E-book": "Эл. книги",
+  "Send PDF to Kindle": "Отправить PDF на Kindle"
  }
 };

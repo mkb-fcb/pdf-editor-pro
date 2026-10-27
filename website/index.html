@@ -265,6 +265,8 @@
   .vid-lang { border: 1px solid var(--border); background: #fff; border-radius: 100px; padding: 6px 14px; font: inherit;
               font-size: 13px; font-weight: 600; color: var(--text2); cursor: pointer; }
   .vid-lang.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .eb-guide { text-align: center; margin-top: 14px; font-weight: 600; }
+  .eb-guide a { color: var(--blue); }
   #gallery { background: var(--bg2); }
   .gal { margin-top: 40px; }
   .gal-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
@@ -1157,6 +1159,7 @@
       </table>
     </div>
     <p class="eb-note" data-en="Scanned PDFs (photos of pages) have no text to reflow; their pages are kept as images." data-tr="Taranmış PDF'lerde (sayfa fotoğrafları) akacak metin yoktur; sayfaları resim olarak korunur.">Scanned PDFs (photos of pages) have no text to reflow; their pages are kept as images.</p>
+    <p class="eb-guide"><a data-guide href="/send-pdf-to-kindle/" data-en="Step-by-step guide: how to send a PDF to Kindle →" data-tr="Adım adım rehber: PDF Kindle'a nasıl gönderilir? →">Step-by-step guide: how to send a PDF to Kindle →</a></p>
   </div>
 </section>
 
@@ -1499,6 +1502,7 @@
     <ul class="footer-links">
       <li><a href="#gallery" data-en="Screenshots" data-tr="Ekran Görüntüleri">Screenshots</a></li>
       <li><a href="#ebook" data-en="E-book" data-tr="E-kitap">E-book</a></li>
+      <li><a data-guide href="/send-pdf-to-kindle/" data-en="Send PDF to Kindle" data-tr="PDF'i Kindle'a gönder">Send PDF to Kindle</a></li>
       <li><a href="#features">Features</a></li>
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#faq">FAQ</a></li>
@@ -1543,12 +1547,14 @@ function setLang(lang) {
   });
   document.querySelectorAll('.lang-card').forEach(c => c.classList.toggle('active', c.dataset.lang === lang));
   if (typeof showVideo === 'function') showVideo(lang);
+  document.querySelectorAll('a[data-guide]').forEach(a => { a.href = KINDLE_GUIDES[lang] || KINDLE_GUIDES.en; });
   const sel = document.getElementById('lang-select');
   if (sel) sel.value = lang;
   document.title = SITE_TITLES[lang];
   try { localStorage.setItem('lang', lang); } catch (e) {}
 }
 
+const KINDLE_GUIDES = {en: '/send-pdf-to-kindle/', tr: '/tr/pdf-kindle-gonderme/', de: '/de/pdf-an-kindle-senden/', es: '/es/enviar-pdf-a-kindle/', fr: '/fr/envoyer-pdf-sur-kindle/', it: '/it/inviare-pdf-a-kindle/', pt: '/pt/enviar-pdf-para-kindle/', ru: '/ru/otpravit-pdf-na-kindle/'};
 const SITE_VIDEOS = {en: 'UDoxql62qK8', tr: 'Mb9A51Lgb9I', de: 'nG1L9S54GLw', es: 'mh86FYa6Eb0', fr: 'yd0NelENLn8', it: '3MV8G-7DZf0', pt: 'h75Pno2yG4Q', ru: 'uw06CtlESSM'};
 function showVideo(lang) {
   const code = SITE_VIDEOS[lang] ? lang : 'en';
