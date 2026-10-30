@@ -36,9 +36,10 @@ T = {
     "Unisci, dividi, ruota, proteggi e annota i PDF direttamente sul desktop. Niente cloud, niente canoni mensili: tuo per sempre.",
     "Una, divida, gire, criptografe e anote PDFs direto na sua área de trabalho. Sem nuvem, sem mensalidade — seu para sempre.",
     "Объединяйте, разделяйте, поворачивайте, шифруйте и комментируйте PDF прямо на компьютере. Без облака и ежемесячных платежей — навсегда ваш."),
-"⬇ Download for Windows &nbsp;·&nbsp; $9.99": ("⬇ Für Windows laden &nbsp;·&nbsp; $9.99", "⬇ Descargar para Windows &nbsp;·&nbsp; $9.99",
-    "⬇ Télécharger pour Windows &nbsp;·&nbsp; $9.99", "⬇ Scarica per Windows &nbsp;·&nbsp; $9.99", "⬇ Baixar para Windows &nbsp;·&nbsp; $9.99",
-    "⬇ Скачать для Windows &nbsp;·&nbsp; $9.99"),
+"⬇ Download from Microsoft Store": ("⬇ Im Microsoft Store herunterladen", "⬇ Descargar en Microsoft Store", "⬇ Télécharger sur le Microsoft Store",
+    "⬇ Scarica dal Microsoft Store", "⬇ Baixar na Microsoft Store", "⬇ Скачать в Microsoft Store"),
+"⬇ Download Free Demo from Microsoft Store": ("⬇ Kostenlose Demo im Microsoft Store", "⬇ Demo gratis en Microsoft Store", "⬇ Démo gratuite sur le Microsoft Store",
+    "⬇ Demo gratuita dal Microsoft Store", "⬇ Demo grátis na Microsoft Store", "⬇ Бесплатная демо в Microsoft Store"),
 "Try Free Demo →": ("Kostenlose Demo →", "Demo gratis →", "Démo gratuite →", "Demo gratuita →", "Demo grátis →", "Бесплатная демо →"),
 "One-time payment &nbsp;·&nbsp; Lifetime license &nbsp;·&nbsp; Free updates &nbsp;·&nbsp; Free demo available": (
     "Einmalzahlung &nbsp;·&nbsp; Lebenslange Lizenz &nbsp;·&nbsp; Kostenlose Updates &nbsp;·&nbsp; Kostenlose Demo",
@@ -367,8 +368,6 @@ T = {
 "Core editing tools enabled": ("Wichtige Bearbeitungswerkzeuge aktiv", "Herramientas básicas de edición activas", "Outils d’édition essentiels actifs",
     "Strumenti di modifica principali attivi", "Ferramentas básicas de edição ativas", "Основные инструменты редактирования доступны"),
 "No license needed": ("Keine Lizenz nötig", "Sin licencia", "Sans licence", "Nessuna licenza", "Sem licença", "Лицензия не нужна"),
-"⬇ Download Free Demo": ("⬇ Kostenlose Demo laden", "⬇ Descargar demo gratis", "⬇ Télécharger la démo gratuite", "⬇ Scarica la demo gratuita",
-    "⬇ Baixar demo grátis", "⬇ Скачать бесплатную демо"),
 "Windows 10 / 11 · ~72 MB · No installation of extra software required": (
     "Windows 10 / 11 · ca. 72 MB · Keine zusätzliche Software nötig", "Windows 10 / 11 · ~72 MB · Sin instalar software adicional",
     "Windows 10 / 11 · ~72 Mo · Aucun logiciel supplémentaire à installer", "Windows 10 / 11 · ~72 MB · Nessun software aggiuntivo da installare",
@@ -384,8 +383,6 @@ T = {
     "Unisciti ai professionisti che hanno lasciato abbonamenti costosi per uno strumento davvero loro.",
     "Junte-se aos profissionais que trocaram assinaturas caras por uma ferramenta que é realmente deles.",
     "Присоединяйтесь к профессионалам, сменившим дорогие подписки на инструмент, который действительно им принадлежит."),
-"⬇ Download PDF Editor Pro — $9.99": ("⬇ PDF Editor Pro laden — $9.99", "⬇ Descargar PDF Editor Pro — $9.99", "⬇ Télécharger PDF Editor Pro — $9.99",
-    "⬇ Scarica PDF Editor Pro — $9.99", "⬇ Baixar PDF Editor Pro — $9.99", "⬇ Скачать PDF Editor Pro — $9.99"),
 "One-time payment &nbsp;·&nbsp; Instant delivery &nbsp;·&nbsp; 14-day refund guarantee": (
     "Einmalzahlung &nbsp;·&nbsp; Sofortige Lieferung &nbsp;·&nbsp; 14 Tage Geld-zurück", "Pago único &nbsp;·&nbsp; Entrega inmediata &nbsp;·&nbsp; Reembolso en 14 días",
     "Paiement unique &nbsp;·&nbsp; Livraison immédiate &nbsp;·&nbsp; Remboursement sous 14 jours", "Pagamento unico &nbsp;·&nbsp; Consegna immediata &nbsp;·&nbsp; Rimborso entro 14 giorni",
