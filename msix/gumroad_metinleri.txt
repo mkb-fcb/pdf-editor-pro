@@ -1,4 +1,4 @@
-GUMROAD METİNLERİ — PDF Editor Pro (v1.0.6, fiyat $9.99 / $29.99)
+GUMROAD METİNLERİ — PDF Editor Pro (v1.0.8, Store-öncelikli kurulum, fiyat $9.99 / $29.99)
 Her başlığın altındaki metni Gumroad'daki ilgili kutuya yapıştırın.
 =====================================================================
 
@@ -52,9 +52,12 @@ Windows için profesyonel PDF düzenleyici. Tek seferlik ödeme, abonelik yok, b
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Download and install / İndirip kurun
-2. Enter the license key from your email via "Enter License" / E-postanıza gelen anahtarı "Lisans Gir" ile girin
+1. Install free from the Microsoft Store: https://apps.microsoft.com/detail/9PJJ019JKTP9
+   Microsoft Store'dan ücretsiz kurun: https://apps.microsoft.com/detail/9PJJ019JKTP9
+2. Click "Enter License" and paste the key from your email / "Lisans Gir"e tıklayıp e-postanıza gelen anahtarı yapıştırın
 3. Done — the full version is yours / Bitti — tam sürüm sizin
+
+No Store? A classic installer (.exe) is also included after purchase. / Store kullanamıyor musunuz? Satın aldıktan sonra klasik kurulum dosyası (.exe) da verilir.
 
 Requirements / Gereksinimler: Windows 10 or 11 (64-bit)
 Support / Destek: destek@mkbsoft.net
@@ -84,6 +87,7 @@ Individual License — 1 PC / Bireysel Lisans — 1 bilgisayar
 
 --- Demo — Ücretsiz — Fiyat: 0 ---
 Free Demo / Ücretsiz Demo
+• Easiest: install free from the Microsoft Store — https://apps.microsoft.com/detail/9PJJ019JKTP9 / En kolayı: Microsoft Store'dan ücretsiz kurun
 • Documents up to 3 pages / En fazla 3 sayfalık belgeler
 • Saved files carry a "DEMO" watermark / Kaydedilen dosyalarda "DEMO" filigranı
 • Password protection, printing, Word/Excel/PowerPoint/JPG/EPUB export and Send to Kindle are in the full version / Şifreleme, yazdırma, Word/Excel/PowerPoint/JPG/EPUB dışa aktarma ve Kindle'a gönderme tam sürümdedir
@@ -91,10 +95,53 @@ Free Demo / Ücretsiz Demo
 
 
 =====================================================================
+İÇERİK SAYFASI (Content) — alıcının satın aldıktan sonra gördüğü sayfa
+=====================================================================
+Gumroad > Ürün > Content sekmesinde dosyanın ÜSTÜNE şu metni yazın.
+Store adresini "Button" olarak eklerseniz (etiket: "Install from Microsoft Store") daha görünür olur.
+
+----- metin başlangıcı -----
+✅ RECOMMENDED: Install from the Microsoft Store (no security warnings)
+✅ ÖNERİLEN: Microsoft Store'dan kurun (hiçbir güvenlik uyarısı çıkmaz)
+
+1. Open / Açın: https://apps.microsoft.com/detail/9PJJ019JKTP9
+2. Click "Get" / "Install" — it's free / "Edinin" veya "Yükle"ye tıklayın — ücretsizdir
+3. Open PDF Editor Pro → "Enter License" → paste your license key (sent to your email)
+   PDF Editor Pro'yu açın → "Lisans Gir" → e-postanıza gelen lisans anahtarını yapıştırın
+
+Your key works in both the Store version and the installer below.
+Anahtarınız hem Store sürümünde hem aşağıdaki kurulum dosyasında çalışır.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ALTERNATIVE: Classic installer (.exe) / ALTERNATİF: Klasik kurulum dosyası
+
+Because the installer is new, your browser or Windows may show a warning. The file is safe.
+Kurulum dosyası yeni olduğu için tarayıcınız veya Windows uyarı gösterebilir. Dosya güvenlidir.
+
+• Chrome / Edge: press Ctrl+J → next to the file click "Keep" / "Download dangerous file anyway"
+  Ctrl+J'ye basın → dosyanın yanında "Tut" / "Yine de indir"e tıklayın
+  (If you see a ".crdownload" file in Downloads, the download is not finished yet — do this step.)
+  (İndirilenler'de ".crdownload" dosyası görüyorsanız indirme bitmemiştir — bu adımı yapın.)
+• "Windows protected your PC": click "More info" → "Run anyway"
+  "Windows bilgisayarınızı korudu": "Ek bilgi" → "Yine de çalıştır"
+
+Questions? / Sorunuz mu var? destek@mkbsoft.net
+----- metin sonu -----
+
+
+=====================================================================
+MAKBUZ MESAJI (Settings / Receipt — "Custom message on receipt" varsa)
+=====================================================================
+Thank you! Easiest install: get PDF Editor Pro free from the Microsoft Store (https://apps.microsoft.com/detail/9PJJ019JKTP9), then click "Enter License" and paste your key.
+Teşekkürler! En kolay kurulum: PDF Editor Pro'yu Microsoft Store'dan ücretsiz kurun (https://apps.microsoft.com/detail/9PJJ019JKTP9), ardından "Lisans Gir"e tıklayıp anahtarınızı yapıştırın.
+
+
+=====================================================================
 DOSYALAR (Content)
 =====================================================================
 Eski kurulum dosyasını silin, şunu yükleyin:
-  installer_output\PDFEditorPro_Kurulum_v1.0.6.exe
+  installer_output\PDFEditorPro_Kurulum_v1.0.8.exe  (yoksa en yeni sürüm)
 (Demo ile tam sürüm artık aynı program; tek dosya yeterli.)
 
 KAPAK GÖRSELİ (Cover)
