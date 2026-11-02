@@ -996,6 +996,29 @@ body.read-mode #reader {
 #rd-page-input { width: 52px; text-align: center; }
 #readerbar .rd-edit { background: var(--primary); color: #fff; font-weight: 600; }
 #readerbar .rd-edit:hover { background: var(--primary-dark); color: #fff; }
+#readerbar .rd-lbl { color: var(--text-muted); font-size: 12px; margin-right: -2px; }
+.rd-pct { font-size: 11px; color: var(--text-muted); min-width: 34px; text-align: center; }
+body.read-mode #reader[data-layout="two"], body.read-mode #reader[data-layout="two-cover"] {
+  display: grid; grid-template-columns: auto auto; column-gap: 14px; row-gap: 14px;
+  justify-content: center; align-items: start;
+}
+#reader[data-layout="two-cover"] .rd-page[data-i="0"] { grid-column: 2; }
+#reader .rd-page.l { justify-self: end; }
+#reader .rd-page.r { justify-self: start; }
+#reader[data-layout="single"] .rd-page:not(.cur) { display: none; }
+#viewer { justify-content: safe center; }
+body.no-thumbs #sidebar { display: none; }
+body.fullscreen #toolbar, body.fullscreen #doc-banners, body.fullscreen #demo-banner { display: none !important; }
+#zoombar { display: none; }
+body.has-file:not(.read-mode) #zoombar {
+  display: flex; align-items: center; gap: 2px; position: fixed; right: 22px; bottom: 18px; z-index: 50;
+  background: #fff; border: 1px solid var(--border); border-radius: 999px; padding: 3px 6px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25); font-size: 13px;
+}
+#zoombar button { background: none; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+                  font-size: 15px; color: var(--text); display: grid; place-items: center; padding: 0; }
+#zoombar button:hover { background: #f1f5f9; }
+#zoombar select { border: none; font-size: 12px; background: transparent; padding: 2px; cursor: pointer; }
 
 /* ── YAZDIRMA ── */
 #print-root { display: none; }
@@ -1247,13 +1270,13 @@ body.read-mode #reader {
 <div id="readerbar">
   <button class="rd-btn rd-edit" onclick="exitReadMode()" title="Düzenleme araçlarını aç"><svg class="ri"><use href="#i-type"/></svg><span>Düzenle</span></button>
   <div class="rd-sep"></div>
-  <button class="rd-btn" onclick="readerGo(S.currentPage - 1)" title="Önceki sayfa">▲</button>
+  <button class="rd-btn" onclick="readerGo(S.currentPage - _readerStep())" title="Önceki sayfa">▲</button>
   <input id="rd-page-input" type="text" inputmode="numeric" onchange="readerGo(parseInt(this.value, 10) - 1)" onkeydown="if (event.key === 'Enter') this.blur()">
   <span id="rd-page-total"></span>
-  <button class="rd-btn" onclick="readerGo(S.currentPage + 1)" title="Sonraki sayfa">▼</button>
+  <button class="rd-btn" onclick="readerGo(S.currentPage + _readerStep())" title="Sonraki sayfa">▼</button>
   <div class="rd-sep"></div>
-  <button class="rd-btn" onclick="readerZoomStep(-1)" title="Uzaklaştır">−</button>
-  <select id="rd-zoom" onchange="readerSetZoom(this.value)">
+  <button class="rd-btn" onclick="readerZoomStep(-1)" title="Uzaklaştır (Ctrl −)">−</button>
+  <select id="rd-zoom" onchange="readerSetZoom(this.value)" title="Yakınlaştırma">
     <option value="fit-width">Genişliğe sığdır</option>
     <option value="fit-page">Sayfaya sığdır</option>
     <option value="0.5">50%</option>
@@ -1263,9 +1286,21 @@ body.read-mode #reader {
     <option value="1.5">150%</option>
     <option value="2">200%</option>
     <option value="3">300%</option>
+    <option value="4">400%</option>
     <option value="custom" hidden></option>
   </select>
-  <button class="rd-btn" onclick="readerZoomStep(1)" title="Yakınlaştır">+</button>
+  <span id="rd-zoom-pct" class="rd-pct"></span>
+  <button class="rd-btn" onclick="readerZoomStep(1)" title="Yakınlaştır (Ctrl +)">+</button>
+  <div class="rd-sep"></div>
+  <label class="rd-lbl" for="rd-layout">Görünüm</label>
+  <select id="rd-layout" onchange="readerSetLayout(this.value)" title="Sayfa görünümü">
+    <option value="continuous">Sürekli</option>
+    <option value="single">Tek sayfa</option>
+    <option value="two">İki sayfa</option>
+    <option value="two-cover">İki sayfa (kapak ayrı)</option>
+  </select>
+  <button class="rd-btn" onclick="toggleThumbs()" title="Küçük resimleri göster/gizle">▤ <span>Küçük resimler</span></button>
+  <button class="rd-btn" onclick="toggleFullscreen()" title="Tam ekran (F11)">⛶ <span>Tam ekran</span></button>
   <div class="rd-sep"></div>
   <button class="rd-btn" onclick="doPrint()" title="Yazdır (Ctrl+P)"><svg class="ri" style="color:#475569"><use href="#i-printer"/></svg><span data-i18n="printBtn">Yazdır</span></button>
 </div>
@@ -1309,6 +1344,29 @@ body.read-mode #reader {
     </div>
     <div id="reader"></div>
   </div>
+</div>
+
+<!-- Düzenleme görünümü: yakınlaştırma -->
+<div id="zoombar">
+  <button onclick="editZoomStep(-1)" title="Uzaklaştır (Ctrl −)">−</button>
+  <select id="ez-zoom" onchange="editSetZoom(this.value)" title="Yakınlaştırma">
+    <option value="auto">Otomatik</option>
+    <option value="fit-width">Genişliğe sığdır</option>
+    <option value="fit-page">Sayfaya sığdır</option>
+    <option value="0.5">50%</option>
+    <option value="0.75">75%</option>
+    <option value="1">100%</option>
+    <option value="1.25">125%</option>
+    <option value="1.5">150%</option>
+    <option value="2">200%</option>
+    <option value="3">300%</option>
+    <option value="4">400%</option>
+    <option value="custom" hidden></option>
+  </select>
+  <span id="ez-zoom-pct" class="rd-pct"></span>
+  <button onclick="editZoomStep(1)" title="Yakınlaştır (Ctrl +)">+</button>
+  <button onclick="toggleThumbs()" title="Küçük resimleri göster/gizle">▤</button>
+  <button onclick="toggleFullscreen()" title="Tam ekran (F11)">⛶</button>
 </div>
 
 
@@ -3114,6 +3172,20 @@ TXR.push(
    "Демоверсия: весь документ можно читать и печатать. Редактировать можно первые 3 страницы."],
   ["Tam sürüm etkinleştirildi. Teşekkürler!", "Full version activated. Thank you!", "Vollversion aktiviert. Vielen Dank!", "Versión completa activada. ¡Gracias!", "Version complète activée. Merci !", "Versione completa attivata. Grazie!", "Versão completa ativada. Obrigado!", "Полная версия активирована. Спасибо!"],
   ["Satın alma tamamlanamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.", "The purchase could not be completed. Check your internet connection and try again.", "Der Kauf konnte nicht abgeschlossen werden. Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.", "No se pudo completar la compra. Compruebe su conexión a internet e inténtelo de nuevo.", "L'achat n'a pas pu aboutir. Vérifiez votre connexion internet et réessayez.", "Impossibile completare l'acquisto. Controlla la connessione a internet e riprova.", "Não foi possível concluir a compra. Verifique sua conexão com a internet e tente novamente.", "Не удалось завершить покупку. Проверьте подключение к интернету и попробуйте снова."],
+  ["Otomatik", "Automatic", "Automatisch", "Automático", "Automatique", "Automatico", "Automático", "Авто"],
+  ["Görünüm", "View", "Ansicht", "Vista", "Affichage", "Vista", "Exibição", "Вид"],
+  ["Sayfa görünümü", "Page layout", "Seitenlayout", "Diseño de página", "Disposition des pages", "Layout pagina", "Layout da página", "Макет страниц"],
+  ["Sürekli", "Continuous", "Fortlaufend", "Continuo", "Continu", "Continuo", "Contínuo", "Непрерывно"],
+  ["Tek sayfa", "Single page", "Einzelseite", "Una página", "Page unique", "Pagina singola", "Página única", "Одна страница"],
+  ["İki sayfa", "Two pages", "Zwei Seiten", "Dos páginas", "Deux pages", "Due pagine", "Duas páginas", "Две страницы"],
+  ["İki sayfa (kapak ayrı)", "Two pages (cover separate)", "Zwei Seiten (Titelblatt einzeln)", "Dos páginas (portada aparte)", "Deux pages (couverture seule)", "Due pagine (copertina separata)", "Duas páginas (capa separada)", "Две страницы (обложка отдельно)"],
+  ["Küçük resimler", "Thumbnails", "Miniaturen", "Miniaturas", "Miniatures", "Miniature", "Miniaturas", "Миниатюры"],
+  ["Küçük resimleri göster/gizle", "Show/hide thumbnails", "Miniaturen ein-/ausblenden", "Mostrar/ocultar miniaturas", "Afficher/masquer les miniatures", "Mostra/nascondi miniature", "Mostrar/ocultar miniaturas", "Показать/скрыть миниатюры"],
+  ["Tam ekran", "Full screen", "Vollbild", "Pantalla completa", "Plein écran", "Schermo intero", "Tela cheia", "Полный экран"],
+  ["Tam ekran (F11)", "Full screen (F11)", "Vollbild (F11)", "Pantalla completa (F11)", "Plein écran (F11)", "Schermo intero (F11)", "Tela cheia (F11)", "Полный экран (F11)"],
+  ["Yakınlaştırma", "Zoom", "Zoom", "Zoom", "Zoom", "Zoom", "Zoom", "Масштаб"],
+  ["Uzaklaştır (Ctrl −)", "Zoom out (Ctrl −)", "Verkleinern (Strg −)", "Alejar (Ctrl −)", "Zoom arrière (Ctrl −)", "Riduci (Ctrl −)", "Diminuir zoom (Ctrl −)", "Уменьшить (Ctrl −)"],
+  ["Yakınlaştır (Ctrl +)", "Zoom in (Ctrl +)", "Vergrößern (Strg +)", "Acercar (Ctrl +)", "Zoom avant (Ctrl +)", "Ingrandisci (Ctrl +)", "Aumentar zoom (Ctrl +)", "Увеличить (Ctrl +)"],
   ["Okuma Modu", "Reading Mode", "Lesemodus", "Modo lectura", "Mode lecture", "Modalità lettura", "Modo de leitura", "Режим чтения"],
   ["Düzenle", "Edit", "Bearbeiten", "Editar", "Modifier", "Modifica", "Editar", "Редактировать"],
   ["Düzenleme araçlarını aç", "Open editing tools", "Bearbeitungswerkzeuge öffnen", "Abrir herramientas de edición", "Ouvrir les outils d'édition", "Apri strumenti di modifica", "Abrir ferramentas de edição", "Открыть инструменты редактирования"],
@@ -3617,7 +3689,7 @@ async function selectPage(i, scrollTo) {
   if (th) th.classList.add('selected');
   S.currentPage = i;
   spin(true);
-  const r = await fetch(`/api/page/${i}?t=${Date.now()}`).then(x => x.json());
+  const r = await fetch(`/api/page/${i}?z=${_editRenderZoom()}&t=${Date.now()}`).then(x => x.json());
   spin(false);
   if (!r.ok) { toast('Sayfa yüklenemedi', 'err'); return; }
   document.getElementById('empty-state').style.display = 'none';
@@ -3628,6 +3700,7 @@ async function selectPage(i, scrollTo) {
   img._zoom = r.zoom;
   img.src = 'data:image/png;base64,' + r.img;
   img.onload = () => {
+    editApplyZoom();
     loadTextBlocks(i);
     const v = document.getElementById('viewer');
     if (scrollTo === 'top') v.scrollTop = 0;
@@ -4354,6 +4427,13 @@ document.addEventListener('mouseup', async e => {
 
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); doPrint(); return; }
+  if ((e.ctrlKey || e.metaKey) && ['+', '=', '-', '0'].includes(e.key)) {
+    e.preventDefault();   // pencerenin kendi yakınlaştırması yerine sayfayı yakınlaştır
+    if (S.pageCount) e.key === '0' ? zoomFit() : zoomStep(e.key === '-' ? -1 : 1);
+    return;
+  }
+  if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); return; }
+  if (e.key === 'Escape' && document.body.classList.contains('fullscreen')) { toggleFullscreen(); return; }
   if (document.querySelector('.modal-backdrop.open')) return;
   if (S.readMode) { readerKey(e); return; }
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); doUndo(); return; }
@@ -5059,8 +5139,18 @@ async function runPrint() {
 // modunda gösterilir: tüm sayfalar alt alta, yakınlaştırma ve sayfa gezintisi; düzenleme
 // araçları "Düzenle" ile açılır.
 S.readMode = false;
-const RD = {sizes: [], zoom: 'fit-width', scale: 1, observer: null};
+const RD = {sizes: [], zoom: 'fit-width', scale: 1, layout: 'continuous', observer: null};
 const RD_PX = 96 / 72;   // PDF noktası → CSS pikseli (%100 = gerçek boyut)
+const ZOOM_STEPS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4, 5];
+const RD_GAP = 14;
+try {
+  RD.layout = localStorage.getItem('rdLayout') || 'continuous';
+  const z = localStorage.getItem('rdZoom');
+  if (z === 'fit-width' || z === 'fit-page') RD.zoom = z;
+  else if (z && !isNaN(+z)) { RD.zoom = 'custom'; RD.scale = +z; }
+} catch (e) {}
+
+function _savePref(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
 async function enterReadMode() {
   if (!S.pageCount) return;
@@ -5115,48 +5205,73 @@ async function buildReader() {
     RD.observer.observe(d);
   });
   document.getElementById('rd-page-total').textContent = `/ ${RD.sizes.length}`;
+  document.getElementById('rd-layout').value = RD.layout;
   _readerLayout();
-  _readerSyncZoomSel();
-  readerGo(Math.min(S.currentPage, RD.sizes.length - 1), true);
+  _syncZoomSel('rd-zoom', RD);
+  readerGo(Math.min(S.currentPage, RD.sizes.length - 1));
 }
+
+const _isTwo = () => RD.layout === 'two' || RD.layout === 'two-cover';
 
 function _readerScale() {
   const v = document.getElementById('viewer');
+  const cols = _isTwo() ? 2 : 1;
+  const availW = v.clientWidth - 40 - (cols - 1) * RD_GAP;
+  const availH = v.clientHeight - 40;
   const maxW = Math.max(...RD.sizes.map(s => s[0]));
-  if (RD.zoom === 'fit-width') return Math.min((v.clientWidth - 60) / (maxW * RD_PX), 3);
+  if (RD.zoom === 'fit-width') return Math.min(availW / (cols * maxW * RD_PX), 4);
   if (RD.zoom === 'fit-page') {
     const sz = RD.sizes[S.currentPage] || RD.sizes[0];
-    return Math.min((v.clientWidth - 60) / (sz[0] * RD_PX), (v.clientHeight - 40) / (sz[1] * RD_PX));
+    return Math.min(availW / (cols * sz[0] * RD_PX), availH / (sz[1] * RD_PX));
   }
   return RD.scale;
 }
 
 function _readerLayout() {
   if (!RD.sizes.length) return;
+  const reader = document.getElementById('reader');
+  reader.dataset.layout = RD.layout;
   RD.scale = Math.max(0.1, _readerScale());
   document.querySelectorAll('#reader .rd-page').forEach(d => {
-    const [w, h] = RD.sizes[+d.dataset.i];
+    const i = +d.dataset.i;
+    const [w, h] = RD.sizes[i];
     d.style.width = Math.round(w * RD_PX * RD.scale) + 'px';
     d.style.height = Math.round(h * RD_PX * RD.scale) + 'px';
+    // İki sayfa: sol sütundaki sayfa sağa, sağdaki sola yaslanır (kitap gibi)
+    const left = RD.layout === 'two' ? i % 2 === 0 : RD.layout === 'two-cover' ? i % 2 === 1 : false;
+    d.classList.toggle('l', _isTwo() && left);
+    d.classList.toggle('r', _isTwo() && !left);
     if (d.dataset.loaded) { delete d.dataset.loaded; RD.observer.unobserve(d); RD.observer.observe(d); }
   });
 }
 
 function _readerLoad(d) {
   // Ekran yoğunluğuna göre net görüntü; ölçek 0.25 adımlarına yuvarlanır
-  const want = Math.min(5, Math.max(0.5, Math.ceil(RD.scale * RD_PX * (window.devicePixelRatio || 1) * 4) / 4));
+  const want = Math.min(6, Math.max(0.5, Math.ceil(RD.scale * RD_PX * (window.devicePixelRatio || 1) * 4) / 4));
   if (d.dataset.loaded == want) return;
   d.dataset.loaded = want;
   d.querySelector('img').src = `/api/view/${d.dataset.i}?s=${want}&t=${S.ts}`;
 }
 
-function readerGo(i, instant) {
+function readerGo(i, fromEnd) {
   if (!RD.sizes.length || isNaN(i)) return;
   i = Math.max(0, Math.min(i, RD.sizes.length - 1));
+  const v = document.getElementById('viewer');
+  if (RD.layout === 'single') {
+    document.querySelectorAll('#reader .rd-page.cur').forEach(d => d.classList.remove('cur'));
+    const d = document.querySelector(`#reader .rd-page[data-i="${i}"]`);
+    if (d) d.classList.add('cur');
+    _readerSetCurrent(i);
+    if (RD.zoom === 'fit-page') _readerLayout();   // sayfa boyutları farklı olabilir
+    v.scrollTop = fromEnd ? v.scrollHeight : 0;
+    return;
+  }
   const d = document.querySelector(`#reader .rd-page[data-i="${i}"]`);
-  if (d) document.getElementById('viewer').scrollTop = d.offsetTop - 12;
+  if (d) v.scrollTop = d.offsetTop - 12;
   _readerSetCurrent(i);
 }
+
+const _readerStep = () => _isTwo() ? 2 : 1;
 
 function _readerSetCurrent(i) {
   S.currentPage = i;
@@ -5166,67 +5281,181 @@ function _readerSetCurrent(i) {
   if (th) { th.classList.add('selected'); th.scrollIntoView({block: 'nearest'}); }
 }
 
-function readerSetZoom(z) {
+function readerSetLayout(l) {
+  RD.layout = l;
+  _savePref('rdLayout', l);
+  document.getElementById('rd-layout').value = l;
   const anchor = S.currentPage;
-  if (z === 'fit-width' || z === 'fit-page') RD.zoom = z;
-  else { RD.zoom = 'custom'; RD.scale = Math.min(5, Math.max(0.1, parseFloat(z))); }
   _readerLayout();
-  _readerSyncZoomSel();
-  readerGo(anchor, true);
+  readerGo(anchor);
 }
 
-function _readerSyncZoomSel() {
-  const sel = document.getElementById('rd-zoom');
-  if (RD.zoom !== 'custom') { sel.value = RD.zoom; return; }
-  const opt = [...sel.options].find(o => !isNaN(+o.value) && o.value !== '' && Math.abs(+o.value - RD.scale) < 0.001);
-  if (opt) { sel.value = opt.value; return; }
-  sel.options[sel.options.length - 1].textContent = Math.round(RD.scale * 100) + '%';
-  sel.value = 'custom';
+function readerSetZoom(z) {
+  const anchor = S.currentPage;
+  _applyZoomValue(RD, z);
+  _savePref('rdZoom', RD.zoom === 'custom' ? RD.scale : RD.zoom);
+  _readerLayout();
+  _syncZoomSel('rd-zoom', RD);
+  readerGo(anchor);
 }
 
 function readerZoomStep(dir) {
-  const steps = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4, 5];
-  const cur = RD.scale;
-  const next = dir > 0 ? steps.find(z => z > cur + 0.001) : [...steps].reverse().find(z => z < cur - 0.001);
+  const next = _nextZoom(RD.scale, dir);
   if (next) readerSetZoom(String(next));
+}
+
+// ── Ortak yakınlaştırma yardımcıları (okuma ve düzenleme) ──
+function _applyZoomValue(o, z) {
+  if (z === 'auto' || z === 'fit-width' || z === 'fit-page') o.zoom = z;
+  else { o.zoom = 'custom'; o.scale = Math.min(5, Math.max(0.1, parseFloat(z))); }
+}
+
+function _nextZoom(cur, dir) {
+  return dir > 0 ? ZOOM_STEPS.find(z => z > cur + 0.001) : [...ZOOM_STEPS].reverse().find(z => z < cur - 0.001);
+}
+
+function _syncZoomSel(id, o) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  const custom = sel.querySelector('option[value="custom"]');
+  if (o.zoom !== 'custom') {
+    // Sığdırma seçiliyken gerçek yüzde de görünsün
+    sel.value = o.zoom;
+  } else {
+    const opt = [...sel.options].find(x => x.value !== '' && !isNaN(+x.value) && Math.abs(+x.value - o.scale) < 0.001);
+    if (opt) sel.value = opt.value;
+    else { custom.textContent = Math.round(o.scale * 100) + '%'; sel.value = 'custom'; }
+  }
+  const pct = document.getElementById(id + '-pct');
+  if (pct) pct.textContent = Math.round(o.scale * 100) + '%';
 }
 
 function readerKey(e) {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
   const v = document.getElementById('viewer');
-  if (e.key === 'PageDown' || e.key === 'ArrowRight') { e.preventDefault(); readerGo(S.currentPage + 1); }
-  else if (e.key === 'PageUp' || e.key === 'ArrowLeft') { e.preventDefault(); readerGo(S.currentPage - 1); }
+  const single = RD.layout === 'single';
+  if (e.key === 'PageDown' || e.key === 'ArrowRight' || (e.key === ' ' && single)) { e.preventDefault(); readerGo(S.currentPage + _readerStep()); }
+  else if (e.key === 'PageUp' || e.key === 'ArrowLeft') { e.preventDefault(); readerGo(S.currentPage - _readerStep()); }
   else if (e.key === 'Home' && !e.ctrlKey) { e.preventDefault(); readerGo(0); }
   else if (e.key === 'End' && !e.ctrlKey) { e.preventDefault(); readerGo(RD.sizes.length - 1); }
-  else if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')) { e.preventDefault(); readerZoomStep(1); }
-  else if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); readerZoomStep(-1); }
-  else if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); readerSetZoom('fit-width'); }
   else if (e.key === 'ArrowDown') { e.preventDefault(); v.scrollTop += 60; }
   else if (e.key === 'ArrowUp') { e.preventDefault(); v.scrollTop -= 60; }
 }
+
+// ── Düzenleme görünümünde yakınlaştırma ──
+const EZ = {zoom: 'auto', scale: 1};
+try {
+  const z = localStorage.getItem('edZoom');
+  if (z === 'auto' || z === 'fit-width' || z === 'fit-page') EZ.zoom = z;
+  else if (z && !isNaN(+z)) { EZ.zoom = 'custom'; EZ.scale = +z; }
+} catch (e) {}
+
+function _editScale(pw, ph) {
+  const v = document.getElementById('viewer');
+  const fitW = (v.clientWidth - 56) / (pw * RD_PX);
+  if (EZ.zoom === 'auto') return Math.min(fitW, 1.5);   // genişliğe sığdır, en fazla %150
+  if (EZ.zoom === 'fit-width') return Math.min(fitW, 4);
+  if (EZ.zoom === 'fit-page') return Math.min((v.clientWidth - 56) / (pw * RD_PX), (v.clientHeight - 48) / (ph * RD_PX));
+  return EZ.scale;
+}
+
+// Sunucudan istenecek görüntü çözünürlüğü (1.0 = 72 DPI); büyütünce bulanıklaşmasın
+function _editRenderZoom() {
+  const need = EZ.scale * RD_PX * (window.devicePixelRatio || 1);
+  return Math.min(6, Math.max(2, Math.ceil(need * 2) / 2));
+}
+
+function editApplyZoom() {
+  const img = document.getElementById('page-img');
+  if (!img.naturalWidth || S.readMode) return;
+  const pz = img._zoom || 2;
+  const pw = img.naturalWidth / pz, ph = img.naturalHeight / pz;
+  EZ.scale = Math.max(0.1, _editScale(pw, ph));
+  img.style.maxWidth = 'none';
+  img.style.width = Math.round(pw * RD_PX * EZ.scale) + 'px';
+  _syncZoomSel('ez-zoom', EZ);
+  // Daha yüksek çözünürlük gerekiyorsa sayfayı yeniden iste
+  if (_editRenderZoom() > pz + 0.01 && !img._reloading) {
+    img._reloading = true;
+    selectPage(S.currentPage).finally(() => { img._reloading = false; });
+  }
+}
+
+function editSetZoom(z) {
+  _applyZoomValue(EZ, z);
+  _savePref('edZoom', EZ.zoom === 'custom' ? EZ.scale : EZ.zoom);
+  editApplyZoom();
+}
+
+function editZoomStep(dir) {
+  const next = _nextZoom(EZ.scale, dir);
+  if (next) editSetZoom(String(next));
+}
+
+function zoomStep(dir) { S.readMode ? readerZoomStep(dir) : editZoomStep(dir); }
+function zoomFit() { S.readMode ? readerSetZoom('fit-width') : editSetZoom('auto'); }
+
+// ── Küçük resim paneli ve tam ekran ──
+function toggleThumbs() {
+  const off = document.body.classList.toggle('no-thumbs');
+  _savePref('noThumbs', off ? '1' : '');
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 0);
+}
+try { if (localStorage.getItem('noThumbs') === '1') document.body.classList.add('no-thumbs'); } catch (e) {}
+
+async function toggleFullscreen() {
+  const on = !document.body.classList.contains('fullscreen');
+  document.body.classList.toggle('fullscreen', on);
+  // Uygulama penceresi tam ekrana geçer; tarayıcıda çalışıyorsa sayfa tam ekranı kullanılır
+  const r = await post('/api/fullscreen', {on}).catch(() => ({ok: false}));
+  if (!r.ok) {
+    try {
+      if (on && !document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else if (!on && document.fullscreenElement) await document.exitFullscreen();
+    } catch (e) {}
+  }
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
+}
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) document.body.classList.remove('fullscreen');
+});
 
 (() => {
   const v = document.getElementById('viewer');
   // Kaydırırken geçerli sayfayı güncelle
   v.addEventListener('scroll', () => {
-    if (!S.readMode || !RD.sizes.length) return;
+    if (!S.readMode || !RD.sizes.length || RD.layout === 'single') return;
     const mid = v.scrollTop + v.clientHeight / 3;
     const pages = document.querySelectorAll('#reader .rd-page');
     let cur = 0;
     for (const d of pages) { if (d.offsetTop <= mid) cur = +d.dataset.i; else break; }
     if (cur !== S.currentPage) _readerSetCurrent(cur);
   }, {passive: true});
-  // Ctrl + tekerlek: yakınlaştır / uzaklaştır
+  // Ctrl + tekerlek: yakınlaştır / uzaklaştır (pencerenin kendi yakınlaştırması yerine)
+  let wacc = 0, wlock = 0;
   v.addEventListener('wheel', e => {
-    if (!S.readMode || !e.ctrlKey) return;
+    if (!S.pageCount) return;
+    if (e.ctrlKey) { e.preventDefault(); zoomStep(e.deltaY < 0 ? 1 : -1); return; }
+    // Tek sayfa görünümü: sayfanın sonuna/başına gelince sonraki/önceki sayfa
+    if (!S.readMode || RD.layout !== 'single') return;
+    const atBottom = v.scrollTop + v.clientHeight >= v.scrollHeight - 2;
+    const atTop = v.scrollTop <= 1;
+    if ((e.deltaY > 0 && !atBottom) || (e.deltaY < 0 && !atTop)) { wacc = 0; return; }
     e.preventDefault();
-    readerZoomStep(e.deltaY < 0 ? 1 : -1);
+    if (Date.now() < wlock) return;
+    wacc += e.deltaY;
+    if (wacc > 60 && S.currentPage < RD.sizes.length - 1) { wacc = 0; wlock = Date.now() + 350; readerGo(S.currentPage + 1); }
+    else if (wacc < -60 && S.currentPage > 0) { wacc = 0; wlock = Date.now() + 350; readerGo(S.currentPage - 1, true); }
   }, {passive: false});
   let rt;
   window.addEventListener('resize', () => {
-    if (!S.readMode || RD.zoom === 'custom') return;
     clearTimeout(rt);
-    rt = setTimeout(() => { const a = S.currentPage; _readerLayout(); readerGo(a, true); }, 150);
+    rt = setTimeout(() => {
+      if (S.readMode) {
+        if (RD.zoom === 'custom') return;
+        const a = S.currentPage; _readerLayout(); _syncZoomSel('rd-zoom', RD); readerGo(a);
+      } else if (EZ.zoom !== 'custom') editApplyZoom();
+    }, 150);
   });
 })();
 

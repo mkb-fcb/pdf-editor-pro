@@ -685,7 +685,9 @@ def api_page(i):
     doc = state['doc']
     if not doc or i >= len(doc):
         return ('', 404)
-    mat = fitz.Matrix(2.0, 2.0)
+    # z: görüntü ölçeği (1.0 = 72 DPI); düzenleme görünümü yakınlaştırınca daha net görüntü ister
+    zoom = min(max(request.args.get('z', 2.0, type=float), 1.0), 6.0)
+    mat = fitz.Matrix(zoom, zoom)
     pix = doc[i].get_pixmap(matrix=mat)
     data = base64.b64encode(pix.tobytes('png')).decode()
     return jsonify({
@@ -693,7 +695,7 @@ def api_page(i):
         'img': data,
         'pdf_w': doc[i].rect.width,
         'pdf_h': doc[i].rect.height,
-        'zoom': 2.0
+        'zoom': zoom
     })
 
 
@@ -1495,6 +1497,21 @@ def api_store_buy():
     if status == _iap.NOT_PURCHASED:
         return jsonify({'ok': False, 'cancelled': True})
     return jsonify({'ok': False, 'error': 'Satın alma tamamlanamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.'})
+
+
+@app.route('/api/fullscreen', methods=['POST'])
+def api_fullscreen():
+    """Uygulama penceresini tam ekrana alır / çıkarır ({on: bool})."""
+    try:
+        import webview
+        win = webview.windows[0]
+    except Exception:
+        return jsonify({'ok': False})
+    on = bool((request.json or {}).get('on'))
+    if on != state.get('fullscreen', False):
+        win.toggle_fullscreen()
+        state['fullscreen'] = on
+    return jsonify({'ok': True})
 
 
 @app.route('/api/open_link', methods=['POST'])
