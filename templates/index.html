@@ -1017,11 +1017,11 @@ body.read-mode #reader {
 <div id="demo-banner">
   <span>
     🎯 <strong data-i18n="demoBannerTitle">DEMO SÜRÜMÜ</strong>
-    <span data-i18n="demoBannerDesc"> — Maksimum 3 sayfa açılabilir, kaydedilen dosyalara filigran eklenir.</span>
+    <span data-i18n="demoBannerDesc"> — Okuma ve yazdırma ücretsiz; düzenleme ilk 3 sayfada, kaydedilen dosyalara filigran eklenir.</span>
   </span>
   <span style="display:flex;gap:6px">
     {% if can_activate %}<a href="/activate" style="background:#0891b2" data-i18n="demoBannerActivate">🔑 Lisans Gir</a>{% endif %}
-    <a href="#" onclick="openLink('buy'); return false" data-i18n="demoBannerBuy">Tam Sürümü Satın Al — $9.99</a>
+    <a href="#" onclick="buyFull(); return false" data-i18n="demoBannerBuy">Tam Sürümü Satın Al — $9.99</a>
   </span>
 </div>
 {% endif %}
@@ -1987,7 +1987,7 @@ const LANGS = {
     exportDone: 'İndirildi', exportErr: 'Dışa aktarma hatası', noDocErr: 'Önce bir PDF açın',
     dragPdfOnly: 'Sadece PDF dosyası',
     demoBannerTitle: 'DEMO SÜRÜMÜ',
-    demoBannerDesc: ' — Maksimum 3 sayfa açılabilir, kaydedilen dosyalara filigran eklenir.',
+    demoBannerDesc: ' — Okuma ve yazdırma ücretsiz; düzenleme ilk 3 sayfada, kaydedilen dosyalara filigran eklenir.',
     demoBannerBuy: 'Tam Sürümü Satın Al — $9.99',
     demoBannerActivate: '🔑 Lisans Gir',
     demoTruncated: 'Bu dosya 3 sayfadan fazla. Demo sürümde yalnızca ilk 3 sayfa açıldı.',
@@ -2125,7 +2125,7 @@ const LANGS = {
     exportDone: 'Downloaded', exportErr: 'Export error', noDocErr: 'Open a PDF first',
     dragPdfOnly: 'PDF files only',
     demoBannerTitle: 'DEMO VERSION',
-    demoBannerDesc: ' — Max 3 pages can be opened. Saved files will have a watermark.',
+    demoBannerDesc: ' — Reading and printing are free; editing works on the first 3 pages and saved files get a watermark.',
     demoBannerBuy: 'Buy Full Version — $9.99',
     demoBannerActivate: '🔑 Enter License',
     demoTruncated: 'This file has more than 3 pages. Only the first 3 pages were opened in demo mode.',
@@ -2263,7 +2263,7 @@ const LANGS = {
     exportDone: 'Heruntergeladen', exportErr: 'Exportfehler', noDocErr: 'Zuerst eine PDF öffnen',
     dragPdfOnly: 'Nur PDF-Dateien',
     demoBannerTitle: 'DEMO-VERSION',
-    demoBannerDesc: ' — Max. 3 Seiten können geöffnet werden. Gespeicherte Dateien erhalten ein Wasserzeichen.',
+    demoBannerDesc: ' — Lesen und Drucken gratis; bearbeitet werden die ersten 3 Seiten, gespeicherte Dateien erhalten ein Wasserzeichen.',
     demoBannerBuy: 'Vollversion kaufen — $9.99',
     demoBannerActivate: '🔑 Lizenz eingeben',
     demoTruncated: 'Diese Datei hat mehr als 3 Seiten. Im Demo-Modus wurden nur die ersten 3 Seiten geöffnet.',
@@ -2401,7 +2401,7 @@ const LANGS = {
     exportDone: 'Descargado', exportErr: 'Error de exportación', noDocErr: 'Abra un PDF primero',
     dragPdfOnly: 'Solo archivos PDF',
     demoBannerTitle: 'VERSIÓN DEMO',
-    demoBannerDesc: ' — Máx. 3 páginas. Los archivos guardados tendrán marca de agua.',
+    demoBannerDesc: ' — Leer e imprimir es gratis; la edición funciona en las 3 primeras páginas y los archivos guardados llevan marca de agua.',
     demoBannerBuy: 'Comprar versión completa — $9.99',
     demoBannerActivate: '🔑 Introducir licencia',
     demoTruncated: 'Este archivo tiene más de 3 páginas. Solo se abrieron las primeras 3 en modo demo.',
@@ -2539,7 +2539,7 @@ const LANGS = {
     exportDone: 'Téléchargé', exportErr: "Erreur d'exportation", noDocErr: "Ouvrez d'abord un PDF",
     dragPdfOnly: 'Fichiers PDF uniquement',
     demoBannerTitle: 'VERSION DÉMO',
-    demoBannerDesc: ' — Max 3 pages. Les fichiers sauvegardés auront un filigrane.',
+    demoBannerDesc: ' — Lecture et impression gratuites ; l\'édition porte sur les 3 premières pages et les fichiers enregistrés ont un filigrane.',
     demoBannerBuy: 'Acheter la version complète — $9.99',
     demoBannerActivate: '🔑 Saisir la licence',
     demoTruncated: 'Ce fichier a plus de 3 pages. Seules les 3 premières ont été ouvertes en mode démo.',
@@ -2677,7 +2677,7 @@ const LANGS = {
     exportDone: 'Scaricato', exportErr: 'Errore di esportazione', noDocErr: 'Apri prima un PDF',
     dragPdfOnly: 'Solo file PDF',
     demoBannerTitle: 'VERSIONE DEMO',
-    demoBannerDesc: ' — Max 3 pagine. I file salvati avranno una filigrana.',
+    demoBannerDesc: ' — Lettura e stampa gratis; la modifica riguarda le prime 3 pagine e i file salvati hanno una filigrana.',
     demoBannerBuy: 'Acquista versione completa — $9.99',
     demoBannerActivate: '🔑 Inserisci licenza',
     demoTruncated: 'Questo file ha più di 3 pagine. Solo le prime 3 sono state aperte in modalità demo.',
@@ -2815,7 +2815,7 @@ const LANGS = {
     exportDone: 'Baixado', exportErr: 'Erro de exportação', noDocErr: 'Abra um PDF primeiro',
     dragPdfOnly: 'Somente arquivos PDF',
     demoBannerTitle: 'VERSÃO DEMO',
-    demoBannerDesc: ' — Máx. 3 páginas. Os arquivos salvos terão marca d\'água.',
+    demoBannerDesc: ' — Ler e imprimir é grátis; a edição funciona nas 3 primeiras páginas e os arquivos salvos recebem marca d\'água.',
     demoBannerBuy: 'Comprar versão completa — $9.99',
     demoBannerActivate: '🔑 Inserir licença',
     demoTruncated: 'Este arquivo tem mais de 3 páginas. Apenas as 3 primeiras foram abertas no modo demo.',
@@ -2953,7 +2953,7 @@ const LANGS = {
     exportDone: 'Загружено', exportErr: 'Ошибка экспорта', noDocErr: 'Сначала откройте PDF',
     dragPdfOnly: 'Только PDF файлы',
     demoBannerTitle: 'ДЕМО-ВЕРСИЯ',
-    demoBannerDesc: ' — Макс. 3 страницы. Сохранённые файлы будут с водяным знаком.',
+    demoBannerDesc: ' — Чтение и печать бесплатны; редактировать можно первые 3 страницы, на сохранённые файлы добавляется водяной знак.',
     demoBannerBuy: 'Купить полную версию — $9.99',
     demoBannerActivate: '🔑 Ввести лицензию',
     demoTruncated: 'Файл содержит больше 3 страниц. В демо-режиме открыты только первые 3.',
@@ -3094,6 +3094,7 @@ function setLang(code) {
   applyI18n();
   if (!S.pageCount) document.getElementById('tb-filename').textContent = t('noFile');
   trxApplyAll();
+  if (typeof applyStorePrice === 'function') applyStorePrice();
 }
 
 // ── Sabit metin çeviri katmanı ────────────────────────────
@@ -3111,6 +3112,8 @@ TXR.push(
    "Versione demo: puoi leggere e stampare l'intero documento. La modifica riguarda le prime 3 pagine.",
    "Versão demo: você pode ler e imprimir o documento inteiro. A edição funciona nas 3 primeiras páginas.",
    "Демоверсия: весь документ можно читать и печатать. Редактировать можно первые 3 страницы."],
+  ["Tam sürüm etkinleştirildi. Teşekkürler!", "Full version activated. Thank you!", "Vollversion aktiviert. Vielen Dank!", "Versión completa activada. ¡Gracias!", "Version complète activée. Merci !", "Versione completa attivata. Grazie!", "Versão completa ativada. Obrigado!", "Полная версия активирована. Спасибо!"],
+  ["Satın alma tamamlanamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.", "The purchase could not be completed. Check your internet connection and try again.", "Der Kauf konnte nicht abgeschlossen werden. Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.", "No se pudo completar la compra. Compruebe su conexión a internet e inténtelo de nuevo.", "L'achat n'a pas pu aboutir. Vérifiez votre connexion internet et réessayez.", "Impossibile completare l'acquisto. Controlla la connessione a internet e riprova.", "Não foi possível concluir a compra. Verifique sua conexão com a internet e tente novamente.", "Не удалось завершить покупку. Проверьте подключение к интернету и попробуйте снова."],
   ["Okuma Modu", "Reading Mode", "Lesemodus", "Modo lectura", "Mode lecture", "Modalità lettura", "Modo de leitura", "Режим чтения"],
   ["Düzenle", "Edit", "Bearbeiten", "Editar", "Modifier", "Modifica", "Editar", "Редактировать"],
   ["Düzenleme araçlarını aç", "Open editing tools", "Bearbeitungswerkzeuge öffnen", "Abrir herramientas de edición", "Ouvrir les outils d'édition", "Apri strumenti di modifica", "Abrir ferramentas de edição", "Открыть инструменты редактирования"],
@@ -4656,6 +4659,30 @@ async function doCompress() {
 }
 
 function openLink(key) { post('/api/open_link', { key }); }
+
+// Satın alma: Store sürümünde Microsoft'un ödeme penceresi, aksi halde Gumroad sayfası
+async function buyFull() {
+  spin(true);
+  const r = await post('/api/store/buy', {}).catch(() => ({fallback: true}));
+  spin(false);
+  if (r.licensed) { toast('Tam sürüm etkinleştirildi. Teşekkürler!', 'ok'); setTimeout(() => location.reload(), 1500); return; }
+  if (r.fallback) { openLink('buy'); return; }
+  if (r.error) toast(r.error, 'err');
+}
+
+// Store fiyatı ülkeye göre farklı olabilir: bannerdaki fiyatı Store'un gösterdiğiyle değiştir
+let _storePrice = '';
+function applyStorePrice() {
+  if (!_storePrice) return;
+  document.querySelectorAll('[data-i18n="demoBannerBuy"]').forEach(el => {
+    el.textContent = el.textContent.replace(/\$\s?9[.,]99|9[.,]99\s?\$/, _storePrice);
+  });
+}
+if (document.getElementById('demo-banner')) {
+  fetch('/api/store/price').then(x => x.json()).then(r => {
+    if (r.ok && r.price) { _storePrice = r.price; applyStorePrice(); }
+  }).catch(() => {});
+}
 
 // Store rating: counted after successful saves; the backend decides when (Store build, engaged user, not dismissed)
 async function ratePing() {

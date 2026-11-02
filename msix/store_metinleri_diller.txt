@@ -32,7 +32,7 @@ KONVERTIEREN & SCHÜTZEN
 Oberfläche in 8 Sprachen: Deutsch, Englisch, Türkisch, Französisch, Spanisch, Italienisch, Portugiesisch und Russisch.
 
 KOSTENLOSE DEMO & VOLLVERSION
-Ohne Lizenz läuft die App als kostenlose Demo: Ganze Dokumente lesen und drucken ist gratis, bearbeitet werden die ersten 3 Seiten, gespeicherte Dateien mit „DEMO“-Wasserzeichen; Passwortschutz sowie Export nach Word/Excel/PowerPoint/JPG/EPUB sind deaktiviert. Für die Vollversion kaufen Sie einen Lizenzschlüssel auf https://mkbsoft.net und geben ihn über „Lizenz eingeben“ ein. Einzelplatzlizenz: $9.99 einmalig für 1 PC. Unternehmenslizenz: $29.99 einmalig für bis zu 5 PCs. Kein Abo.
+Ohne Lizenz läuft die App als kostenlose Demo: Ganze Dokumente lesen und drucken ist gratis, bearbeitet werden die ersten 3 Seiten, gespeicherte Dateien mit „DEMO“-Wasserzeichen; Passwortschutz sowie Export nach Word/Excel/PowerPoint/JPG/EPUB sind deaktiviert. Für die Vollversion klicken Sie in der App auf „Vollversion kaufen“ und bezahlen über den Microsoft Store (einmalig, kein Abo). Ein auf https://mkbsoft.net gekaufter Lizenzschlüssel funktioniert ebenfalls über „Lizenz eingeben“; dort gibt es auch die Unternehmenslizenz für bis zu 5 PCs ($29.99 einmalig).
 
 --- What's new in this version ---
 • PDF zu E-Book: PDFs in EPUB umwandeln — mit umfließendem Text, Überschriften, Kapiteln, Bildern, Diagrammen und Tabellen.
@@ -97,7 +97,7 @@ CONVERTIR Y PROTEGER
 Interfaz en 8 idiomas: español, inglés, turco, alemán, francés, italiano, portugués y ruso.
 
 DEMO GRATUITA Y VERSIÓN COMPLETA
-Sin licencia, la app funciona como demo gratuita: leer e imprimir documentos completos es gratis, la edición funciona en las 3 primeras páginas, archivos guardados con marca de agua «DEMO» y sin protección con contraseña ni exportación a Word/Excel/PowerPoint/JPG/EPUB. Para la versión completa, compra una clave de licencia en https://mkbsoft.net e introdúcela con el botón «Introducir licencia». Licencia individual: $9.99 pago único para 1 PC. Licencia empresa: $29.99 pago único para hasta 5 PC. Sin suscripción.
+Sin licencia, la app funciona como demo gratuita: leer e imprimir documentos completos es gratis, la edición funciona en las 3 primeras páginas, archivos guardados con marca de agua «DEMO» y sin protección con contraseña ni exportación a Word/Excel/PowerPoint/JPG/EPUB. Para la versión completa, pulsa «Comprar versión completa» en la app y paga a través de Microsoft Store (pago único, sin suscripción). Una clave de licencia comprada en https://mkbsoft.net también funciona con el botón «Introducir licencia»; allí está la licencia de empresa para hasta 5 PC ($29.99 pago único).
 
 --- What's new in this version ---
 • PDF a libro electrónico: convierte PDF a EPUB con texto adaptable, títulos, capítulos, imágenes, gráficos y tablas.
@@ -162,7 +162,7 @@ CONVERTIR ET PROTÉGER
 Interface en 8 langues : français, anglais, turc, allemand, espagnol, italien, portugais et russe.
 
 DÉMO GRATUITE ET VERSION COMPLÈTE
-Sans licence, l’application fonctionne en démo gratuite : lecture et impression gratuites des documents entiers, édition limitée aux 3 premières pages, fichiers enregistrés avec un filigrane « DEMO », protection par mot de passe et export Word/Excel/PowerPoint/JPG/EPUB désactivés. Pour la version complète, achetez une clé de licence sur https://mkbsoft.net et saisissez-la via le bouton « Saisir la licence ». Licence individuelle : $9.99 en paiement unique pour 1 PC. Licence entreprise : $29.99 en paiement unique pour 5 PC maximum. Sans abonnement.
+Sans licence, l’application fonctionne en démo gratuite : lecture et impression gratuites des documents entiers, édition limitée aux 3 premières pages, fichiers enregistrés avec un filigrane « DEMO », protection par mot de passe et export Word/Excel/PowerPoint/JPG/EPUB désactivés. Pour la version complète, cliquez sur « Acheter la version complète » dans l’application et payez via le Microsoft Store (paiement unique, sans abonnement). Une clé de licence achetée sur https://mkbsoft.net fonctionne aussi via le bouton « Saisir la licence » ; la licence entreprise pour 5 PC maximum ($29.99 en paiement unique) y est disponible.
 
 --- What's new in this version ---
 • PDF en livre numérique : convertissez vos PDF en EPUB avec texte adaptable, titres, chapitres, images, graphiques et tableaux.
@@ -227,7 +227,7 @@ CONVERTI E PROTEGGI
 Interfaccia in 8 lingue: italiano, inglese, turco, tedesco, francese, spagnolo, portoghese e russo.
 
 DEMO GRATUITA E VERSIONE COMPLETA
-Senza licenza l’app funziona come demo gratuita: lettura e stampa gratuite di documenti interi, modifica limitata alle prime 3 pagine, file salvati con filigrana «DEMO», protezione con password ed esportazione in Word/Excel/PowerPoint/JPG/EPUB disattivate. Per la versione completa acquista una chiave di licenza su https://mkbsoft.net e inseriscila con il pulsante «Inserisci licenza». Licenza singola: $9.99 una tantum per 1 PC. Licenza aziendale: $29.99 una tantum per un massimo di 5 PC. Nessun abbonamento.
+Senza licenza l’app funziona come demo gratuita: lettura e stampa gratuite di documenti interi, modifica limitata alle prime 3 pagine, file salvati con filigrana «DEMO», protezione con password ed esportazione in Word/Excel/PowerPoint/JPG/EPUB disattivate. Per la versione completa fai clic su «Acquista versione completa» nell’app e paga tramite Microsoft Store (una tantum, nessun abbonamento). Anche una chiave di licenza acquistata su https://mkbsoft.net funziona con il pulsante «Inserisci licenza»; lì è disponibile la licenza aziendale per un massimo di 5 PC ($29.99 una tantum).
 
 --- What's new in this version ---
 • Da PDF a e-book: converti i PDF in EPUB con testo adattabile, titoli, capitoli, immagini, grafici e tabelle.
@@ -292,7 +292,7 @@ CONVERTER E PROTEGER
 Interface em 8 idiomas: português, inglês, turco, alemão, francês, espanhol, italiano e russo.
 
 DEMO GRÁTIS E VERSÃO COMPLETA
-Sem licença, o app funciona como demo grátis: ler e imprimir documentos inteiros é grátis, a edição funciona nas 3 primeiras páginas, arquivos salvos com marca d’água "DEMO" e proteção por senha e exportação para Word/Excel/PowerPoint/JPG/EPUB desativadas. Para a versão completa, compre uma chave de licença em https://mkbsoft.net e digite-a no botão "Inserir licença". Licença individual: US$ 9.99 pagamento único para 1 PC. Licença empresarial: US$ 29.99 pagamento único para até 5 PCs. Sem assinatura.
+Sem licença, o app funciona como demo grátis: ler e imprimir documentos inteiros é grátis, a edição funciona nas 3 primeiras páginas, arquivos salvos com marca d’água "DEMO" e proteção por senha e exportação para Word/Excel/PowerPoint/JPG/EPUB desativadas. Para a versão completa, clique em "Comprar versão completa" no app e pague pela Microsoft Store (pagamento único, sem assinatura). Uma chave de licença comprada em https://mkbsoft.net também funciona no botão "Inserir licença"; lá está a licença empresarial para até 5 PCs (US$ 29.99 pagamento único).
 
 --- What's new in this version ---
 • PDF para e-book: converta PDFs em EPUB com texto ajustável, títulos, capítulos, imagens, gráficos e tabelas.
@@ -357,7 +357,7 @@ PDF Editor Pro — быстрый и лёгкий редактор PDF для Wi
 Интерфейс на 8 языках: русский, английский, турецкий, немецкий, французский, испанский, итальянский и португальский.
 
 БЕСПЛАТНАЯ ДЕМО И ПОЛНАЯ ВЕРСИЯ
-Без лицензии приложение работает как бесплатная демо: документы целиком можно читать и печатать бесплатно, редактировать — первые 3 страницы, сохранённые файлы с водяным знаком «DEMO», защита паролем и экспорт в Word/Excel/PowerPoint/JPG/EPUB отключены. Для полной версии купите лицензионный ключ на https://mkbsoft.net и введите его кнопкой «Ввести лицензию». Индивидуальная лицензия: $9.99 разово на 1 ПК. Корпоративная лицензия: $29.99 разово до 5 ПК. Без подписки.
+Без лицензии приложение работает как бесплатная демо: документы целиком можно читать и печатать бесплатно, редактировать — первые 3 страницы, сохранённые файлы с водяным знаком «DEMO», защита паролем и экспорт в Word/Excel/PowerPoint/JPG/EPUB отключены. Для полной версии нажмите в приложении «Купить полную версию» и оплатите через Microsoft Store (разово, без подписки). Лицензионный ключ, купленный на https://mkbsoft.net, тоже работает через кнопку «Ввести лицензию»; там же доступна корпоративная лицензия до 5 ПК ($29.99 разово).
 
 --- What's new in this version ---
 • PDF в электронную книгу: конвертация PDF в EPUB с переносом текста, заголовками, главами, изображениями, диаграммами и таблицами.

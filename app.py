@@ -25,6 +25,7 @@ app = Flask(__name__,
 state = {'doc': None, 'path': None, 'history': []}
 
 import license as _lic
+import store_iap as _iap
 
 MAX_HISTORY = 15
 
@@ -263,7 +264,8 @@ def is_demo() -> bool:
     # is_licensed() may hit the license server, so check once per run
     global _licensed_cache
     if _licensed_cache is None:
-        _licensed_cache = _lic.is_licensed()
+        # Gumroad license key, or the full-version add-on bought in the Microsoft Store
+        _licensed_cache = _lic.is_licensed() or _iap.owns_full()
     return not _licensed_cache
 
 
@@ -1468,6 +1470,31 @@ def api_kindle_usb_eject():
     import kindle_usb
     k = state.get('kindle_usb') or kindle_usb.find_kindle()
     return jsonify({'ok': bool(k) and kindle_usb.eject(k)})
+
+
+@app.route('/api/store/price')
+def api_store_price():
+    """Localized Store price of the full-version add-on (Store build only)."""
+    if not is_demo():
+        return jsonify({'ok': False})
+    info = _iap.full_product()
+    return jsonify({'ok': bool(info), 'price': info[1] if info else ''})
+
+
+@app.route('/api/store/buy', methods=['POST'])
+def api_store_buy():
+    """Buys the full version through the Microsoft Store. {fallback: true} → use the Gumroad link."""
+    global _licensed_cache
+    info = _iap.full_product()
+    if not info:
+        return jsonify({'ok': False, 'fallback': True})
+    status = _iap.purchase(info[0])
+    if status in (_iap.SUCCEEDED, _iap.ALREADY_PURCHASED):
+        _licensed_cache = True
+        return jsonify({'ok': True, 'licensed': True})
+    if status == _iap.NOT_PURCHASED:
+        return jsonify({'ok': False, 'cancelled': True})
+    return jsonify({'ok': False, 'error': 'Satın alma tamamlanamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.'})
 
 
 @app.route('/api/open_link', methods=['POST'])
