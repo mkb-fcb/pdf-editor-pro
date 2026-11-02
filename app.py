@@ -395,6 +395,81 @@ def _span_at(page_dict, rect):
     return best
 
 
+def _embedded_font(page, span_font):
+    """Buffer of the page's embedded font that the span uses, or None."""
+    if not span_font:
+        return None
+    for f in page.get_fonts(full=True):
+        xref, ext, basefont = f[0], f[1], f[3]
+        if span_font not in (basefont, basefont.split('+', 1)[-1]) or ext in ('', 'n/a'):
+            continue
+        try:
+            buf = page.parent.extract_font(xref)[3]
+        except Exception:
+            continue
+        if buf:
+            return buf
+    return None
+
+
+def _match_font(page, span_font, flags, orig_text, orig_width, orig_size, new_text, keep_style=True):
+    """Font for re-typing a line so it looks like the original. Call BEFORE redaction.
+
+    1. The PDF's own embedded font, if it reproduces the original line at its original width
+       (proves the glyph mapping is usable) and has every character of the new text.
+    2. Otherwise the closest Windows font. Fonts look bigger or smaller at the same point size
+       (Calibri is much smaller than DejaVu or Roboto), so the size is scaled until the original
+       text would have had its original width.
+    Returns ({'buffer': bytes} | {'fontfile', 'fontname'}, size factor)."""
+    orig = (orig_text or '').strip()
+    if keep_style and orig and orig_width > 2:
+        buf = _embedded_font(page, span_font)
+        if buf:
+            try:
+                f = fitz.Font(fontbuffer=buf)
+                if all(f.has_glyph(ord(ch)) for ch in set(new_text) - set(orig)):
+                    w = f.text_length(orig, fontsize=orig_size)
+                    if w and abs(w - orig_width) / orig_width < 0.04:
+                        return {'buffer': buf}, 1.0
+            except Exception:
+                pass
+    lookup = span_font or ''
+    if not (flags & 16):
+        lookup = re.sub(r'(?i)(bold|heavy|black|demi)', '', lookup).strip(' -_') or lookup
+    if not (flags & 2):
+        lookup = re.sub(r'(?i)(italic|oblique|slant)', '', lookup).strip(' -_') or lookup
+    ff, fn, _, _ = resolve_font(lookup, flags) if lookup else (UNICODE_FONT, UNICODE_FONTNAME, 0, 0)
+    if not ff:
+        return {}, 1.0
+    factor = 1.0
+    if orig and orig_width > 5 and len(orig) >= 3:
+        try:
+            w = fitz.Font(fontfile=ff).text_length(orig, fontsize=orig_size)
+            if w > 0:
+                factor = min(1.3, max(0.77, orig_width / w))
+        except Exception:
+            pass
+    return {'fontfile': ff, 'fontname': fn}, factor
+
+
+def _font_kwargs(page, spec):
+    """insert_text keyword arguments for a _match_font() result (registers an embedded font)."""
+    if 'buffer' in spec:
+        name = 'E' + format(abs(hash(spec['buffer'])) % 10**8, 'd')
+        page.insert_font(fontname=name, fontbuffer=spec['buffer'])
+        return {'fontname': name}
+    return dict(spec)
+
+
+def _text_width(spec, text, size):
+    try:
+        f = fitz.Font(fontbuffer=spec['buffer']) if 'buffer' in spec else \
+            fitz.Font(fontfile=spec['fontfile']) if spec.get('fontfile') else fitz.Font('helv')
+        return f.text_length(text, fontsize=size)
+    except Exception:
+        return 0
+
+
 def resolve_font(pdf_fontname, flags=0):
     """PDF font adı + flags'ten Windows font dosyasını bul."""
     name = pdf_fontname or ''
@@ -423,6 +498,15 @@ def resolve_font(pdf_fontname, flags=0):
         'segoeui':       ('segoeui.ttf',  'segoeuib.ttf', 'segoeuii.ttf', 'segoeuiz.ttf'),
         'cambria':       ('cambria.ttc',  'cambriab.ttf', 'cambriai.ttf', 'cambriaz.ttf'),
         'garamond':      ('GARA.TTF',     'GARAB.TTF',    'GARAI.TTF',    'GARABI.TTF'),
+        # Fonts that are not installed: nearest look-alike (sans before serif: "sansserif")
+        'sans':          ('arial.ttf',    'arialbd.ttf',  'ariali.ttf',   'arialbi.ttf'),
+        'roboto':        ('arial.ttf',    'arialbd.ttf',  'ariali.ttf',   'arialbi.ttf'),
+        'arimo':         ('arial.ttf',    'arialbd.ttf',  'ariali.ttf',   'arialbi.ttf'),
+        'lato':          ('arial.ttf',    'arialbd.ttf',  'ariali.ttf',   'arialbi.ttf'),
+        'serif':         ('times.ttf',    'timesbd.ttf',  'timesi.ttf',   'timesbi.ttf'),
+        'tinos':         ('times.ttf',    'timesbd.ttf',  'timesi.ttf',   'timesbi.ttf'),
+        'minion':        ('times.ttf',    'timesbd.ttf',  'timesi.ttf',   'timesbi.ttf'),
+        'palatino':      ('pala.ttf',     'palab.ttf',    'palai.ttf',    'palabi.ttf'),
     }
 
     idx = (1 if is_bold else 0) + (2 if is_italic else 0)
@@ -890,13 +974,18 @@ def api_replaceblock():
     if force_italic is not None:
         effective_flags = (effective_flags | 2) if force_italic else (effective_flags & ~2)
     sz         = float(data.get('size', 12))
+    orig_size  = float(data.get('orig_size') or sz)
     color      = tuple(data.get('color', [0, 0, 0]))
 
     page = doc[page_idx]
     pdf_w, pdf_h = page.rect.width, page.rect.height
     block_rect = fitz.Rect(bx0 * pdf_w, by0 * pdf_h, bx1 * pdf_w, by1 * pdf_h)
 
-    sz = max(sz, 5.0)
+    # Same font as the original (or a size-matched substitute); the user's size change is kept as a ratio
+    style_kept = effective_flags == font_flags
+    spec, factor = _match_font(page, pdf_font, effective_flags, data.get('original_text', ''),
+                               block_rect.width, orig_size, new_text, keep_style=style_kept)
+    sz = max(sz * factor, 5.0)
 
     push_history()
     page.add_redact_annot(block_rect, fill=(1, 1, 1))
@@ -904,33 +993,10 @@ def api_replaceblock():
 
     if new_text:
         kw = {'fontsize': sz, 'color': color}
-        if pdf_font:
-            # When effective_flags has no bold bit, also strip "bold" from the
-            # font name so resolve_font's name-based detection doesn't re-enable
-            # bold. (e.g. "CalibriBold" with flags=0 → look up as "Calibri")
-            lookup_font = pdf_font
-            if not (effective_flags & 16):
-                lookup_font = re.sub(r'(?i)(bold|heavy|black|demi)', '', lookup_font).strip(' -_') or lookup_font
-            if not (effective_flags & 2):
-                lookup_font = re.sub(r'(?i)(italic|oblique|slant)', '', lookup_font).strip(' -_') or lookup_font
-            ff, fn, _, _ = resolve_font(lookup_font, effective_flags)
-            if ff:
-                kw['fontfile'] = ff
-                kw['fontname'] = fn
-            elif UNICODE_FONT:
-                kw['fontfile'] = UNICODE_FONT
-                kw['fontname'] = UNICODE_FONTNAME
-        elif UNICODE_FONT:
-            kw['fontfile'] = UNICODE_FONT
-            kw['fontname'] = UNICODE_FONTNAME
+        kw.update(_font_kwargs(page, spec))
         page.insert_text(fitz.Point(block_rect.x0, baseline_y), new_text, **kw)
         if underline:
-            try:
-                ff = kw.get('fontfile')
-                font = fitz.Font(fontfile=ff) if ff else fitz.Font('helv')
-                tw = font.text_length(new_text, fontsize=sz)
-            except Exception:
-                tw = block_rect.width
+            tw = _text_width(spec, new_text, sz) or block_rect.width
             ul_y = baseline_y + sz * 0.12
             page.draw_line(
                 fitz.Point(block_rect.x0, ul_y),
@@ -980,15 +1046,16 @@ def api_movetext():
     text   = data['text']
     size   = float(data.get('size', 12))
     color  = tuple(data.get('color', [0, 0, 0]))
+    # Keep the original font when moving (it used to be rewritten in the default font)
+    spec, factor = _match_font(page, data.get('font'), int(data.get('flags', 0)), text,
+                               old_rect.width, size, text)
 
     push_history()
     page.add_redact_annot(old_rect, fill=(1, 1, 1))
     page.apply_redactions(graphics=0)
 
-    kw = {'fontsize': size, 'color': color}
-    if UNICODE_FONT:
-        kw['fontfile'] = UNICODE_FONT
-        kw['fontname'] = UNICODE_FONTNAME
+    kw = {'fontsize': max(size * factor, 5.0), 'color': color}
+    kw.update(_font_kwargs(page, spec))
     page.insert_text(fitz.Point(new_x, new_bl), text, **kw)
     return jsonify({'ok': True})
 

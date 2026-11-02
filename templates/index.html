@@ -3944,6 +3944,7 @@ function startEdit(div, block, clickEvent) {
       pdf_font:      block.font  || null,
       flags:         block.flags || 0,
       size:          chosenSize,
+      orig_size:     originalSize,
       force_bold:    forceBold,
       force_italic:  fmtItalic,
       underline:     fmtUnderline,
@@ -4414,7 +4415,9 @@ document.addEventListener('mouseup', async e => {
     new_x, new_baseline_y,
     text: drag.block.text,
     size: _defaultSz(drag.block),
-    color: drag.block.color || [0,0,0]
+    color: drag.block.color || [0,0,0],
+    font: drag.block.font || null,
+    flags: drag.block.flags || 0
   });
   spin(false);
   if (!r.ok) { toast('Taşıma başarısız', 'err'); return; }
