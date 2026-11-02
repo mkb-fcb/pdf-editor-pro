@@ -86,7 +86,7 @@
       "name": "Is there a free version of PDF Editor Pro?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. A free demo is available. It opens documents of up to 3 pages and adds a \"DEMO\" watermark to saved files. Password protection, printing and Word/Excel/PowerPoint/JPG export are available in the full version only. No license required for the demo."
+        "text": "Yes. A free demo is available. It reads and prints complete documents, and you can try the editing tools on the first 3 pages; saved files get a \"DEMO\" watermark. Password protection and Word/Excel/PowerPoint/JPG export are available in the full version only. No license required for the demo."
       }
     },
     {
@@ -1347,9 +1347,9 @@
       <div class="pricing-card">
         <div class="pricing-name" data-en="Demo" data-tr="Demo">Demo</div>
         <div class="pricing-price" style="color:var(--green)" data-en="Free" data-tr="Ücretsiz">Free</div>
-        <div class="pricing-period" data-en="3 pages · watermarked output" data-tr="3 sayfa · filigranli çıktı">3 pages · watermarked output</div>
+        <div class="pricing-period" data-en="Read &amp; print free · edit 3 pages" data-tr="Okuma ve yazdırma ücretsiz · 3 sayfa düzenleme">Read &amp; print free · edit 3 pages</div>
         <ul class="pricing-features">
-          <li data-en="Open PDFs up to 3 pages" data-tr="3 sayfaya kadar PDF aç">Open PDFs up to 3 pages</li>
+          <li data-en="Read and print any PDF in full" data-tr="Her PDF'i tamamen oku ve yazdır">Read and print any PDF in full</li>
           <li data-en="Try all editing features" data-tr="Tüm düzenleme özelliklerini dene">Try all editing features</li>
           <li data-en="Save with watermark" data-tr="Filigranla kaydet">Save with watermark</li>
           <li data-en="No license required" data-tr="Lisans gerekmez">No license required</li>
@@ -1468,9 +1468,9 @@
     <div class="demo-box">
       <span class="demo-icon">🎯</span>
       <h3 data-en="PDF Editor Pro Demo" data-tr="PDF Editör Pro Demo">PDF Editor Pro Demo</h3>
-      <p data-en="In the demo you can open, edit, merge, split and rotate. Limits: documents of up to 3 pages and a watermark on saved files. Password protection, printing, Word/Excel/PowerPoint/JPG/EPUB export and Send to Kindle are in the full version only." data-tr="Demoda açabilir, düzenleyebilir, birleştirebilir, bölebilir ve döndürebilirsin. Sınırlar: en fazla 3 sayfa ve kaydedilen dosyalarda filigran. Şifreleme, yazdırma, Word/Excel/PowerPoint/JPG/EPUB dışa aktarma ve Kindle'a gönderim yalnızca tam sürümde.">In the demo you can open, edit, merge, split and rotate. Limits: documents of up to 3 pages and a watermark on saved files. Password protection, printing, Word/Excel/PowerPoint/JPG/EPUB export and Send to Kindle are in the full version only.</p>
+      <p data-en="In the demo you can read and print any PDF in full, and try editing, merging, splitting and rotating. Limits: editing works on the first 3 pages and saved files get a watermark. Password protection, Word/Excel/PowerPoint/JPG/EPUB export and Send to Kindle are in the full version only." data-tr="Demoda her PDF'i tamamen okuyup yazdırabilir; düzenleme, birleştirme, bölme ve döndürmeyi deneyebilirsin. Sınırlar: düzenleme ilk 3 sayfada yapılır ve kaydedilen dosyalara filigran eklenir. Şifreleme, Word/Excel/PowerPoint/JPG/EPUB dışa aktarma ve Kindle'a gönderim yalnızca tam sürümde.">In the demo you can read and print any PDF in full, and try editing, merging, splitting and rotating. Limits: editing works on the first 3 pages and saved files get a watermark. Password protection, Word/Excel/PowerPoint/JPG/EPUB export and Send to Kindle are in the full version only.</p>
       <div class="demo-limits">
-        <div class="demo-limit-item">📄 <span data-en="3-page limit" data-tr="3 sayfa sınırı">3-page limit</span></div>
+        <div class="demo-limit-item">📄 <span data-en="Editing: first 3 pages" data-tr="Düzenleme: ilk 3 sayfa">Editing: first 3 pages</span></div>
         <div class="demo-limit-item">🏷 <span data-en="Watermark on save" data-tr="Kayıtta filigran">Watermark on save</span></div>
         <div class="demo-limit-item">✅ <span data-en="Core editing tools enabled" data-tr="Temel düzenleme araçları açık">Core editing tools enabled</span></div>
         <div class="demo-limit-item">🚫 <span data-en="No license needed" data-tr="Lisans gerekmez">No license needed</span></div>
@@ -1503,6 +1503,7 @@
       <li><a href="#gallery" data-en="Screenshots" data-tr="Ekran Görüntüleri">Screenshots</a></li>
       <li><a href="#ebook" data-en="E-book" data-tr="E-kitap">E-book</a></li>
       <li><a data-guide href="/send-pdf-to-kindle/" data-en="Send PDF to Kindle" data-tr="PDF'i Kindle'a gönder">Send PDF to Kindle</a></li>
+      <li><a data-free-guide href="/free-pdf-editor-no-crack/" data-en="Free PDF editor (no crack)" data-tr="Ücretsiz PDF editör (crack'siz)">Free PDF editor (no crack)</a></li>
       <li><a href="#features">Features</a></li>
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#faq">FAQ</a></li>
@@ -1548,12 +1549,14 @@ function setLang(lang) {
   document.querySelectorAll('.lang-card').forEach(c => c.classList.toggle('active', c.dataset.lang === lang));
   if (typeof showVideo === 'function') showVideo(lang);
   document.querySelectorAll('a[data-guide]').forEach(a => { a.href = KINDLE_GUIDES[lang] || KINDLE_GUIDES.en; });
+  document.querySelectorAll('a[data-free-guide]').forEach(a => { a.href = FREE_GUIDES[lang] || FREE_GUIDES.en; });
   const sel = document.getElementById('lang-select');
   if (sel) sel.value = lang;
   document.title = SITE_TITLES[lang];
   try { localStorage.setItem('lang', lang); } catch (e) {}
 }
 
+const FREE_GUIDES = {en: '/free-pdf-editor-no-crack/', tr: '/tr/pdf-editor-full-ucretsiz/', de: '/de/pdf-editor-kostenlos-ohne-crack/', es: '/es/editor-pdf-gratis-sin-crack/', fr: '/fr/editeur-pdf-gratuit-sans-crack/', it: '/it/editor-pdf-gratis-senza-crack/', pt: '/pt/editor-pdf-gratis-sem-crack/', ru: '/ru/pdf-redaktor-besplatno-bez-kryaka/'};
 const KINDLE_GUIDES = {en: '/send-pdf-to-kindle/', tr: '/tr/pdf-kindle-gonderme/', de: '/de/pdf-an-kindle-senden/', es: '/es/enviar-pdf-a-kindle/', fr: '/fr/envoyer-pdf-sur-kindle/', it: '/it/inviare-pdf-a-kindle/', pt: '/pt/enviar-pdf-para-kindle/', ru: '/ru/otpravit-pdf-na-kindle/'};
 const SITE_VIDEOS = {en: 'UDoxql62qK8', tr: 'Mb9A51Lgb9I', de: 'nG1L9S54GLw', es: 'mh86FYa6Eb0', fr: 'yd0NelENLn8', it: '3MV8G-7DZf0', pt: 'h75Pno2yG4Q', ru: 'uw06CtlESSM'};
 function showVideo(lang) {

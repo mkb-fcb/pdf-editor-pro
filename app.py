@@ -275,6 +275,38 @@ def _demo_truncate(doc) -> bool:
     return False
 
 
+def _demo_over_limit() -> bool:
+    """Demo modunda açık belge sayfa sınırını aşıyor mu (yalnızca okunabilir/yazdırılabilir)."""
+    doc = state['doc']
+    return bool(doc) and is_demo() and len(doc) > DEMO_MAX_PAGES
+
+
+# Demo modunda belgenin tamamı okunur ve yazdırılır; bunların dışındaki her API çağrısı
+# (düzenleme, kaydetme, dışa aktarma...) belgeyi önce ilk DEMO_MAX_PAGES sayfaya indirir.
+_DEMO_FULL_DOC_ENDPOINTS = {
+    'api_status', 'api_page_sizes', 'api_view', 'api_print_page', 'api_thumb',
+    'api_open', 'api_upload', 'api_browse', 'api_ui_lang', 'api_rate_prompt',
+    'api_activate', 'api_open_link', 'api_demo_edit',
+}
+
+
+@app.before_request
+def _demo_page_limit_guard():
+    if (request.path.startswith('/api/') and request.endpoint not in _DEMO_FULL_DOC_ENDPOINTS
+            and _demo_over_limit()):
+        _demo_truncate(state['doc'])
+
+
+@app.route('/api/demo_edit', methods=['POST'])
+def api_demo_edit():
+    """Okuma modundan düzenlemeye geçerken demo sayfa sınırını uygular."""
+    doc = state['doc']
+    if not doc:
+        return jsonify({'ok': False, 'error': 'Açık dosya yok'})
+    truncated = _demo_truncate(doc)
+    return jsonify({'ok': True, 'pages': len(doc), 'truncated': truncated})
+
+
 def _apply_demo_watermark(doc):
     """Tüm sayfalara çapraz DEMO filigranı ekle."""
     text = 'PDF Editör Pro — DEMO'
@@ -494,36 +526,52 @@ def api_open():
                 doc.close()
                 return jsonify({'ok': False, 'needs_password': True, 'wrong_password': True,
                                 'error': 'Şifre yanlış.'})
-        truncated = _demo_truncate(doc)
         _swap_doc(doc, path, data.get('name'))
         sigs   = detect_signatures(doc)
         fields = detect_form_fields(doc)
         return jsonify({'ok': True, 'pages': len(doc), 'name': _doc_name(),
                         'signatures': sigs, 'form_fields': fields,
-                        'demo_truncated': truncated})
+                        'demo_full': _demo_over_limit()})
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)})
 
 
 
-@app.route('/api/print')
-def api_print():
+@app.route('/api/page_sizes')
+def api_page_sizes():
+    """Okuma modu ve yazdırma için sayfa boyutları (pt) ve yazdırma izni."""
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Açık dosya yok'})
-    if is_demo():
-        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
-    try:
-        # Yapılan düzenlemeler yazdırılsın diye geçerli belge geçici dosyaya kaydedilir
-        fd, tmp = tempfile.mkstemp(suffix='.pdf', prefix='pdfeditor_yazdir_')
-        os.close(fd)
-        doc.save(tmp, garbage=1, deflate=True)
-        os.startfile(tmp, 'print')
-        return jsonify({'ok': True})
-    except AttributeError:
-        return jsonify({'ok': False, 'error': 'Yazdırma yalnızca Windows\'ta desteklenir'})
-    except Exception as e:
-        return jsonify({'ok': False, 'error': str(e)})
+    sizes = [[round(p.rect.width, 2), round(p.rect.height, 2)] for p in doc]
+    return jsonify({'ok': True, 'sizes': sizes, 'name': _doc_name(), 'print_block': ''})
+
+
+def _page_png(i, scale):
+    pix = state['doc'][i].get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=False)
+    resp = app.response_class(pix.tobytes('png'), mimetype='image/png')
+    resp.headers['Cache-Control'] = 'no-store'
+    return resp
+
+
+@app.route('/api/view/<int:i>')
+def api_view(i):
+    """Okuma modu: sayfa görüntüsü, istenen ölçekte (1.0 = 72 DPI)."""
+    doc = state['doc']
+    if not doc or not 0 <= i < len(doc):
+        return ('', 404)
+    scale = min(max(request.args.get('s', 1.5, type=float), 0.25), 5.0)
+    return _page_png(i, scale)
+
+
+@app.route('/api/print_page/<int:i>')
+def api_print_page(i):
+    """Yazdırma: sayfa görüntüsü. Düzenlemeler ve açıklamalar dahil, seçilen DPI'da."""
+    doc = state['doc']
+    if not doc or not 0 <= i < len(doc):
+        return ('', 404)
+    dpi = min(max(request.args.get('dpi', 150, type=int), 72), 600)
+    return _page_png(i, dpi / 72)
 
 
 @app.route('/api/text')
@@ -1137,14 +1185,13 @@ def api_upload():
                 return jsonify({'ok': False, 'needs_password': True, 'tmp_path': tmp,
                                 'name': f.filename,
                                 'error': 'Bu PDF şifreli. Açmak için şifreyi girin.'})
-        truncated = _demo_truncate(doc)
         _swap_doc(doc, tmp, f.filename)
         _cleanup_tmp(keep=tmp)
         sigs   = detect_signatures(doc)
         fields = detect_form_fields(doc)
         return jsonify({'ok': True, 'pages': len(doc), 'name': f.filename,
                         'signatures': sigs, 'form_fields': fields,
-                        'demo_truncated': truncated})
+                        'demo_full': _demo_over_limit()})
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)})
 
@@ -1218,7 +1265,8 @@ def api_undo():
 @app.route('/api/status')
 def api_status():
     if state['doc']:
-        return jsonify({'ok': True, 'pages': len(state['doc']), 'name': _doc_name()})
+        return jsonify({'ok': True, 'pages': len(state['doc']), 'name': _doc_name(),
+                        'demo_full': _demo_over_limit()})
     return jsonify({'ok': False})
 
 
@@ -2294,6 +2342,9 @@ if __name__ == '__main__':
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             return s.connect_ex(('localhost', PORT)) == 0
 
+    # Varsayılan PDF görüntüleyici olarak bir dosyayla açıldıysa okuma modunda başla
+    START_URL = f'http://localhost:{PORT}' + ('/?mode=read' if filepath else '')
+
     if port_in_use():
         # Uygulama zaten açık — dosyayı çalışan örneğe gönder, yeni pencere aç
         if filepath:
@@ -2307,7 +2358,7 @@ if __name__ == '__main__':
                 print(f'Dosya gonderilemedi: {e}')
         window = webview.create_window(
             'PDF Editor Pro',
-            f'http://localhost:{PORT}',
+            START_URL,
             width=1280, height=800,
             min_size=(900, 600),
         )
@@ -2316,7 +2367,6 @@ if __name__ == '__main__':
         if filepath:
             try:
                 doc = fitz.open(filepath)
-                _demo_truncate(doc)
                 state['doc'] = doc
                 state['path'] = filepath
             except Exception as e:
@@ -2330,7 +2380,7 @@ if __name__ == '__main__':
 
         window = webview.create_window(
             'PDF Editor Pro',
-            f'http://localhost:{PORT}',
+            START_URL,
             width=1280, height=800,
             min_size=(900, 600),
         )

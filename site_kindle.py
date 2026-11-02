@@ -619,14 +619,16 @@ def _strip(s):
 
 def write_sitemap():
     p = os.path.join(WEB, 'sitemap.xml')
-    urls = [('/', '1.0')] + [(s, '0.8') for s in SLUGS.values()]
+    import site_free   # imported here: site_free imports this module
+    urls = ([('/', '1.0', LASTMOD)] + [(s, '0.8', LASTMOD) for s in SLUGS.values()]
+            + [(s, '0.8', site_free.LASTMOD) for s in site_free.SLUGS.values()])
     body = ''.join(f'''  <url>
     <loc>{SITE}{u}</loc>
-    <lastmod>{LASTMOD}</lastmod>
+    <lastmod>{lm}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>{pr}</priority>
   </url>
-''' for u, pr in urls)
+''' for u, pr, lm in urls)
     open(p, 'w', encoding='utf-8', newline='\n').write(
         f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{body}</urlset>\n')
 

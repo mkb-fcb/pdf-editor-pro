@@ -969,6 +969,46 @@ body.has-file #sidebar {
   0%, 100% { box-shadow: 0 0 0 4px rgba(251,191,36,.25), 0 0 18px rgba(251,191,36,.45); }
   50%       { box-shadow: 0 0 0 8px rgba(251,191,36,.12), 0 0 28px rgba(251,191,36,.7); }
 }
+
+/* ── OKUMA MODU ── */
+#readerbar { display: none; }
+#reader { display: none; }
+body.read-mode #toolbar2, body.read-mode .rb-tabs, body.read-mode #qa-undo,
+body.read-mode #page-wrap, body.read-mode .thumb-ops, body.read-mode #format-bar { display: none !important; }
+body.read-mode #readerbar {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  background: #fff; border-bottom: 1px solid var(--border);
+  padding: 6px 12px; flex-shrink: 0; font-size: 13px;
+}
+body.read-mode #viewer { display: block; padding: 20px 0; }
+body.read-mode #reader {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  width: max-content; min-width: 100%; padding: 0 20px;
+}
+.rd-page { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.45); position: relative; flex-shrink: 0; }
+.rd-page img { width: 100%; height: 100%; display: block; }
+#readerbar .rd-btn { background: none; border: 1px solid transparent; border-radius: 6px; padding: 4px 8px;
+  display: inline-flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; color: var(--text); }
+#readerbar .rd-btn:hover { background: #f1f5f9; border-color: var(--border); }
+#readerbar .rd-btn .ri { width: 18px; height: 18px; }
+#readerbar .rd-sep { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
+#readerbar input, #readerbar select { font-size: 13px; padding: 3px 6px; border: 1px solid var(--border); border-radius: 5px; }
+#rd-page-input { width: 52px; text-align: center; }
+#readerbar .rd-edit { background: var(--primary); color: #fff; font-weight: 600; }
+#readerbar .rd-edit:hover { background: var(--primary-dark); color: #fff; }
+
+/* ── YAZDIRMA ── */
+#print-root { display: none; }
+@media print {
+  html, body { height: auto !important; overflow: visible !important; background: #fff !important; display: block !important; }
+  body > *:not(#print-root) { display: none !important; }
+  #print-root { display: block !important; }
+  .pp { width: 100%; height: calc(100vh - 2px); display: flex; align-items: center; justify-content: center;
+        overflow: hidden; break-after: page; page-break-after: always; break-inside: avoid; }
+  .pp:last-child { break-after: auto; page-break-after: auto; }
+  .pp.fit img { max-width: 100%; max-height: 100%; }
+  .pp.actual { align-items: flex-start; justify-content: flex-start; }
+}
 </style>
 </head>
 <body>
@@ -1048,6 +1088,7 @@ body.has-file #sidebar {
   <button class="qa" onclick="browseFile()" title="Aç"><svg class="ri" style="color:#f59e0b"><use href="#i-folder-open"/></svg></button>
   <button class="qa" id="qa-save" onclick="doSave()" disabled title="Kaydet"><svg class="ri" style="color:#2563eb"><use href="#i-save"/></svg></button>
   <button class="qa" id="qa-print" onclick="doPrint()" disabled title="Yazdır"><svg class="ri" style="color:#475569"><use href="#i-printer"/></svg></button>
+  <button class="qa" id="qa-read" onclick="toggleReadMode()" disabled title="Okuma Modu"><svg class="ri" style="color:#0891b2"><use href="#i-book-open"/></svg></button>
   <button class="qa" id="qa-undo" onclick="doUndo()" disabled title="Geri Al"><svg class="ri" style="color:#64748b"><use href="#i-undo-2"/></svg></button>
   <div class="rb-tabs" role="tablist">
     <button class="rb-tab" data-tabbtn="home" onclick="setRibbonTab('home')" data-i18n="tabHome">Ana Sayfa</button>
@@ -1089,6 +1130,7 @@ body.has-file #sidebar {
     <button class="rb" onclick="browseFile()"><svg class="ri" style="color:#f59e0b"><use href="#i-folder-open"/></svg><span><span data-i18n="open">Aç</span></span></button>
     <button class="rb" id="btn-save" onclick="doSave()" disabled><svg class="ri" style="color:#2563eb"><use href="#i-save"/></svg><span><span data-i18n="save">Kaydet</span></span></button>
     <button class="rb" id="btn-print" onclick="doPrint()" disabled><svg class="ri" style="color:#475569"><use href="#i-printer"/></svg><span><span data-i18n="printBtn">Yazdır</span></span></button>
+    <button class="rb" id="btn-read" onclick="enterReadMode()" disabled><svg class="ri" style="color:#0891b2"><use href="#i-book-open"/></svg><span>Okuma Modu</span></button>
     <button class="rb" id="btn-undo" onclick="doUndo()" disabled><svg class="ri" style="color:#64748b"><use href="#i-undo-2"/></svg><span><span data-i18n="undo">Geri Al</span></span></button>
     <div class="rb-sep"></div>
     <button class="rb" id="btn-compress" onclick="openModal('m-compress')" disabled title="PDF boyutunu küçült, kaydet veya e-postayla gönder"><svg class="ri" style="color:#0891b2"><use href="#i-shrink"/></svg><span><span data-i18n="compressBtn">Küçült / Gönder</span></span></button>
@@ -1201,6 +1243,33 @@ body.has-file #sidebar {
   </div>
 </div>
 
+<!-- OKUMA MODU ÇUBUĞU -->
+<div id="readerbar">
+  <button class="rd-btn rd-edit" onclick="exitReadMode()" title="Düzenleme araçlarını aç"><svg class="ri"><use href="#i-type"/></svg><span>Düzenle</span></button>
+  <div class="rd-sep"></div>
+  <button class="rd-btn" onclick="readerGo(S.currentPage - 1)" title="Önceki sayfa">▲</button>
+  <input id="rd-page-input" type="text" inputmode="numeric" onchange="readerGo(parseInt(this.value, 10) - 1)" onkeydown="if (event.key === 'Enter') this.blur()">
+  <span id="rd-page-total"></span>
+  <button class="rd-btn" onclick="readerGo(S.currentPage + 1)" title="Sonraki sayfa">▼</button>
+  <div class="rd-sep"></div>
+  <button class="rd-btn" onclick="readerZoomStep(-1)" title="Uzaklaştır">−</button>
+  <select id="rd-zoom" onchange="readerSetZoom(this.value)">
+    <option value="fit-width">Genişliğe sığdır</option>
+    <option value="fit-page">Sayfaya sığdır</option>
+    <option value="0.5">50%</option>
+    <option value="0.75">75%</option>
+    <option value="1">100%</option>
+    <option value="1.25">125%</option>
+    <option value="1.5">150%</option>
+    <option value="2">200%</option>
+    <option value="3">300%</option>
+    <option value="custom" hidden></option>
+  </select>
+  <button class="rd-btn" onclick="readerZoomStep(1)" title="Yakınlaştır">+</button>
+  <div class="rd-sep"></div>
+  <button class="rd-btn" onclick="doPrint()" title="Yazdır (Ctrl+P)"><svg class="ri" style="color:#475569"><use href="#i-printer"/></svg><span data-i18n="printBtn">Yazdır</span></button>
+</div>
+
 <!-- DOC INFO BANNERS -->
 <div id="doc-banners"></div>
 
@@ -1238,6 +1307,7 @@ body.has-file #sidebar {
         <button class="btn-secondary" style="font-size:12px;padding:3px 10px;" onclick="cancelSelection()" data-i18n="selCancel">İptal</button>
       </div>
     </div>
+    <div id="reader"></div>
   </div>
 </div>
 
@@ -1418,6 +1488,42 @@ body.has-file #sidebar {
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('m-compress')" data-i18n="cmpCancel">İptal</button>
       <button class="btn-primary" onclick="doCompress()" data-i18n="cmpRun">Küçült</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Yazdır -->
+<div class="modal-backdrop" id="m-print">
+  <div class="modal-card">
+    <h3>Yazdır</h3>
+    <div class="form-group">
+      <label>Sayfalar</label>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+        <label style="display:flex;gap:8px;align-items:center;color:var(--text);margin:0"><input type="radio" name="pr-range" value="all" checked style="width:auto"> <span>Tüm sayfalar</span> <span id="pr-all-count" style="color:var(--text-muted)"></span></label>
+        <label style="display:flex;gap:8px;align-items:center;color:var(--text);margin:0"><input type="radio" name="pr-range" value="current" style="width:auto"> <span>Geçerli sayfa</span> <span id="pr-cur-num" style="color:var(--text-muted)"></span></label>
+        <label style="display:flex;gap:8px;align-items:center;color:var(--text);margin:0"><input type="radio" name="pr-range" value="custom" style="width:auto"> <span>Sayfa aralığı</span>
+          <input type="text" id="pr-custom" placeholder="1-3, 5, 8" style="flex:1;padding:4px 8px" oninput="document.querySelector('input[name=pr-range][value=custom]').checked = true"></label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Sayfa boyutlandırma</label>
+      <select id="pr-fit">
+        <option value="fit">Kağıda sığdır</option>
+        <option value="actual">Gerçek boyut</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Baskı kalitesi</label>
+      <select id="pr-dpi">
+        <option value="150">Normal (150 DPI)</option>
+        <option value="300">Yüksek (300 DPI)</option>
+        <option value="100">Taslak (100 DPI)</option>
+      </select>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;white-space:normal">Yazıcı, kopya sayısı, kağıt boyutu, yön, kenar boşlukları, renk ve çift taraflı baskı bir sonraki pencerede seçilir. Yazıcının kendi gelişmiş ayarları için oradaki "Sistem iletişim kutusunu kullanarak yazdır" seçeneğini kullanabilirsiniz.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('m-print')">İptal</button>
+      <button class="btn-primary" onclick="runPrint()">Yazdır</button>
     </div>
   </div>
 </div>
@@ -2996,8 +3102,51 @@ function setLang(code) {
 const _TXL = ['en','de','es','fr','it','pt','ru'];
 const TXR = [["Şekil Çiz", "Draw Shape", "Form zeichnen", "Dibujar forma", "Dessiner une forme", "Disegna forma", "Desenhar forma", "Фигура"], ["▭ Dikdörtgen", "▭ Rectangle", "▭ Rechteck", "▭ Rectángulo", "▭ Rectangle", "▭ Rettangolo", "▭ Retângulo", "▭ Прямоугольник"], ["◯ Daire", "◯ Circle", "◯ Kreis", "◯ Círculo", "◯ Cercle", "◯ Cerchio", "◯ Círculo", "◯ Круг"], ["Renk:", "Color:", "Farbe:", "Color:", "Couleur :", "Colore:", "Cor:", "Цвет:"], ["Dosya açılmadı", "No file open", "Keine Datei geöffnet", "Ningún archivo abierto", "Aucun fichier ouvert", "Nessun file aperto", "Nenhum arquivo aberto", "Файл не открыт"], ["✓ Onay (yeşil)", "✓ Approved (green)", "✓ Genehmigt (grün)", "✓ Aprobado (verde)", "✓ Approuvé (vert)", "✓ Approvato (verde)", "✓ Aprovado (verde)", "✓ Одобрено (зелёный)"], ["✗ İptal (kırmızı)", "✗ Rejected (red)", "✗ Abgelehnt (rot)", "✗ Rechazado (rojo)", "✗ Refusé (rouge)", "✗ Rifiutato (rosso)", "✗ Recusado (vermelho)", "✗ Отклонено (красный)"], ["○ Daire (mavi)", "○ Circle (blue)", "○ Kreis (blau)", "○ Círculo (azul)", "○ Cercle (bleu)", "○ Cerchio (blu)", "○ Círculo (azul)", "○ Круг (синий)"], ["📅 Tarih", "📅 Date", "📅 Datum", "📅 Fecha", "📅 Date", "📅 Data", "📅 Data", "📅 Дата"], ["🔤 Fontu Kaydet", "🔤 Save Font", "🔤 Schrift speichern", "🔤 Guardar fuente", "🔤 Enregistrer la police", "🔤 Salva font", "🔤 Salvar fonte", "🔤 Сохранить шрифт"], ["✕ İptal", "✕ Cancel", "✕ Abbrechen", "✕ Cancelar", "✕ Annuler", "✕ Annulla", "✕ Cancelar", "✕ Отмена"], ["✓ Uygula", "✓ Apply", "✓ Anwenden", "✓ Aplicar", "✓ Appliquer", "✓ Applica", "✓ Aplicar", "✓ Применить"], ["Dijital İmzalı Belge", "Digitally Signed Document", "Digital signiertes Dokument", "Documento con firma digital", "Document signé numériquement", "Documento con firma digitale", "Documento com assinatura digital", "Документ с цифровой подписью"], ["Bu belgede", "This document has", "Dieses Dokument enthält", "Este documento tiene", "Ce document contient", "Questo documento contiene", "Este documento tem", "В документе"], ["dijital imza bulunuyor.", "digital signature(s).", "digitale Signatur(en).", "firma(s) digital(es).", "signature(s) numérique(s).", "firma/e digitale/i.", "assinatura(s) digital(is).", "шт. цифровых подписей."], ["⚠️ Herhangi bir değişiklik yapıp kaydettiğinizde bu imzalar", "⚠️ If you make any change and save, these signatures", "⚠️ Wenn Sie etwas ändern und speichern, werden diese Signaturen", "⚠️ Si realiza cualquier cambio y guarda, estas firmas", "⚠️ Si vous modifiez et enregistrez le document, ces signatures", "⚠️ Se apporti modifiche e salvi, queste firme", "⚠️ Se você fizer qualquer alteração e salvar, estas assinaturas", "⚠️ Если вы внесёте изменения и сохраните файл, эти подписи"], ["otomatik olarak kaldırılacaktır", "will be removed automatically", "automatisch entfernt", "se eliminarán automáticamente", "seront supprimées automatiquement", "verranno rimosse automaticamente", "serão removidas automaticamente", "будут удалены автоматически"], [". Yeni dosyada Adobe gibi programların gösterdiği mavi sertifika rozeti ya da \"imza geçersiz\" uyarısı", ". The blue certificate badge or the \"invalid signature\" warning that programs like Adobe show", ". Das blaue Zertifikat-Symbol oder die Warnung „Signatur ungültig“, die Programme wie Adobe anzeigen,", ". La insignia azul de certificado o el aviso de «firma no válida» que muestran programas como Adobe", ". Le badge bleu de certificat ou l’avertissement « signature invalide » affiché par des programmes comme Adobe", ". Il badge blu del certificato o l’avviso «firma non valida» mostrato da programmi come Adobe", ". O selo azul de certificado ou o aviso de «assinatura inválida» exibido por programas como o Adobe", ". Синий значок сертификата или предупреждение «подпись недействительна», которое показывают программы вроде Adobe,"], ["yer almayacaktır", "will not appear in the new file", "erscheinen in der neuen Datei nicht", "no aparecerá en el archivo nuevo", "n’apparaîtra pas dans le nouveau fichier", "non comparirà nel nuovo file", "não aparecerá no novo arquivo", "не появятся в новом файле"], ["İptal", "Cancel", "Abbrechen", "Cancelar", "Annuler", "Annulla", "Cancelar", "Отмена"], ["Anladım, Devam Et", "Got it, continue", "Verstanden, weiter", "Entendido, continuar", "Compris, continuer", "Ho capito, continua", "Entendi, continuar", "Понятно, продолжить"], ["Şifre Ekle", "Add Password", "Passwort hinzufügen", "Añadir contraseña", "Ajouter un mot de passe", "Aggiungi password", "Adicionar senha", "Добавить пароль"], ["Şifre Kaldır", "Remove Password", "Passwort entfernen", "Quitar contraseña", "Supprimer le mot de passe", "Rimuovi password", "Remover senha", "Удалить пароль"], ["Açma Şifresi (Zorunlu)", "Open password (required)", "Öffnungspasswort (erforderlich)", "Contraseña de apertura (obligatoria)", "Mot de passe d’ouverture (obligatoire)", "Password di apertura (obbligatoria)", "Senha de abertura (obrigatória)", "Пароль для открытия (обязательно)"], ["Düzenleme Şifresi (Opsiyonel)", "Edit password (optional)", "Bearbeitungspasswort (optional)", "Contraseña de edición (opcional)", "Mot de passe de modification (facultatif)", "Password di modifica (facoltativa)", "Senha de edição (opcional)", "Пароль для редактирования (необязательно)"], ["İzinler", "Permissions", "Berechtigungen", "Permisos", "Autorisations", "Autorizzazioni", "Permissões", "Разрешения"], ["Yazdırmaya izin ver", "Allow printing", "Drucken erlauben", "Permitir imprimir", "Autoriser l’impression", "Consenti la stampa", "Permitir impressão", "Разрешить печать"], ["Kopyalamaya izin ver", "Allow copying", "Kopieren erlauben", "Permitir copiar", "Autoriser la copie", "Consenti la copia", "Permitir cópia", "Разрешить копирование"], ["🔒 Şifrele ve Kaydet", "🔒 Encrypt and Save", "🔒 Verschlüsseln und speichern", "🔒 Cifrar y guardar", "🔒 Chiffrer et enregistrer", "🔒 Cifra e salva", "🔒 Criptografar e salvar", "🔒 Зашифровать и сохранить"], ["Şifreli bir PDF'in şifresini kaldırmak için mevcut şifreyi girin.", "Enter the current password to remove the password from an encrypted PDF.", "Geben Sie das aktuelle Passwort ein, um den Schutz eines verschlüsselten PDFs zu entfernen.", "Introduzca la contraseña actual para quitar la protección de un PDF cifrado.", "Saisissez le mot de passe actuel pour retirer la protection d’un PDF chiffré.", "Inserisci la password attuale per rimuovere la protezione da un PDF cifrato.", "Digite a senha atual para remover a proteção de um PDF criptografado.", "Введите текущий пароль, чтобы снять защиту с зашифрованного PDF."], ["Mevcut Şifre", "Current password", "Aktuelles Passwort", "Contraseña actual", "Mot de passe actuel", "Password attuale", "Senha atual", "Текущий пароль"], ["🔓 Şifreyi Kaldır", "🔓 Remove Password", "🔓 Passwort entfernen", "🔓 Quitar contraseña", "🔓 Supprimer le mot de passe", "🔓 Rimuovi password", "🔓 Remover senha", "🔓 Удалить пароль"], ["💧 Filigran", "💧 Watermark", "💧 Wasserzeichen", "💧 Marca de agua", "💧 Filigrane", "💧 Filigrana", "💧 Marca d’água", "💧 Водяной знак"], ["Ekle", "Add", "Hinzufügen", "Añadir", "Ajouter", "Aggiungi", "Adicionar", "Добавить"], ["Kaldır", "Remove", "Entfernen", "Quitar", "Supprimer", "Rimuovi", "Remover", "Удалить"], ["Filigran metni", "Watermark text", "Wasserzeichentext", "Texto de la marca de agua", "Texte du filigrane", "Testo della filigrana", "Texto da marca d’água", "Текст водяного знака"], ["Opaklık (0.05 – 0.5)", "Opacity (0.05 – 0.5)", "Deckkraft (0,05 – 0,5)", "Opacidad (0,05 – 0,5)", "Opacité (0,05 – 0,5)", "Opacità (0,05 – 0,5)", "Opacidade (0,05 – 0,5)", "Прозрачность (0,05 – 0,5)"], ["Font boyutu (pt)", "Font size (pt)", "Schriftgröße (pt)", "Tamaño de fuente (pt)", "Taille de police (pt)", "Dimensione font (pt)", "Tamanho da fonte (pt)", "Размер шрифта (пт)"], ["Tüm Sayfalara Ekle", "Add to All Pages", "Auf allen Seiten hinzufügen", "Añadir a todas las páginas", "Ajouter à toutes les pages", "Aggiungi a tutte le pagine", "Adicionar a todas as páginas", "Добавить на все страницы"], ["Kaldırılacak filigran metni", "Watermark text to remove", "Zu entfernender Wasserzeichentext", "Texto de marca de agua a quitar", "Texte du filigrane à supprimer", "Testo della filigrana da rimuovere", "Texto da marca d’água a remover", "Текст водяного знака для удаления"], ["Tüm sayfalarda bu metni arar ve üzerini beyazla örter.", "Searches all pages for this text and covers it with white.", "Sucht diesen Text auf allen Seiten und überdeckt ihn weiß.", "Busca este texto en todas las páginas y lo cubre con blanco.", "Recherche ce texte sur toutes les pages et le recouvre de blanc.", "Cerca questo testo in tutte le pagine e lo copre di bianco.", "Procura este texto em todas as páginas e o cobre de branco.", "Ищет этот текст на всех страницах и закрашивает его белым."], ["Filigranı Kaldır", "Remove Watermark", "Wasserzeichen entfernen", "Quitar marca de agua", "Supprimer le filigrane", "Rimuovi filigrana", "Remover marca d’água", "Удалить водяной знак"], ["🖼 Görseli Sayfaya Ekle", "🖼 Add Image to Page", "🖼 Bild zur Seite hinzufügen", "🖼 Añadir imagen a la página", "🖼 Ajouter une image à la page", "🖼 Aggiungi immagine alla pagina", "🖼 Adicionar imagem à página", "🖼 Добавить изображение на страницу"], ["Görseli seçin — ardından sayfada istediğiniz alana sürükleyip bırakın.", "Choose an image, then drag it onto the area you want on the page.", "Wählen Sie ein Bild und ziehen Sie es auf den gewünschten Bereich der Seite.", "Elija una imagen y arrástrela al área que desee de la página.", "Choisissez une image, puis faites-la glisser vers la zone voulue de la page.", "Scegli un’immagine, poi trascinala nell’area desiderata della pagina.", "Escolha uma imagem e arraste-a para a área desejada da página.", "Выберите изображение и перетащите его в нужную область страницы."], ["Görsel dosyası (PNG / JPG / BMP)", "Image file (PNG / JPG / BMP)", "Bilddatei (PNG / JPG / BMP)", "Archivo de imagen (PNG / JPG / BMP)", "Fichier image (PNG / JPG / BMP)", "File immagine (PNG / JPG / BMP)", "Arquivo de imagem (PNG / JPG / BMP)", "Файл изображения (PNG / JPG / BMP)"], ["Sayfaya Yerleştir", "Place on Page", "Auf Seite platzieren", "Colocar en la página", "Placer sur la page", "Posiziona sulla pagina", "Colocar na página", "Поместить на страницу"], ["+ Boş Sayfa Ekle", "+ Add Blank Page", "+ Leere Seite hinzufügen", "+ Añadir página en blanco", "+ Ajouter une page vierge", "+ Aggiungi pagina vuota", "+ Adicionar página em branco", "+ Добавить пустую страницу"], ["Ekleme konumu (kaçıncı sayfadan sonra)", "Insert position (after which page)", "Einfügeposition (nach welcher Seite)", "Posición de inserción (después de qué página)", "Position d’insertion (après quelle page)", "Posizione di inserimento (dopo quale pagina)", "Posição de inserção (após qual página)", "Позиция вставки (после какой страницы)"], ["0 = başa ekle ·", "0 = at the start ·", "0 = am Anfang ·", "0 = al principio ·", "0 = au début ·", "0 = all’inizio ·", "0 = no início ·", "0 = в начало ·"], ["= sona ekle", "= at the end", "= am Ende", "= al final", "= à la fin", "= alla fine", "= no fim", "= в конец"], ["✍️ İmza Oluştur", "✍️ Create Signature", "✍️ Signatur erstellen", "✍️ Crear firma", "✍️ Créer une signature", "✍️ Crea firma", "✍️ Criar assinatura", "✍️ Создать подпись"], ["Yaz", "Type", "Tippen", "Escribir", "Saisir", "Digita", "Digitar", "Ввод"], ["Çiz", "Draw", "Zeichnen", "Dibujar", "Dessiner", "Disegna", "Desenhar", "Рисовать"], ["Resim", "Image", "Bild", "Imagen", "Image", "Immagine", "Imagem", "Рисунок"], ["Temizle", "Clear", "Löschen", "Borrar", "Effacer", "Cancella", "Limpar", "Очистить"], ["Fare ile yukarıdaki alana imzanızı çizin.", "Draw your signature in the area above with the mouse.", "Zeichnen Sie Ihre Signatur mit der Maus in den Bereich oben.", "Dibuje su firma en el área de arriba con el ratón.", "Dessinez votre signature dans la zone ci-dessus avec la souris.", "Disegna la tua firma nell’area sopra con il mouse.", "Desenhe sua assinatura na área acima com o mouse.", "Нарисуйте подпись мышью в области выше."], ["İmza görseli (PNG / JPG / GIF)", "Signature image (PNG / JPG / GIF)", "Signaturbild (PNG / JPG / GIF)", "Imagen de firma (PNG / JPG / GIF)", "Image de signature (PNG / JPG / GIF)", "Immagine della firma (PNG / JPG / GIF)", "Imagem da assinatura (PNG / JPG / GIF)", "Изображение подписи (PNG / JPG / GIF)"], ["Oluştur & Yerleştir", "Create & Place", "Erstellen & platzieren", "Crear y colocar", "Créer et placer", "Crea e posiziona", "Criar e colocar", "Создать и поместить"], ["Yazdır", "Print", "Drucken", "Imprimir", "Imprimer", "Stampa", "Imprimir", "Печать"], ["Tüm sayfaların metnini panoya kopyala", "Copy the text of all pages to the clipboard", "Text aller Seiten in die Zwischenablage kopieren", "Copiar el texto de todas las páginas al portapapeles", "Copier le texte de toutes les pages dans le presse-papiers", "Copia il testo di tutte le pagine negli appunti", "Copiar o texto de todas as páginas para a área de transferência", "Скопировать текст всех страниц в буфер обмена"], ["Aktif font — temizlemek için × tıkla", "Active font — click × to clear", "Aktive Schrift — zum Löschen × klicken", "Fuente activa — haga clic en × para borrar", "Police active — cliquez sur × pour l’effacer", "Font attivo — clicca × per cancellare", "Fonte ativa — clique em × para limpar", "Активный шрифт — нажмите × для сброса"], ["Vurgula", "Highlight", "Hervorheben", "Resaltar", "Surligner", "Evidenzia", "Destacar", "Выделить"], ["Sarı", "Yellow", "Gelb", "Amarillo", "Jaune", "Giallo", "Amarelo", "Жёлтый"], ["Yeşil", "Green", "Grün", "Verde", "Vert", "Verde", "Verde", "Зелёный"], ["Mavi", "Blue", "Blau", "Azul", "Bleu", "Blu", "Azul", "Синий"], ["Damga", "Stamp", "Stempel", "Sello", "Tampon", "Timbro", "Carimbo", "Штамп"], ["Filigran ekle / kaldır", "Add / remove watermark", "Wasserzeichen hinzufügen / entfernen", "Añadir / quitar marca de agua", "Ajouter / supprimer un filigrane", "Aggiungi / rimuovi filigrana", "Adicionar / remover marca d’água", "Добавить / удалить водяной знак"], ["Sayfaya görsel ekle", "Add image to page", "Bild zur Seite hinzufügen", "Añadir imagen a la página", "Ajouter une image à la page", "Aggiungi immagine alla pagina", "Adicionar imagem à página", "Добавить изображение на страницу"], ["Sayfa sırasını ters çevir", "Reverse page order", "Seitenreihenfolge umkehren", "Invertir el orden de las páginas", "Inverser l’ordre des pages", "Inverti l’ordine delle pagine", "Inverter a ordem das páginas", "Изменить порядок страниц на обратный"], ["Boş sayfa ekle", "Add blank page", "Leere Seite hinzufügen", "Añadir página en blanco", "Ajouter une page vierge", "Aggiungi pagina vuota", "Adicionar página em branco", "Добавить пустую страницу"], ["Şifre ekle / kaldır", "Add / remove password", "Passwort hinzufügen / entfernen", "Añadir / quitar contraseña", "Ajouter / supprimer le mot de passe", "Aggiungi / rimuovi password", "Adicionar / remover senha", "Добавить / удалить пароль"], ["PDF'i sıkıştır", "Compress PDF", "PDF komprimieren", "Comprimir PDF", "Compresser le PDF", "Comprimi PDF", "Comprimir PDF", "Сжать PDF"], ["İmza ekle", "Add signature", "Signatur hinzufügen", "Añadir firma", "Ajouter une signature", "Aggiungi firma", "Adicionar assinatura", "Добавить подпись"], ["Kalın (B)", "Bold (B)", "Fett (B)", "Negrita (B)", "Gras (B)", "Grassetto (B)", "Negrito (B)", "Жирный (B)"], ["İtalik (I)", "Italic (I)", "Kursiv (I)", "Cursiva (I)", "Italique (I)", "Corsivo (I)", "Itálico (I)", "Курсив (I)"], ["Alt çizgi (U)", "Underline (U)", "Unterstrichen (U)", "Subrayado (U)", "Souligné (U)", "Sottolineato (U)", "Sublinhado (U)", "Подчёркнутый (U)"], ["Metin rengi", "Text color", "Textfarbe", "Color del texto", "Couleur du texte", "Colore del testo", "Cor do texto", "Цвет текста"], ["Sayfa", "Page", "Seite", "Página", "Page", "Pagina", "Página", "Страница"], ["PDF'i açmak için şifre", "Password to open the PDF", "Passwort zum Öffnen des PDFs", "Contraseña para abrir el PDF", "Mot de passe pour ouvrir le PDF", "Password per aprire il PDF", "Senha para abrir o PDF", "Пароль для открытия PDF"], ["Düzenleme/yazdırma kısıtlaması için", "For edit/print restrictions", "Für Bearbeitungs-/Druckbeschränkung", "Para restringir edición/impresión", "Pour restreindre modification/impression", "Per limitare modifica/stampa", "Para restringir edição/impressão", "Для ограничения правки/печати"], ["Mevcut açma şifresi", "Current open password", "Aktuelles Öffnungspasswort", "Contraseña de apertura actual", "Mot de passe d’ouverture actuel", "Password di apertura attuale", "Senha de abertura atual", "Текущий пароль для открытия"], ["örn: GİZLİ", "e.g. CONFIDENTIAL", "z. B. VERTRAULICH", "p. ej.: CONFIDENCIAL", "ex. : CONFIDENTIEL", "es.: RISERVATO", "ex.: CONFIDENCIAL", "напр.: КОНФИДЕНЦИАЛЬНО"], ["Önizleme", "Preview", "Vorschau", "Vista previa", "Aperçu", "Anteprima", "Pré-visualização", "Предпросмотр"], ["Adınızı yazın…", "Type your name…", "Namen eingeben…", "Escriba su nombre…", "Saisissez votre nom…", "Scrivi il tuo nome…", "Digite seu nome…", "Введите ваше имя…"], ["İmza önizleme", "Signature preview", "Signaturvorschau", "Vista previa de la firma", "Aperçu de la signature", "Anteprima della firma", "Pré-visualização da assinatura", "Предпросмотр подписи"], ["Metni düzenle", "Edit text", "Text bearbeiten", "Editar texto", "Modifier le texte", "Modifica testo", "Editar texto", "Редактировать текст"], ["Yukarı taşı", "Move up", "Nach oben", "Mover arriba", "Monter", "Sposta su", "Mover para cima", "Вверх"], ["Aşağı taşı", "Move down", "Nach unten", "Mover abajo", "Descendre", "Sposta giù", "Mover para baixo", "Вниз"], ["Sağa döndür", "Rotate right", "Nach rechts drehen", "Girar a la derecha", "Pivoter à droite", "Ruota a destra", "Girar à direita", "Повернуть вправо"], ["Sayfayı sil", "Delete page", "Seite löschen", "Eliminar página", "Supprimer la page", "Elimina pagina", "Excluir página", "Удалить страницу"], ["Kapat", "Close", "Schließen", "Cerrar", "Fermer", "Chiudi", "Fechar", "Закрыть"], ["Metni buraya yazın…", "Type your text here…", "Text hier eingeben…", "Escriba su texto aquí…", "Saisissez votre texte ici…", "Scrivi qui il testo…", "Digite seu texto aqui…", "Введите текст здесь…"], ["Taşımak için sürükle", "Drag to move", "Zum Verschieben ziehen", "Arrastre para mover", "Faites glisser pour déplacer", "Trascina per spostare", "Arraste para mover", "Перетащите, чтобы переместить"], ["Ekle (Enter)", "Add (Enter)", "Hinzufügen (Enter)", "Añadir (Intro)", "Ajouter (Entrée)", "Aggiungi (Invio)", "Adicionar (Enter)", "Добавить (Enter)"], ["İptal (Esc)", "Cancel (Esc)", "Abbrechen (Esc)", "Cancelar (Esc)", "Annuler (Échap)", "Annulla (Esc)", "Cancelar (Esc)", "Отмена (Esc)"], ["İmzalar Hakkında", "About signatures", "Über Signaturen", "Acerca de las firmas", "À propos des signatures", "Informazioni sulle firme", "Sobre as assinaturas", "О подписях"], ["etkileşimli form alanı var.", "interactive form field(s).", "interaktive Formularfeld(er).", "campo(s) de formulario interactivo(s).", "champ(s) de formulaire interactif(s).", "campo/i modulo interattivo/i.", "campo(s) de formulário interativo(s).", "шт. интерактивных полей формы."], ["form alanı var.", "form field(s).", "Formularfeld(er).", "campo(s) de formulario.", "champ(s) de formulaire.", "campo/i modulo.", "campo(s) de formulário.", "шт. полей формы."], ["dijital imza tespit edildi — kaydettiğinizde otomatik kaldırılır.", "digital signature(s) detected — they will be removed automatically when you save.", "digitale Signatur(en) erkannt — beim Speichern werden sie automatisch entfernt.", "firma(s) digital(es) detectada(s): se eliminarán automáticamente al guardar.", "signature(s) numérique(s) détectée(s) — supprimée(s) automatiquement à l’enregistrement.", "firma/e digitale/i rilevata/e — verranno rimosse automaticamente al salvataggio.", "assinatura(s) digital(is) detectada(s) — serão removidas automaticamente ao salvar.", "цифровых подписей обнаружено — при сохранении они будут удалены автоматически."], ["Sayfa yüklenemedi", "Could not load page", "Seite konnte nicht geladen werden", "No se pudo cargar la página", "Impossible de charger la page", "Impossibile caricare la pagina", "Não foi possível carregar a página", "Не удалось загрузить страницу"], ["Döndürme başarısız", "Rotation failed", "Drehen fehlgeschlagen", "Error al girar", "Échec de la rotation", "Rotazione non riuscita", "Falha ao girar", "Не удалось повернуть"], ["Aranan metin boş", "Search text is empty", "Suchtext ist leer", "El texto de búsqueda está vacío", "Le texte recherché est vide", "Il testo da cercare è vuoto", "O texto de busca está vazio", "Строка поиска пуста"], ["Metin bulunamadı", "Text not found", "Text nicht gefunden", "Texto no encontrado", "Texte introuvable", "Testo non trovato", "Texto não encontrado", "Текст не найден"], ["Güncellendi", "Updated", "Aktualisiert", "Actualizado", "Mis à jour", "Aggiornato", "Atualizado", "Обновлено"], ["Silme başarısız", "Delete failed", "Löschen fehlgeschlagen", "Error al eliminar", "Échec de la suppression", "Eliminazione non riuscita", "Falha ao excluir", "Не удалось удалить"], ["Geri alınacak işlem yok", "Nothing to undo", "Nichts rückgängig zu machen", "No hay nada que deshacer", "Rien à annuler", "Niente da annullare", "Nada para desfazer", "Нечего отменять"], ["Geri alındı", "Undone", "Rückgängig gemacht", "Deshecho", "Annulé", "Annullato", "Desfeito", "Отменено"], ["Geçersiz sayfa aralığı", "Invalid page range", "Ungültiger Seitenbereich", "Rango de páginas no válido", "Plage de pages invalide", "Intervallo di pagine non valido", "Intervalo de páginas inválido", "Недопустимый диапазон страниц"], ["Kayıt başarısız", "Save failed", "Speichern fehlgeschlagen", "Error al guardar", "Échec de l’enregistrement", "Salvataggio non riuscito", "Falha ao salvar", "Не удалось сохранить"], ["İşlem başarısız", "Operation failed", "Vorgang fehlgeschlagen", "La operación falló", "Échec de l’opération", "Operazione non riuscita", "A operação falhou", "Операция не удалась"], ["Taşıma başarısız", "Move failed", "Verschieben fehlgeschlagen", "Error al mover", "Échec du déplacement", "Spostamento non riuscito", "Falha ao mover", "Не удалось переместить"], ["Metin taşındı", "Text moved", "Text verschoben", "Texto movido", "Texte déplacé", "Testo spostato", "Texto movido", "Текст перемещён"], ["Filigran metni boş", "Watermark text is empty", "Wasserzeichentext ist leer", "El texto de la marca de agua está vacío", "Le texte du filigrane est vide", "Il testo della filigrana è vuoto", "O texto da marca d’água está vazio", "Текст водяного знака пуст"], ["Filigran bulunamadı", "Watermark not found", "Wasserzeichen nicht gefunden", "Marca de agua no encontrada", "Filigrane introuvable", "Filigrana non trovata", "Marca d’água não encontrada", "Водяной знак не найден"], ["Filigran hatası", "Watermark error", "Wasserzeichenfehler", "Error de marca de agua", "Erreur de filigrane", "Errore filigrana", "Erro de marca d’água", "Ошибка водяного знака"], ["En az bir şifre girilmeli", "Enter at least one password", "Mindestens ein Passwort eingeben", "Introduzca al menos una contraseña", "Saisissez au moins un mot de passe", "Inserisci almeno una password", "Digite pelo menos uma senha", "Введите хотя бы один пароль"], ["Şifreleme başarısız", "Encryption failed", "Verschlüsselung fehlgeschlagen", "Error al cifrar", "Échec du chiffrement", "Cifratura non riuscita", "Falha na criptografia", "Не удалось зашифровать"], ["Şifre kaldırılamadı", "Could not remove password", "Passwort konnte nicht entfernt werden", "No se pudo quitar la contraseña", "Impossible de supprimer le mot de passe", "Impossibile rimuovere la password", "Não foi possível remover a senha", "Не удалось удалить пароль"], ["Boş sayfa eklendi", "Blank page added", "Leere Seite hinzugefügt", "Página en blanco añadida", "Page vierge ajoutée", "Pagina vuota aggiunta", "Página em branco adicionada", "Пустая страница добавлена"], ["Tüm sayfa sırası ters çevrilsin mi?", "Reverse the order of all pages?", "Reihenfolge aller Seiten umkehren?", "¿Invertir el orden de todas las páginas?", "Inverser l’ordre de toutes les pages ?", "Invertire l’ordine di tutte le pagine?", "Inverter a ordem de todas as páginas?", "Изменить порядок всех страниц на обратный?"], ["Ters çevirme başarısız", "Reversal failed", "Umkehren fehlgeschlagen", "Error al invertir", "Échec de l’inversion", "Inversione non riuscita", "Falha ao inverter", "Не удалось изменить порядок"], ["Sayfa sırası ters çevrildi", "Page order reversed", "Seitenreihenfolge umgekehrt", "Orden de páginas invertido", "Ordre des pages inversé", "Ordine delle pagine invertito", "Ordem das páginas invertida", "Порядок страниц изменён"], ["Sıkıştırma başarısız", "Compression failed", "Komprimierung fehlgeschlagen", "Error al comprimir", "Échec de la compression", "Compressione non riuscita", "Falha na compressão", "Не удалось сжать"], ["Görseli yerleştirmek için sayfada alan seçin", "Select an area on the page to place the image", "Wählen Sie einen Bereich auf der Seite für das Bild", "Seleccione un área de la página para colocar la imagen", "Sélectionnez une zone de la page pour placer l’image", "Seleziona un’area della pagina per posizionare l’immagine", "Selecione uma área da página para colocar a imagem", "Выберите область на странице для изображения"], ["Lütfen imza metni girin", "Please enter signature text", "Bitte Signaturtext eingeben", "Introduzca el texto de la firma", "Veuillez saisir le texte de la signature", "Inserisci il testo della firma", "Digite o texto da assinatura", "Введите текст подписи"], ["Lütfen bir görsel seçin", "Please choose an image", "Bitte wählen Sie ein Bild", "Elija una imagen", "Veuillez choisir une image", "Scegli un’immagine", "Escolha uma imagem", "Выберите изображение"], ["İmzayı yerleştirmek için sayfada alan seçin", "Select an area on the page to place the signature", "Wählen Sie einen Bereich auf der Seite für die Signatur", "Seleccione un área de la página para colocar la firma", "Sélectionnez une zone de la page pour placer la signature", "Seleziona un’area della pagina per posizionare la firma", "Selecione uma área da página para colocar a assinatura", "Выберите область на странице для подписи"], ["Belge yazdırmaya gönderildi", "Document sent to printer", "Dokument an den Drucker gesendet", "Documento enviado a la impresora", "Document envoyé à l’imprimante", "Documento inviato alla stampante", "Documento enviado para a impressora", "Документ отправлен на печать"], ["Belgede kopyalanacak metin bulunamadı", "No text to copy in the document", "Kein kopierbarer Text im Dokument", "No hay texto para copiar en el documento", "Aucun texte à copier dans le document", "Nessun testo da copiare nel documento", "Nenhum texto para copiar no documento", "В документе нет текста для копирования"], ["Pano erişimi engellendi — lütfen HTTPS üzerinden açın", "Clipboard access blocked — please open over HTTPS", "Zugriff auf die Zwischenablage blockiert — bitte über HTTPS öffnen", "Acceso al portapapeles bloqueado: abra la página con HTTPS", "Accès au presse-papiers bloqué — ouvrez la page en HTTPS", "Accesso agli appunti bloccato — apri tramite HTTPS", "Acesso à área de transferência bloqueado — abra via HTTPS", "Доступ к буферу обмена заблокирован — откройте через HTTPS"], ["Demo başlatılıyor...", "Starting demo...", "Demo wird gestartet...", "Iniciando demo...", "Démarrage de la démo...", "Avvio della demo...", "Iniciando demonstração...", "Запуск демо..."], ["Demo PDF yüklenemedi", "Could not load demo PDF", "Demo-PDF konnte nicht geladen werden", "No se pudo cargar el PDF de demostración", "Impossible de charger le PDF de démo", "Impossibile caricare il PDF demo", "Não foi possível carregar o PDF de demonstração", "Не удалось загрузить демо-PDF"], ["Bağlantı hatası", "Connection error", "Verbindungsfehler", "Error de conexión", "Erreur de connexion", "Errore di connessione", "Erro de conexão", "Ошибка соединения"], ["Sunucu hatası", "Server error", "Serverfehler", "Error del servidor", "Erreur du serveur", "Errore del server", "Erro do servidor", "Ошибка сервера"], ["Vurgulama eklendi", "Highlight added", "Hervorhebung hinzugefügt", "Resaltado añadido", "Surlignage ajouté", "Evidenziazione aggiunta", "Destaque adicionado", "Выделение добавлено"], ["Dikdörtgen eklendi", "Rectangle added", "Rechteck hinzugefügt", "Rectángulo añadido", "Rectangle ajouté", "Rettangolo aggiunto", "Retângulo adicionado", "Прямоугольник добавлен"], ["Daire eklendi", "Circle added", "Kreis hinzugefügt", "Círculo añadido", "Cercle ajouté", "Cerchio aggiunto", "Círculo adicionado", "Круг добавлен"], ["Görsel eklendi", "Image added", "Bild hinzugefügt", "Imagen añadida", "Image ajoutée", "Immagine aggiunta", "Imagem adicionada", "Изображение добавлено"], ["Vurgulama modu — sayfada alan seç", "Highlight mode — select an area on the page", "Hervorhebungsmodus — Bereich auf der Seite wählen", "Modo resaltado: seleccione un área de la página", "Mode surlignage — sélectionnez une zone de la page", "Modalità evidenziazione — seleziona un’area della pagina", "Modo destaque — selecione uma área da página", "Режим выделения — выберите область на странице"], ["Onay", "Approved", "Genehmigt", "Aprobado", "Approuvé", "Approvato", "Aprovado", "Одобрено"], ["Dikdörtgen", "Rectangle", "Rechteck", "Rectángulo", "Rectangle", "Rettangolo", "Retângulo", "Прямоугольник"], ["Daire", "Circle", "Kreis", "Círculo", "Cercle", "Cerchio", "Círculo", "Круг"], ["Tarih", "Date", "Datum", "Fecha", "Date", "Data", "Data", "Дата"], ["Açık dosya yok", "No file is open", "Keine Datei geöffnet", "No hay ningún archivo abierto", "Aucun fichier ouvert", "Nessun file aperto", "Nenhum arquivo aberto", "Нет открытого файла"], ["Dosya açık değil", "File is not open", "Datei ist nicht geöffnet", "El archivo no está abierto", "Le fichier n’est pas ouvert", "Il file non è aperto", "O arquivo não está aberto", "Файл не открыт"], ["Dosya yok", "No file", "Keine Datei", "Sin archivo", "Aucun fichier", "Nessun file", "Sem arquivo", "Нет файла"], ["Dosya bulunamadı", "File not found", "Datei nicht gefunden", "Archivo no encontrado", "Fichier introuvable", "File non trovato", "Arquivo não encontrado", "Файл не найден"], ["Geçersiz sayfa", "Invalid page", "Ungültige Seite", "Página no válida", "Page invalide", "Pagina non valida", "Página inválida", "Недопустимая страница"], ["Aranacak metin boş", "Search text is empty", "Suchtext ist leer", "El texto de búsqueda está vacío", "Le texte recherché est vide", "Il testo da cercare è vuoto", "O texto de busca está vazio", "Строка поиска пуста"], ["Metin boş", "Text is empty", "Text ist leer", "El texto está vacío", "Le texte est vide", "Il testo è vuoto", "O texto está vazio", "Текст пуст"], ["Silinecek metin boş", "Text to delete is empty", "Zu löschender Text ist leer", "El texto a eliminar está vacío", "Le texte à supprimer est vide", "Il testo da eliminare è vuoto", "O texto a excluir está vazio", "Текст для удаления пуст"], ["Yanlış şifre", "Wrong password", "Falsches Passwort", "Contraseña incorrecta", "Mot de passe incorrect", "Password errata", "Senha incorreta", "Неверный пароль"], ["Şifre yanlış.", "Wrong password.", "Falsches Passwort.", "Contraseña incorrecta.", "Mot de passe incorrect.", "Password errata.", "Senha incorreta.", "Неверный пароль."], ["Yazdırma yalnızca Windows'ta desteklenir", "Printing is only supported on Windows", "Drucken wird nur unter Windows unterstützt", "La impresión solo se admite en Windows", "L’impression n’est prise en charge que sous Windows", "La stampa è supportata solo su Windows", "A impressão só é compatível com o Windows", "Печать поддерживается только в Windows"]];
 const TXP = [["^(.+) açıldı \\((\\d+) sayfa\\)$", ["{1} opened ({2} pages)", "{1} geöffnet ({2} Seiten)", "{1} abierto ({2} páginas)", "{1} ouvert ({2} pages)", "{1} aperto ({2} pagine)", "{1} aberto ({2} páginas)", "{1} открыт ({2} стр.)"]], ["^(\\d+) sayfa$", ["{1} pages", "{1} Seiten", "{1} páginas", "{1} pages", "{1} pagine", "{1} páginas", "{1} стр."]], ["^Sayfa (\\d+) silinsin mi\\?$", ["Delete page {1}?", "Seite {1} löschen?", "¿Eliminar la página {1}?", "Supprimer la page {1} ?", "Eliminare la pagina {1}?", "Excluir a página {1}?", "Удалить страницу {1}?"]], ["^Sayfa (\\d+)$", ["Page {1}", "Seite {1}", "Página {1}", "Page {1}", "Pagina {1}", "Página {1}", "Страница {1}"]], ["^(\\d+) yerde değiştirildi$", ["Replaced in {1} places", "An {1} Stellen ersetzt", "Reemplazado en {1} lugares", "Remplacé à {1} endroits", "Sostituito in {1} punti", "Substituído em {1} locais", "Заменено: {1}"]], ["^Birleştirildi — toplam (\\d+) sayfa$", ["Merged — {1} pages in total", "Zusammengeführt — insgesamt {1} Seiten", "Combinado: {1} páginas en total", "Fusionné — {1} pages au total", "Unito — {1} pagine in totale", "Mesclado — {1} páginas no total", "Объединено — всего страниц: {1}"]], ["^Dönüştürüldü: (.+) \\((\\d+) sayfa\\)$", ["Converted: {1} ({2} pages)", "Konvertiert: {1} ({2} Seiten)", "Convertido: {1} ({2} páginas)", "Converti : {1} ({2} pages)", "Convertito: {1} ({2} pagine)", "Convertido: {1} ({2} páginas)", "Преобразовано: {1} ({2} стр.)"]], ["^Filigran kaldırıldı — (\\d+) alanda temizlendi$", ["Watermark removed — cleared in {1} areas", "Wasserzeichen entfernt — in {1} Bereichen gelöscht", "Marca de agua quitada: limpiada en {1} áreas", "Filigrane supprimé — effacé dans {1} zones", "Filigrana rimossa — eliminata in {1} aree", "Marca d’água removida — limpa em {1} áreas", "Водяной знак удалён — очищено областей: {1}"]], ["^Şifrelendi: (.+)$", ["Encrypted: {1}", "Verschlüsselt: {1}", "Cifrado: {1}", "Chiffré : {1}", "Cifrato: {1}", "Criptografado: {1}", "Зашифровано: {1}"]], ["^Şifre kaldırıldı: (.+)$", ["Password removed: {1}", "Passwort entfernt: {1}", "Contraseña quitada: {1}", "Mot de passe supprimé : {1}", "Password rimossa: {1}", "Senha removida: {1}", "Пароль удалён: {1}"]], ["^Sıkıştırıldı: (.+) \\((.+) KB\\)$", ["Compressed: {1} ({2} KB)", "Komprimiert: {1} ({2} KB)", "Comprimido: {1} ({2} KB)", "Compressé : {1} ({2} Ko)", "Compresso: {1} ({2} KB)", "Comprimido: {1} ({2} KB)", "Сжато: {1} ({2} КБ)"]], ["^Tüm metin panoya kopyalandı \\((\\d+) karakter\\)$", ["All text copied to clipboard ({1} characters)", "Gesamter Text kopiert ({1} Zeichen)", "Todo el texto copiado ({1} caracteres)", "Tout le texte copié ({1} caractères)", "Tutto il testo copiato ({1} caratteri)", "Todo o texto copiado ({1} caracteres)", "Весь текст скопирован ({1} симв.)"]], ["^Yazdırma başlatılamadı: (.+)$", ["Could not start printing: {1}", "Drucken konnte nicht gestartet werden: {1}", "No se pudo iniciar la impresión: {1}", "Impossible de lancer l’impression : {1}", "Impossibile avviare la stampa: {1}", "Não foi possível iniciar a impressão: {1}", "Не удалось начать печать: {1}"]], ["^(.+) damgası — sayfada tıkla$", ["{1} stamp — click on the page", "Stempel „{1}“ — auf die Seite klicken", "Sello «{1}»: haga clic en la página", "Tampon « {1} » — cliquez sur la page", "Timbro «{1}» — clicca sulla pagina", "Carimbo «{1}» — clique na página", "Штамп «{1}» — щёлкните на странице"]], ["^(Dikdörtgen|Daire) — sayfada alan seç$", ["{1} — select an area on the page", "{1} — Bereich auf der Seite wählen", "{1}: seleccione un área de la página", "{1} — sélectionnez une zone de la page", "{1} — seleziona un’area della pagina", "{1} — selecione uma área da página", "{1} — выберите область на странице"]], ["^(Dikdörtgen|Daire) modu — sayfada alan seç$", ["{1} mode — select an area on the page", "{1}-Modus — Bereich auf der Seite wählen", "Modo {1}: seleccione un área de la página", "Mode {1} — sélectionnez une zone de la page", "Modalità {1} — seleziona un’area della pagina", "Modo {1} — selecione uma área da página", "Режим «{1}» — выберите область на странице"]], ["^· (\\d+) dijital imza kaldırıldı$", ["· {1} digital signature(s) removed", "· {1} digitale Signatur(en) entfernt", "· {1} firma(s) digital(es) eliminada(s)", "· {1} signature(s) numérique(s) supprimée(s)", "· {1} firma/e digitale/i rimossa/e", "· {1} assinatura(s) digital(is) removida(s)", "· удалено цифровых подписей: {1}"]], ["^Dosya bulunamadı: (.+)$", ["File not found: {1}", "Datei nicht gefunden: {1}", "Archivo no encontrado: {1}", "Fichier introuvable : {1}", "File non trovato: {1}", "Arquivo não encontrado: {1}", "Файл не найден: {1}"]], ["^Dönüştürme hatası: (.+)$", ["Conversion error: {1}", "Konvertierungsfehler: {1}", "Error de conversión: {1}", "Erreur de conversion : {1}", "Errore di conversione: {1}", "Erro de conversão: {1}", "Ошибка преобразования: {1}"]], ["^\"(.+)\" metni sayfalarda bulunamadı$", ["\"{1}\" was not found on any page", "„{1}“ wurde auf keiner Seite gefunden", "«{1}» no se encontró en ninguna página", "« {1} » est introuvable dans les pages", "«{1}» non trovato in nessuna pagina", "«{1}» não foi encontrado em nenhuma página", "«{1}» не найдено ни на одной странице"]]];
+TXR.push(
+  ["Demo sürümü: belgenin tamamını okuyabilir ve yazdırabilirsiniz. Düzenleme ilk 3 sayfada yapılır.",
+   "Demo version: you can read and print the whole document. Editing works on the first 3 pages.",
+   "Demoversion: Sie können das gesamte Dokument lesen und drucken. Bearbeitet werden die ersten 3 Seiten.",
+   "Versión demo: puede leer e imprimir todo el documento. La edición funciona en las 3 primeras páginas.",
+   "Version démo : vous pouvez lire et imprimer tout le document. L'édition porte sur les 3 premières pages.",
+   "Versione demo: puoi leggere e stampare l'intero documento. La modifica riguarda le prime 3 pagine.",
+   "Versão demo: você pode ler e imprimir o documento inteiro. A edição funciona nas 3 primeiras páginas.",
+   "Демоверсия: весь документ можно читать и печатать. Редактировать можно первые 3 страницы."],
+  ["Okuma Modu", "Reading Mode", "Lesemodus", "Modo lectura", "Mode lecture", "Modalità lettura", "Modo de leitura", "Режим чтения"],
+  ["Düzenle", "Edit", "Bearbeiten", "Editar", "Modifier", "Modifica", "Editar", "Редактировать"],
+  ["Düzenleme araçlarını aç", "Open editing tools", "Bearbeitungswerkzeuge öffnen", "Abrir herramientas de edición", "Ouvrir les outils d'édition", "Apri strumenti di modifica", "Abrir ferramentas de edição", "Открыть инструменты редактирования"],
+  ["Önceki sayfa", "Previous page", "Vorherige Seite", "Página anterior", "Page précédente", "Pagina precedente", "Página anterior", "Предыдущая страница"],
+  ["Sonraki sayfa", "Next page", "Nächste Seite", "Página siguiente", "Page suivante", "Pagina successiva", "Próxima página", "Следующая страница"],
+  ["Uzaklaştır", "Zoom out", "Verkleinern", "Alejar", "Zoom arrière", "Riduci", "Diminuir zoom", "Уменьшить"],
+  ["Yakınlaştır", "Zoom in", "Vergrößern", "Acercar", "Zoom avant", "Ingrandisci", "Aumentar zoom", "Увеличить"],
+  ["Genişliğe sığdır", "Fit width", "An Breite anpassen", "Ajustar al ancho", "Ajuster à la largeur", "Adatta alla larghezza", "Ajustar à largura", "По ширине"],
+  ["Sayfaya sığdır", "Fit page", "Ganze Seite", "Ajustar a la página", "Ajuster à la page", "Adatta alla pagina", "Ajustar à página", "Страница целиком"],
+  ["Yazdır (Ctrl+P)", "Print (Ctrl+P)", "Drucken (Strg+P)", "Imprimir (Ctrl+P)", "Imprimer (Ctrl+P)", "Stampa (Ctrl+P)", "Imprimir (Ctrl+P)", "Печать (Ctrl+P)"],
+  ["Yazdır", "Print", "Drucken", "Imprimir", "Imprimer", "Stampa", "Imprimir", "Печать"],
+  ["Sayfalar", "Pages", "Seiten", "Páginas", "Pages", "Pagine", "Páginas", "Страницы"],
+  ["Tüm sayfalar", "All pages", "Alle Seiten", "Todas las páginas", "Toutes les pages", "Tutte le pagine", "Todas as páginas", "Все страницы"],
+  ["Geçerli sayfa", "Current page", "Aktuelle Seite", "Página actual", "Page actuelle", "Pagina corrente", "Página atual", "Текущая страница"],
+  ["Sayfa aralığı", "Page range", "Seitenbereich", "Intervalo de páginas", "Plage de pages", "Intervallo di pagine", "Intervalo de páginas", "Диапазон страниц"],
+  ["Sayfa boyutlandırma", "Page sizing", "Seitengröße", "Tamaño de página", "Dimensionnement", "Ridimensionamento", "Dimensionamento", "Масштабирование"],
+  ["Kağıda sığdır", "Fit to paper", "An Papier anpassen", "Ajustar al papel", "Ajuster au papier", "Adatta al foglio", "Ajustar ao papel", "По размеру бумаги"],
+  ["Gerçek boyut", "Actual size", "Originalgröße", "Tamaño real", "Taille réelle", "Dimensioni reali", "Tamanho real", "Реальный размер"],
+  ["Baskı kalitesi", "Print quality", "Druckqualität", "Calidad de impresión", "Qualité d'impression", "Qualità di stampa", "Qualidade de impressão", "Качество печати"],
+  ["Normal (150 DPI)", "Normal (150 DPI)", "Normal (150 DPI)", "Normal (150 DPI)", "Normale (150 DPI)", "Normale (150 DPI)", "Normal (150 DPI)", "Обычное (150 DPI)"],
+  ["Yüksek (300 DPI)", "High (300 DPI)", "Hoch (300 DPI)", "Alta (300 DPI)", "Haute (300 DPI)", "Alta (300 DPI)", "Alta (300 DPI)", "Высокое (300 DPI)"],
+  ["Taslak (100 DPI)", "Draft (100 DPI)", "Entwurf (100 DPI)", "Borrador (100 DPI)", "Brouillon (100 DPI)", "Bozza (100 DPI)", "Rascunho (100 DPI)", "Черновик (100 DPI)"],
+  ["Yazıcı, kopya sayısı, kağıt boyutu, yön, kenar boşlukları, renk ve çift taraflı baskı bir sonraki pencerede seçilir. Yazıcının kendi gelişmiş ayarları için oradaki \"Sistem iletişim kutusunu kullanarak yazdır\" seçeneğini kullanabilirsiniz.",
+   "Printer, copies, paper size, orientation, margins, color and two-sided printing are chosen in the next window. For the printer's own advanced settings, use \"Print using system dialog\" there.",
+   "Drucker, Kopien, Papierformat, Ausrichtung, Ränder, Farbe und beidseitiger Druck werden im nächsten Fenster gewählt. Für die erweiterten Druckereinstellungen dort \"Über das Systemdialogfeld drucken\" verwenden.",
+   "La impresora, las copias, el tamaño de papel, la orientación, los márgenes, el color y la impresión a doble cara se eligen en la siguiente ventana. Para los ajustes avanzados de la impresora, use allí \"Imprimir con el cuadro de diálogo del sistema\".",
+   "L'imprimante, le nombre de copies, le format, l'orientation, les marges, la couleur et le recto verso se choisissent dans la fenêtre suivante. Pour les réglages avancés de l'imprimante, utilisez \"Imprimer à l'aide de la boîte de dialogue système\".",
+   "Stampante, copie, formato carta, orientamento, margini, colore e fronte/retro si scelgono nella finestra successiva. Per le impostazioni avanzate della stampante usa \"Stampa utilizzando la finestra di dialogo di sistema\".",
+   "Impressora, cópias, tamanho do papel, orientação, margens, cor e impressão frente e verso são escolhidos na próxima janela. Para as configurações avançadas da impressora, use \"Imprimir usando a caixa de diálogo do sistema\".",
+   "Принтер, число копий, формат бумаги, ориентация, поля, цвет и двусторонняя печать выбираются в следующем окне. Для расширенных настроек принтера используйте там «Печать с помощью системного диалога»."],
+  ["İptal", "Cancel", "Abbrechen", "Cancelar", "Annuler", "Annulla", "Cancelar", "Отмена"],
+  ["Yazdırma için sayfalar hazırlanamadı", "Pages could not be prepared for printing", "Seiten konnten nicht für den Druck vorbereitet werden", "No se pudieron preparar las páginas para imprimir", "Impossible de préparer les pages pour l'impression", "Impossibile preparare le pagine per la stampa", "Não foi possível preparar as páginas para impressão", "Не удалось подготовить страницы к печати"]
+);
 const TX = {};
 TXR.forEach(r => { TX[r[0]] = r.slice(1); });
+TXP.push(["^Geçersiz sayfa aralığı \\(1-(\\d+)\\)$", ["Invalid page range (1-{1})", "Ungültiger Seitenbereich (1-{1})", "Intervalo de páginas no válido (1-{1})", "Plage de pages non valide (1-{1})", "Intervallo di pagine non valido (1-{1})", "Intervalo de páginas inválido (1-{1})", "Недопустимый диапазон страниц (1-{1})"]]);
 const TXPR = TXP.map(p => [new RegExp(p[0]), p[1]]);
 
 function trx(s) {
@@ -3289,7 +3438,7 @@ function setDocButtons(enabled) {
     'btn-undo','btn-save','btn-merge','btn-split','btn-fr','btn-addtext','btn-select','btn-export',
     'btn-shape-dd','btn-hl','btn-stamp','btn-watermark','btn-addimg',
     'btn-reverse','btn-addblank','btn-compress','btn-signature','btn-encrypt',
-    'btn-print','btn-copy-text','btn-pages','qa-save','qa-print','qa-undo',
+    'btn-print','btn-copy-text','btn-pages','qa-save','qa-print','qa-undo','btn-read','qa-read',
     'btn-cv-docx','btn-cv-excel','btn-cv-pptx','btn-cv-images','btn-cv-jpg','btn-cv-txt',
     'btn-cv-epub','btn-cv-azw3','btn-kindle'
   ].forEach(id => {
@@ -3311,13 +3460,15 @@ function applyOpenResult(r) {
   document.getElementById('split-end').value = r.pages;
   setDocButtons(true);
   buildSidebar();
-  selectPage(0);
+  if (r.demo_full && !S.readMode) enterReadMode();
+  else if (S.readMode) { S.currentPage = 0; buildReader(); } else selectPage(0);
   toast(`${r.name} açıldı (${r.pages} sayfa)`, 'ok');
 
   clearBanners();
   if (r.demo_truncated) {
     addBanner('info', '🎯', t('demoTruncated') || 'Demo: yalnızca ilk 3 sayfa açıldı.', null, null);
   }
+  if (r.demo_full) addBanner('info', '🎯', 'Demo sürümü: belgenin tamamını okuyabilir ve yazdırabilirsiniz. Düzenleme ilk 3 sayfada yapılır.', null, null);
   if (r.form_fields > 0) {
     addBanner('info', 'ℹ️',
       `Bu belgede <strong>${r.form_fields}</strong> etkileşimli form alanı var.`,
@@ -3457,6 +3608,7 @@ function rebuildSidebarFull() {
 // ── select page ───────────────────────────────────────────
 
 async function selectPage(i, scrollTo) {
+  if (S.readMode) { readerGo(i); return; }
   document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('selected'));
   const th = document.getElementById(`th-${i}`);
   if (th) th.classList.add('selected');
@@ -3486,7 +3638,7 @@ async function selectPage(i, scrollTo) {
   const v = document.getElementById('viewer');
   let acc = 0, lockUntil = 0;
   v.addEventListener('wheel', e => {
-    if (e.ctrlKey || !S.pageCount || document.querySelector('.modal-backdrop.open')) return;
+    if (S.readMode || e.ctrlKey || !S.pageCount || document.querySelector('.modal-backdrop.open')) return;
     if (e.target.closest('textarea,[contenteditable]')) return;
     const atBottom = v.scrollTop + v.clientHeight >= v.scrollHeight - 2;
     const atTop = v.scrollTop <= 1;
@@ -4198,6 +4350,9 @@ document.addEventListener('mouseup', async e => {
 // ── keyboard shortcuts ────────────────────────────────────
 
 document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); doPrint(); return; }
+  if (document.querySelector('.modal-backdrop.open')) return;
+  if (S.readMode) { readerKey(e); return; }
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); doUndo(); return; }
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -4798,11 +4953,255 @@ function createSignature() {
 }
 
 // ── PRINT & COPY TEXT ────────────────────────────────────────────────────────
+// Yazdırma Windows'un "print" fiiline bağlı değildir (varsayılan PDF uygulaması bu program
+// olduğunda o fiil tanımlı olmaz). Sayfalar seçilen DPI'da görüntülenir ve WebView2'nin yazdırma
+// penceresi açılır: yazıcı, kopya, kağıt, yön, kenar boşluğu, renk ve çift taraf orada seçilir.
+let _printSizes = null;
+
 async function doPrint() {
-  const r = await fetch('/api/print').then(x => x.json()).catch(() => ({ok:false,error:'Bağlantı hatası'}));
-  if (!r.ok) toast('Yazdırma başlatılamadı: ' + r.error, 'err');
-  else toast('Belge yazdırmaya gönderildi', 'ok');
+  if (!S.pageCount) return;
+  const r = await fetch('/api/page_sizes').then(x => x.json()).catch(() => ({ok: false, error: 'Bağlantı hatası'}));
+  if (!r.ok) { toast(r.error, 'err'); return; }
+  if (r.print_block) { toast(r.print_block, 'err'); return; }
+  _printSizes = r.sizes;
+  document.getElementById('pr-all-count').textContent = `(${r.sizes.length})`;
+  document.getElementById('pr-cur-num').textContent = `(${S.currentPage + 1})`;
+  openModal('m-print');
 }
+
+function _parsePageRange(txt, n) {
+  const out = new Set();
+  for (const part of txt.split(/[,;]+/)) {
+    const m = part.trim().match(/^(\d+)\s*(?:-\s*(\d+))?$/);
+    if (!m) { if (part.trim()) return null; continue; }
+    let a = +m[1], b = m[2] ? +m[2] : a;
+    if (a > b) [a, b] = [b, a];
+    if (a < 1 || b > n) return null;
+    for (let i = a; i <= b; i++) out.add(i - 1);
+  }
+  return out.size ? [...out].sort((x, y) => x - y) : null;
+}
+
+async function runPrint() {
+  const n = _printSizes.length;
+  const mode = document.querySelector('input[name=pr-range]:checked').value;
+  let pages;
+  if (mode === 'current') pages = [Math.min(S.currentPage, n - 1)];
+  else if (mode === 'custom') {
+    pages = _parsePageRange(document.getElementById('pr-custom').value, n);
+    if (!pages) { toast(`Geçersiz sayfa aralığı (1-${n})`, 'err'); return; }
+  } else pages = [...Array(n).keys()];
+  const fit = document.getElementById('pr-fit').value;
+  const dpi = document.getElementById('pr-dpi').value;
+  closeModal('m-print');
+
+  document.getElementById('print-root')?.remove();
+  const root = document.createElement('div');
+  root.id = 'print-root';
+  // Seçilen sayfaların hepsi yatay ise kağıt yönü de yatay olsun
+  if (pages.every(i => _printSizes[i][0] > _printSizes[i][1])) {
+    root.innerHTML = '<style>@page { size: landscape; }</style>';
+  }
+  const ts = Date.now();
+  const imgs = pages.map(i => {
+    const box = document.createElement('div');
+    box.className = 'pp ' + fit;
+    const img = new Image();
+    if (fit === 'actual') { img.style.width = _printSizes[i][0] + 'pt'; img.style.height = _printSizes[i][1] + 'pt'; }
+    img.src = `/api/print_page/${i}?dpi=${dpi}&t=${ts}`;
+    box.appendChild(img);
+    root.appendChild(box);
+    return img;
+  });
+  document.body.appendChild(root);
+
+  spin(true);
+  const results = await Promise.all(imgs.map(img => img.decode().then(() => true, () => false)));
+  spin(false);
+  if (results.includes(false)) {
+    root.remove();
+    toast('Yazdırma için sayfalar hazırlanamadı', 'err');
+    return;
+  }
+  window.addEventListener('afterprint', () => root.remove(), {once: true});
+  window.print();
+}
+
+// ── OKUMA MODU ───────────────────────────────────────────────────────────────
+// Program varsayılan PDF görüntüleyici olarak bir dosyayla açıldığında belge önce okuma
+// modunda gösterilir: tüm sayfalar alt alta, yakınlaştırma ve sayfa gezintisi; düzenleme
+// araçları "Düzenle" ile açılır.
+S.readMode = false;
+const RD = {sizes: [], zoom: 'fit-width', scale: 1, observer: null};
+const RD_PX = 96 / 72;   // PDF noktası → CSS pikseli (%100 = gerçek boyut)
+
+async function enterReadMode() {
+  if (!S.pageCount) return;
+  if (selectMode) { cancelSelection(); toggleSelectMode(); }
+  if (annotMode) { deactivateAnnotMode(); document.getElementById('annot-preview').style.display = 'none'; }
+  S.readMode = true;
+  document.body.classList.add('read-mode');
+  await buildReader();
+}
+
+async function exitReadMode() {
+  if (S.pageCount) {
+    const r = await post('/api/demo_edit', {});
+    if (r.ok && r.truncated) {
+      S.pageCount = r.pages;
+      S.currentPage = Math.min(S.currentPage, r.pages - 1);
+      document.getElementById('tb-info').textContent = `${r.pages} sayfa`;
+      document.getElementById('split-end').value = r.pages;
+      rebuildSidebarFull();
+      clearBanners();
+      addBanner('info', '🎯', t('demoTruncated') || 'Demo: yalnızca ilk 3 sayfa açıldı.', null, null);
+    }
+  }
+  S.readMode = false;
+  document.body.classList.remove('read-mode');
+  if (RD.observer) RD.observer.disconnect();
+  document.getElementById('reader').innerHTML = '';
+  if (S.pageCount) selectPage(Math.min(S.currentPage, S.pageCount - 1));
+}
+
+function toggleReadMode() { S.readMode ? exitReadMode() : enterReadMode(); }
+
+async function buildReader() {
+  const r = await fetch('/api/page_sizes').then(x => x.json()).catch(() => ({ok: false}));
+  if (!r.ok) return;
+  RD.sizes = r.sizes;
+  S.ts = Date.now();
+  const reader = document.getElementById('reader');
+  reader.innerHTML = '';
+  document.getElementById('empty-state').style.display = 'none';
+  document.body.classList.add('has-file');
+  if (RD.observer) RD.observer.disconnect();
+  RD.observer = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) _readerLoad(en.target); });
+  }, {root: document.getElementById('viewer'), rootMargin: '600px 0px'});
+  RD.sizes.forEach((sz, i) => {
+    const d = document.createElement('div');
+    d.className = 'rd-page';
+    d.dataset.i = i;
+    d.appendChild(document.createElement('img'));
+    reader.appendChild(d);
+    RD.observer.observe(d);
+  });
+  document.getElementById('rd-page-total').textContent = `/ ${RD.sizes.length}`;
+  _readerLayout();
+  _readerSyncZoomSel();
+  readerGo(Math.min(S.currentPage, RD.sizes.length - 1), true);
+}
+
+function _readerScale() {
+  const v = document.getElementById('viewer');
+  const maxW = Math.max(...RD.sizes.map(s => s[0]));
+  if (RD.zoom === 'fit-width') return Math.min((v.clientWidth - 60) / (maxW * RD_PX), 3);
+  if (RD.zoom === 'fit-page') {
+    const sz = RD.sizes[S.currentPage] || RD.sizes[0];
+    return Math.min((v.clientWidth - 60) / (sz[0] * RD_PX), (v.clientHeight - 40) / (sz[1] * RD_PX));
+  }
+  return RD.scale;
+}
+
+function _readerLayout() {
+  if (!RD.sizes.length) return;
+  RD.scale = Math.max(0.1, _readerScale());
+  document.querySelectorAll('#reader .rd-page').forEach(d => {
+    const [w, h] = RD.sizes[+d.dataset.i];
+    d.style.width = Math.round(w * RD_PX * RD.scale) + 'px';
+    d.style.height = Math.round(h * RD_PX * RD.scale) + 'px';
+    if (d.dataset.loaded) { delete d.dataset.loaded; RD.observer.unobserve(d); RD.observer.observe(d); }
+  });
+}
+
+function _readerLoad(d) {
+  // Ekran yoğunluğuna göre net görüntü; ölçek 0.25 adımlarına yuvarlanır
+  const want = Math.min(5, Math.max(0.5, Math.ceil(RD.scale * RD_PX * (window.devicePixelRatio || 1) * 4) / 4));
+  if (d.dataset.loaded == want) return;
+  d.dataset.loaded = want;
+  d.querySelector('img').src = `/api/view/${d.dataset.i}?s=${want}&t=${S.ts}`;
+}
+
+function readerGo(i, instant) {
+  if (!RD.sizes.length || isNaN(i)) return;
+  i = Math.max(0, Math.min(i, RD.sizes.length - 1));
+  const d = document.querySelector(`#reader .rd-page[data-i="${i}"]`);
+  if (d) document.getElementById('viewer').scrollTop = d.offsetTop - 12;
+  _readerSetCurrent(i);
+}
+
+function _readerSetCurrent(i) {
+  S.currentPage = i;
+  document.getElementById('rd-page-input').value = i + 1;
+  document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('selected'));
+  const th = document.getElementById(`th-${i}`);
+  if (th) { th.classList.add('selected'); th.scrollIntoView({block: 'nearest'}); }
+}
+
+function readerSetZoom(z) {
+  const anchor = S.currentPage;
+  if (z === 'fit-width' || z === 'fit-page') RD.zoom = z;
+  else { RD.zoom = 'custom'; RD.scale = Math.min(5, Math.max(0.1, parseFloat(z))); }
+  _readerLayout();
+  _readerSyncZoomSel();
+  readerGo(anchor, true);
+}
+
+function _readerSyncZoomSel() {
+  const sel = document.getElementById('rd-zoom');
+  if (RD.zoom !== 'custom') { sel.value = RD.zoom; return; }
+  const opt = [...sel.options].find(o => !isNaN(+o.value) && o.value !== '' && Math.abs(+o.value - RD.scale) < 0.001);
+  if (opt) { sel.value = opt.value; return; }
+  sel.options[sel.options.length - 1].textContent = Math.round(RD.scale * 100) + '%';
+  sel.value = 'custom';
+}
+
+function readerZoomStep(dir) {
+  const steps = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4, 5];
+  const cur = RD.scale;
+  const next = dir > 0 ? steps.find(z => z > cur + 0.001) : [...steps].reverse().find(z => z < cur - 0.001);
+  if (next) readerSetZoom(String(next));
+}
+
+function readerKey(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  const v = document.getElementById('viewer');
+  if (e.key === 'PageDown' || e.key === 'ArrowRight') { e.preventDefault(); readerGo(S.currentPage + 1); }
+  else if (e.key === 'PageUp' || e.key === 'ArrowLeft') { e.preventDefault(); readerGo(S.currentPage - 1); }
+  else if (e.key === 'Home' && !e.ctrlKey) { e.preventDefault(); readerGo(0); }
+  else if (e.key === 'End' && !e.ctrlKey) { e.preventDefault(); readerGo(RD.sizes.length - 1); }
+  else if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')) { e.preventDefault(); readerZoomStep(1); }
+  else if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); readerZoomStep(-1); }
+  else if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); readerSetZoom('fit-width'); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); v.scrollTop += 60; }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); v.scrollTop -= 60; }
+}
+
+(() => {
+  const v = document.getElementById('viewer');
+  // Kaydırırken geçerli sayfayı güncelle
+  v.addEventListener('scroll', () => {
+    if (!S.readMode || !RD.sizes.length) return;
+    const mid = v.scrollTop + v.clientHeight / 3;
+    const pages = document.querySelectorAll('#reader .rd-page');
+    let cur = 0;
+    for (const d of pages) { if (d.offsetTop <= mid) cur = +d.dataset.i; else break; }
+    if (cur !== S.currentPage) _readerSetCurrent(cur);
+  }, {passive: true});
+  // Ctrl + tekerlek: yakınlaştır / uzaklaştır
+  v.addEventListener('wheel', e => {
+    if (!S.readMode || !e.ctrlKey) return;
+    e.preventDefault();
+    readerZoomStep(e.deltaY < 0 ? 1 : -1);
+  }, {passive: false});
+  let rt;
+  window.addEventListener('resize', () => {
+    if (!S.readMode || RD.zoom === 'custom') return;
+    clearTimeout(rt);
+    rt = setTimeout(() => { const a = S.currentPage; _readerLayout(); readerGo(a, true); }, 150);
+  });
+})();
 
 async function doCopyText() {
   const r = await fetch('/api/text').then(x => x.json()).catch(() => ({ok:false,error:'Bağlantı hatası'}));
@@ -4983,7 +5382,9 @@ setLang(currentLang);
     document.getElementById('split-end').value = r.pages;
     setDocButtons(true);
     buildSidebar();
-    await selectPage(0);
+    if (r.demo_full) addBanner('info', '🎯', 'Demo sürümü: belgenin tamamını okuyabilir ve yazdırabilirsiniz. Düzenleme ilk 3 sayfada yapılır.', null, null);
+    if (r.demo_full || new URLSearchParams(location.search).get('mode') === 'read') await enterReadMode();
+    else await selectPage(0);
   }
 })();
 </script>
