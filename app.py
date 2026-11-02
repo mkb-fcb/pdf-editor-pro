@@ -510,6 +510,19 @@ def resolve_font(pdf_fontname, flags=0):
     }
 
     idx = (1 if is_bold else 0) + (2 if is_italic else 0)
+    # Free font families shipped with the app (static/fonts): when a PDF embeds only a subset
+    # of one of these, edits with new characters still use the very same typeface
+    BUNDLED = {
+        'dejavusansmono': ('DejaVuSansMono.ttf', 'DejaVuSansMono-Bold.ttf', 'DejaVuSansMono.ttf', 'DejaVuSansMono-Bold.ttf'),
+        'dejavusans':     ('DejaVuSans.ttf', 'DejaVuSans-Bold.ttf', 'DejaVuSans-Oblique.ttf', 'DejaVuSans-BoldOblique.ttf'),
+        'dejavuserif':    ('DejaVuSerif.ttf', 'DejaVuSerif-Bold.ttf', 'DejaVuSerif-Italic.ttf', 'DejaVuSerif-BoldItalic.ttf'),
+    }
+    font_dir = os.path.join(_BASE_DIR, 'static', 'fonts')
+    for key, files in BUNDLED.items():
+        if key in base:
+            f = os.path.join(font_dir, files[idx])
+            if os.path.exists(f):
+                return f, os.path.splitext(files[idx])[0].replace('-', ''), is_bold, is_italic
     for key, files in MAP.items():
         if key in base:
             for attempt_idx in [idx, 0]:
