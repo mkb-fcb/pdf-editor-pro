@@ -1,0 +1,29 @@
+# derleme ve paketler
+build/
+dist/
+installer_output/
+__pycache__/
+*.pyc
+*.exe
+*.msix
+*.msixupload
+
+# cloudflare / yerel ortam
+.wrangler/
+.dev.vars
+.env
+*.bak*
+worker.js.bak-*
+
+# yedekler ve dahili notlar
+_yedek_*/
+_pazarlama/
+*.pdf
+DEGISIKLIKLER_*.md
+PROJE_DURUMU.md
+video_senaryo.txt
+
+# lisans sunucusu: ayrı bir program, PyMuPDF kullanmaz (AGPL kapsamında değil)
+# license.py ise programın parçasıdır ve AGPL gereği repoda olmalıdır
+worker.js
+wrangler.toml

@@ -51,7 +51,7 @@ CONVERT & PROTECT
 Multilingual interface: English, Turkish, German, French, Spanish, Italian, Portuguese and Russian.
 
 FREE DEMO & FULL VERSION
-The app is free to download and runs as a demo without a license: complete documents can be read and printed for free, editing works on the first 3 pages, saved files carry a "DEMO" watermark, and password protection and Word/Excel/PowerPoint/JPG/EPUB export are disabled. To unlock the full version, click "Buy Full Version" in the app and pay through the Microsoft Store (one-time, no subscription). A license key bought at https://mkbsoft.net also works via the "Enter License" button; a corporate license for up to 5 PCs ($29.99 one-time) is available there.
+The app is free to download and runs as a demo without a license: complete documents can be read and printed for free, editing works on the first 3 pages, saved files carry a "DEMO" watermark, and password protection and Word/Excel/PowerPoint/JPG/EPUB export are disabled. To unlock the full version, click "Buy Full Version" in the app and pay through the Microsoft Store (one-time, no subscription). A license key bought at https://mkbsoft.net also works via the "Enter License" button; a corporate license for up to 5 PCs ($29.99 one-time) is available there. PDF Editor Pro is open source under the AGPL-3.0 license; source code: https://github.com/mkb-fcb/pdf-editor-pro
 
 --- What's new in this version ---
 • PDF to e-book: convert PDFs to EPUB with reflowing text, headings, chapters, images, charts and tables.
@@ -129,7 +129,7 @@ DÖNÜŞTÜR & KORU
 Çok dilli arayüz: Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Portekizce ve Rusça.
 
 ÜCRETSİZ DEMO VE TAM SÜRÜM
-Lisans girilmeden uygulama ücretsiz demo olarak çalışır: belgelerin tamamı ücretsiz okunur ve yazdırılır, düzenleme ilk 3 sayfada yapılır, kaydedilen dosyalarda "DEMO" filigranı; şifreleme ve Word/Excel/PowerPoint/JPG/EPUB dışa aktarma kapalıdır. Tam sürüm için uygulamadaki "Tam Sürümü Satın Al" düğmesine basıp Microsoft Store üzerinden ödeme yapın (tek seferlik, abonelik yok). https://mkbsoft.net adresinden alınan lisans anahtarı da "Lisans Gir" butonuyla çalışır; 5 bilgisayara kadar kurumsal lisans (tek seferlik 29,99 $) oradan alınabilir.
+Lisans girilmeden uygulama ücretsiz demo olarak çalışır: belgelerin tamamı ücretsiz okunur ve yazdırılır, düzenleme ilk 3 sayfada yapılır, kaydedilen dosyalarda "DEMO" filigranı; şifreleme ve Word/Excel/PowerPoint/JPG/EPUB dışa aktarma kapalıdır. Tam sürüm için uygulamadaki "Tam Sürümü Satın Al" düğmesine basıp Microsoft Store üzerinden ödeme yapın (tek seferlik, abonelik yok). https://mkbsoft.net adresinden alınan lisans anahtarı da "Lisans Gir" butonuyla çalışır; 5 bilgisayara kadar kurumsal lisans (tek seferlik 29,99 $) oradan alınabilir. PDF Editor Pro, AGPL-3.0 lisanslı açık kaynak bir yazılımdır; kaynak kodu: https://github.com/mkb-fcb/pdf-editor-pro
 
 --- What's new in this version ---
 • PDF'ten e-kitaba: PDF'leri EPUB'a dönüştürün; metin ekrana göre akar, başlıklar, bölümler, resimler, grafikler ve tablolar korunur.

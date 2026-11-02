@@ -29,6 +29,10 @@ import store_iap as _iap
 
 MAX_HISTORY = 15
 
+# Keep in sync with installer.iss / installer_demo.iss (MyAppVersion) and build_msix.py's argument
+APP_VERSION = '1.1.0'
+SOURCE_URL = 'https://github.com/mkb-fcb/pdf-editor-pro'
+
 # Lisans girilmemişse uygulama demo modunda çalışır (3 sayfa, filigranlı kayıt)
 DEMO_MAX_PAGES = 3
 DEMO_LIMIT_MSG = (f'Demo sürümünde en fazla {DEMO_MAX_PAGES} sayfa desteklenir. '
@@ -580,7 +584,8 @@ def _has_underline(bbox, drawings):
 def index():
     demo = is_demo()
     _count_launch()
-    resp = make_response(render_template('index.html', demo_mode=demo, can_activate=demo))
+    resp = make_response(render_template('index.html', demo_mode=demo, can_activate=demo,
+                                         app_version=APP_VERSION))
     resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     resp.headers['Pragma'] = 'no-cache'
     resp.headers['Expires'] = '0'
@@ -1600,6 +1605,9 @@ def api_open_link():
         'kindle_settings': 'https://www.amazon.com/hz/mycd/myx#/home/settings/pdoc',
         'calibre': 'https://calibre-ebook.com/download_windows',
         'buy': BUY_URL,
+        # AGPL-3.0: the source of exactly this version, and the license text
+        'source': f'{SOURCE_URL}/tree/v{APP_VERSION}',
+        'agpl': 'https://www.gnu.org/licenses/agpl-3.0.html',
     }
     url = links.get((request.json or {}).get('key'))
     if not url:

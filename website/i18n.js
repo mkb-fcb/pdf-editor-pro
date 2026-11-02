@@ -180,7 +180,9 @@ window.SITE_I18N = {
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Einmalzahlung &nbsp;·&nbsp; Sofortige Lieferung &nbsp;·&nbsp; 14 Tage Geld-zurück",
   "E-book": "E-Book",
   "Send PDF to Kindle": "PDF an Kindle senden",
-  "Free PDF editor (no crack)": "Kostenloser PDF-Editor (ohne Crack)"
+  "Free PDF editor (no crack)": "Kostenloser PDF-Editor (ohne Crack)",
+  "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Open-Source-Software (AGPL-3.0)",
+  "Source code": "Quellcode"
  },
  "es": {
   "What's new": "Novedades",
@@ -362,7 +364,9 @@ window.SITE_I18N = {
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Pago único &nbsp;·&nbsp; Entrega inmediata &nbsp;·&nbsp; Reembolso en 14 días",
   "E-book": "Libro electrónico",
   "Send PDF to Kindle": "Enviar PDF a Kindle",
-  "Free PDF editor (no crack)": "Editor PDF gratis (sin crack)"
+  "Free PDF editor (no crack)": "Editor PDF gratis (sin crack)",
+  "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Software de código abierto (AGPL-3.0)",
+  "Source code": "Código fuente"
  },
  "fr": {
   "What's new": "Nouveautés",
@@ -544,7 +548,9 @@ window.SITE_I18N = {
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Paiement unique &nbsp;·&nbsp; Livraison immédiate &nbsp;·&nbsp; Remboursement sous 14 jours",
   "E-book": "Livre numérique",
   "Send PDF to Kindle": "Envoyer un PDF sur Kindle",
-  "Free PDF editor (no crack)": "Éditeur PDF gratuit (sans crack)"
+  "Free PDF editor (no crack)": "Éditeur PDF gratuit (sans crack)",
+  "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Logiciel open source (AGPL-3.0)",
+  "Source code": "Code source"
  },
  "it": {
   "What's new": "Novità",
@@ -726,7 +732,9 @@ window.SITE_I18N = {
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Pagamento unico &nbsp;·&nbsp; Consegna immediata &nbsp;·&nbsp; Rimborso entro 14 giorni",
   "E-book": "E-book",
   "Send PDF to Kindle": "Inviare PDF a Kindle",
-  "Free PDF editor (no crack)": "Editor PDF gratis (senza crack)"
+  "Free PDF editor (no crack)": "Editor PDF gratis (senza crack)",
+  "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Software open source (AGPL-3.0)",
+  "Source code": "Codice sorgente"
  },
  "pt": {
   "What's new": "Novidades",
@@ -908,7 +916,9 @@ window.SITE_I18N = {
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Pagamento único &nbsp;·&nbsp; Entrega imediata &nbsp;·&nbsp; Reembolso em 14 dias",
   "E-book": "E-book",
   "Send PDF to Kindle": "Enviar PDF para o Kindle",
-  "Free PDF editor (no crack)": "Editor de PDF grátis (sem crack)"
+  "Free PDF editor (no crack)": "Editor de PDF grátis (sem crack)",
+  "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Software de código aberto (AGPL-3.0)",
+  "Source code": "Código-fonte"
  },
  "ru": {
   "What's new": "Что нового",
@@ -1090,6 +1100,8 @@ window.SITE_I18N = {
   "One-time payment  ·  Instant delivery  ·  14-day refund guarantee": "Разовый платёж &nbsp;·&nbsp; Мгновенная доставка &nbsp;·&nbsp; Возврат в течение 14 дней",
   "E-book": "Эл. книги",
   "Send PDF to Kindle": "Отправить PDF на Kindle",
-  "Free PDF editor (no crack)": "Бесплатный PDF-редактор (без кряка)"
+  "Free PDF editor (no crack)": "Бесплатный PDF-редактор (без кряка)",
+  "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Программа с открытым кодом (AGPL-3.0)",
+  "Source code": "Исходный код"
  }
 };

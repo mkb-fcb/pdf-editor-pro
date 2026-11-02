@@ -240,6 +240,11 @@ T = {
 "Free PDF editor (no crack)": (
     "Kostenloser PDF-Editor (ohne Crack)", "Editor PDF gratis (sin crack)", "Éditeur PDF gratuit (sans crack)",
     "Editor PDF gratis (senza crack)", "Editor de PDF grátis (sem crack)", "Бесплатный PDF-редактор (без кряка)"),
+"© 2026 MKBSoft · Open-source software (AGPL-3.0)": (
+    "© 2026 MKBSoft · Open-Source-Software (AGPL-3.0)", "© 2026 MKBSoft · Software de código abierto (AGPL-3.0)",
+    "© 2026 MKBSoft · Logiciel open source (AGPL-3.0)", "© 2026 MKBSoft · Software open source (AGPL-3.0)",
+    "© 2026 MKBSoft · Software de código aberto (AGPL-3.0)", "© 2026 MKBSoft · Программа с открытым кодом (AGPL-3.0)"),
+"Source code": ("Quellcode", "Código fuente", "Code source", "Codice sorgente", "Código-fonte", "Исходный код"),
 "Send PDF to Kindle": (
     "PDF an Kindle senden", "Enviar PDF a Kindle", "Envoyer un PDF sur Kindle", "Inviare PDF a Kindle",
     "Enviar PDF para o Kindle", "Отправить PDF на Kindle"),
