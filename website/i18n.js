@@ -182,7 +182,8 @@ window.SITE_I18N = {
   "Send PDF to Kindle": "PDF an Kindle senden",
   "Free PDF editor (no crack)": "Kostenloser PDF-Editor (ohne Crack)",
   "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Open-Source-Software (AGPL-3.0)",
-  "Source code": "Quellcode"
+  "Source code": "Quellcode",
+  "Kindle is a trademark of Amazon.com, Inc. PDF Editor Pro is not affiliated with Amazon.": "Kindle ist eine Marke von Amazon.com, Inc. PDF Editor Pro steht in keiner Verbindung zu Amazon."
  },
  "es": {
   "What's new": "Novedades",
@@ -366,7 +367,8 @@ window.SITE_I18N = {
   "Send PDF to Kindle": "Enviar PDF a Kindle",
   "Free PDF editor (no crack)": "Editor PDF gratis (sin crack)",
   "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Software de código abierto (AGPL-3.0)",
-  "Source code": "Código fuente"
+  "Source code": "Código fuente",
+  "Kindle is a trademark of Amazon.com, Inc. PDF Editor Pro is not affiliated with Amazon.": "Kindle es una marca comercial de Amazon.com, Inc. PDF Editor Pro no está afiliado a Amazon."
  },
  "fr": {
   "What's new": "Nouveautés",
@@ -550,7 +552,8 @@ window.SITE_I18N = {
   "Send PDF to Kindle": "Envoyer un PDF sur Kindle",
   "Free PDF editor (no crack)": "Éditeur PDF gratuit (sans crack)",
   "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Logiciel open source (AGPL-3.0)",
-  "Source code": "Code source"
+  "Source code": "Code source",
+  "Kindle is a trademark of Amazon.com, Inc. PDF Editor Pro is not affiliated with Amazon.": "Kindle est une marque d’Amazon.com, Inc. PDF Editor Pro n’est pas affilié à Amazon."
  },
  "it": {
   "What's new": "Novità",
@@ -734,7 +737,8 @@ window.SITE_I18N = {
   "Send PDF to Kindle": "Inviare PDF a Kindle",
   "Free PDF editor (no crack)": "Editor PDF gratis (senza crack)",
   "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Software open source (AGPL-3.0)",
-  "Source code": "Codice sorgente"
+  "Source code": "Codice sorgente",
+  "Kindle is a trademark of Amazon.com, Inc. PDF Editor Pro is not affiliated with Amazon.": "Kindle è un marchio di Amazon.com, Inc. PDF Editor Pro non è affiliato ad Amazon."
  },
  "pt": {
   "What's new": "Novidades",
@@ -918,7 +922,8 @@ window.SITE_I18N = {
   "Send PDF to Kindle": "Enviar PDF para o Kindle",
   "Free PDF editor (no crack)": "Editor de PDF grátis (sem crack)",
   "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Software de código aberto (AGPL-3.0)",
-  "Source code": "Código-fonte"
+  "Source code": "Código-fonte",
+  "Kindle is a trademark of Amazon.com, Inc. PDF Editor Pro is not affiliated with Amazon.": "Kindle é uma marca registrada da Amazon.com, Inc. O PDF Editor Pro não é afiliado à Amazon."
  },
  "ru": {
   "What's new": "Что нового",
@@ -1102,6 +1107,7 @@ window.SITE_I18N = {
   "Send PDF to Kindle": "Отправить PDF на Kindle",
   "Free PDF editor (no crack)": "Бесплатный PDF-редактор (без кряка)",
   "© 2026 MKBSoft · Open-source software (AGPL-3.0)": "© 2026 MKBSoft · Программа с открытым кодом (AGPL-3.0)",
-  "Source code": "Исходный код"
+  "Source code": "Исходный код",
+  "Kindle is a trademark of Amazon.com, Inc. PDF Editor Pro is not affiliated with Amazon.": "Kindle — товарный знак Amazon.com, Inc. PDF Editor Pro не связан с Amazon."
  }
 };

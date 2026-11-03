@@ -245,6 +245,13 @@ T = {
     "© 2026 MKBSoft · Logiciel open source (AGPL-3.0)", "© 2026 MKBSoft · Software open source (AGPL-3.0)",
     "© 2026 MKBSoft · Software de código aberto (AGPL-3.0)", "© 2026 MKBSoft · Программа с открытым кодом (AGPL-3.0)"),
 "Source code": ("Quellcode", "Código fuente", "Code source", "Codice sorgente", "Código-fonte", "Исходный код"),
+"Kindle is a trademark of Amazon.com, Inc. PDF Editor Pro is not affiliated with Amazon.": (
+    "Kindle ist eine Marke von Amazon.com, Inc. PDF Editor Pro steht in keiner Verbindung zu Amazon.",
+    "Kindle es una marca comercial de Amazon.com, Inc. PDF Editor Pro no está afiliado a Amazon.",
+    "Kindle est une marque d’Amazon.com, Inc. PDF Editor Pro n’est pas affilié à Amazon.",
+    "Kindle è un marchio di Amazon.com, Inc. PDF Editor Pro non è affiliato ad Amazon.",
+    "Kindle é uma marca registrada da Amazon.com, Inc. O PDF Editor Pro não é afiliado à Amazon.",
+    "Kindle — товарный знак Amazon.com, Inc. PDF Editor Pro не связан с Amazon."),
 "Send PDF to Kindle": (
     "PDF an Kindle senden", "Enviar PDF a Kindle", "Envoyer un PDF sur Kindle", "Inviare PDF a Kindle",
     "Enviar PDF para o Kindle", "Отправить PDF на Kindle"),
