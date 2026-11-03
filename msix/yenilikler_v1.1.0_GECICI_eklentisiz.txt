@@ -1,0 +1,49 @@
+Partner Center > Store listings > (her dil) > "What's new in this version" alanına yapıştırın.
+
+[TR]
+• Yeni Okuma Modu: PDF'e çift tıklayınca belge sade okuma ekranında açılır; sayfalar alt alta kayar, yakınlaştırma ve sayfa gezintisi var. Düzenlemek için "Düzenle" düğmesine basın.
+• Yakınlaştırma: düzenlerken ve okurken sayfayı büyütüp küçültün (Ctrl + tekerlek, Ctrl +/−). Okuma görünümü: sürekli, tek sayfa, iki sayfa, kapak ayrı; tam ekran ve küçük resim paneli.
+• Yazdırma yenilendi: yazıcı, kopya sayısı, sayfa aralığı, kağıt boyutu, yön, kenar boşlukları, renk, çift taraflı baskı ve baskı kalitesi seçilebilir. Ctrl+P ile açılır.
+• Okuma ve yazdırma artık ücretsiz: demo sürümünde de belgenin tamamını okuyup yazdırabilirsiniz.
+
+[EN]
+• New Reading Mode: double-click a PDF and it opens in a clean reading view with continuous scrolling, zoom and page navigation. Press "Edit" to open the editing tools.
+• Zoom: enlarge or shrink the page while editing and reading (Ctrl + wheel, Ctrl +/−). Reading layouts: continuous, single page, two pages, cover separate; full screen and a thumbnail panel toggle.
+• Printing rebuilt: choose printer, copies, page range, paper size, orientation, margins, color, two-sided printing and print quality. Opens with Ctrl+P.
+• Reading and printing are now free: the demo version reads and prints the whole document.
+
+[DE]
+• Neuer Lesemodus: Ein Doppelklick auf eine PDF öffnet sie in einer übersichtlichen Leseansicht mit fortlaufendem Scrollen, Zoom und Seitennavigation. Mit „Bearbeiten“ öffnen Sie die Bearbeitungswerkzeuge.
+• Zoom: Seite beim Bearbeiten und Lesen vergrößern oder verkleinern (Strg + Mausrad, Strg +/−). Leseansichten: fortlaufend, Einzelseite, zwei Seiten, Titelblatt einzeln; Vollbild und ausblendbare Miniaturen.
+• Drucken überarbeitet: Drucker, Kopien, Seitenbereich, Papierformat, Ausrichtung, Ränder, Farbe, beidseitiger Druck und Druckqualität wählbar. Öffnet mit Strg+P.
+• Lesen und Drucken jetzt kostenlos: Auch die Demoversion zeigt und druckt das gesamte Dokument.
+
+[ES]
+• Nuevo modo lectura: al hacer doble clic en un PDF se abre en una vista de lectura limpia con desplazamiento continuo, zoom y navegación por páginas. Pulse «Editar» para abrir las herramientas de edición.
+• Zoom: amplíe o reduzca la página al editar y leer (Ctrl + rueda, Ctrl +/−). Vistas de lectura: continua, una página, dos páginas, portada aparte; pantalla completa y panel de miniaturas.
+• Impresión renovada: elija impresora, copias, intervalo de páginas, tamaño de papel, orientación, márgenes, color, impresión a doble cara y calidad. Se abre con Ctrl+P.
+• Leer e imprimir ahora es gratis: la versión demo muestra e imprime todo el documento.
+
+[FR]
+• Nouveau mode lecture : un double-clic sur un PDF l'ouvre dans une vue de lecture épurée avec défilement continu, zoom et navigation par page. Cliquez sur « Modifier » pour ouvrir les outils d'édition.
+• Zoom : agrandissez ou réduisez la page en édition comme en lecture (Ctrl + molette, Ctrl +/−). Affichages : continu, page unique, deux pages, couverture seule ; plein écran et panneau de miniatures.
+• Impression repensée : choix de l'imprimante, du nombre de copies, de la plage de pages, du format, de l'orientation, des marges, de la couleur, du recto verso et de la qualité. S'ouvre avec Ctrl+P.
+• Lecture et impression désormais gratuites : la version démo affiche et imprime tout le document.
+
+[IT]
+• Nuova modalità lettura: con un doppio clic il PDF si apre in una vista di lettura pulita con scorrimento continuo, zoom e navigazione tra le pagine. Premi «Modifica» per aprire gli strumenti di modifica.
+• Zoom: ingrandisci o riduci la pagina durante modifica e lettura (Ctrl + rotellina, Ctrl +/−). Viste di lettura: continua, pagina singola, due pagine, copertina separata; schermo intero e pannello miniature.
+• Stampa rinnovata: scegli stampante, copie, intervallo di pagine, formato carta, orientamento, margini, colore, fronte/retro e qualità di stampa. Si apre con Ctrl+P.
+• Lettura e stampa ora gratuite: anche la versione demo mostra e stampa l'intero documento.
+
+[PT-BR]
+• Novo modo de leitura: ao clicar duas vezes em um PDF, ele abre em uma visualização limpa com rolagem contínua, zoom e navegação entre páginas. Clique em "Editar" para abrir as ferramentas de edição.
+• Zoom: amplie ou reduza a página ao editar e ler (Ctrl + roda do mouse, Ctrl +/−). Exibições de leitura: contínua, página única, duas páginas, capa separada; tela cheia e painel de miniaturas.
+• Impressão reformulada: escolha impressora, cópias, intervalo de páginas, tamanho do papel, orientação, margens, cor, frente e verso e qualidade. Abre com Ctrl+P.
+• Ler e imprimir agora é grátis: a versão demo mostra e imprime o documento inteiro.
+
+[RU]
+• Новый режим чтения: по двойному щелчку PDF открывается в удобном режиме чтения с непрерывной прокруткой, масштабированием и переходом по страницам. Кнопка «Редактировать» открывает инструменты редактирования.
+• Масштаб: увеличивайте и уменьшайте страницу при редактировании и чтении (Ctrl + колесо, Ctrl +/−). Режимы просмотра: непрерывно, одна страница, две страницы, обложка отдельно; полный экран и панель миниатюр.
+• Обновлённая печать: выбор принтера, числа копий, диапазона страниц, формата бумаги, ориентации, полей, цвета, двусторонней печати и качества. Открывается по Ctrl+P.
+• Чтение и печать теперь бесплатны: демоверсия показывает и печатает весь документ.
