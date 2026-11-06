@@ -187,6 +187,8 @@ Steps:
 4. Click the open button and choose any PDF file to test editing, merging, splitting, compressing, exporting and password protection.
 
 The interface opens in Turkish by default. To switch to English, click the "TR" language button in the toolbar and choose "English".
-Licenses are sold outside the Store (https://mkbsoft.net) as permitted for non-game apps under Microsoft Store Policy 10.8.
+The full version can also be bought in-app through the Microsoft Store add-on "pdfeditorpro_full" ("Buy Full Version" button in the demo banner). License keys from https://mkbsoft.net keep working as an alternative, as permitted for non-game apps under Microsoft Store Policy 10.8.
+
+Scanned PDFs: this version recognises the text of scanned pages so it can be edited. For this the package includes Tesseract OCR (Apache License 2.0, folder _internal	esseract), started by the app as a helper process. It runs entirely on the PC; no document or text is sent anywhere. To try it, open any scanned PDF (a page that is one picture), wait for the "Reading the text of the scanned page…" note to disappear, then click a line of text.
 
 Contact: destek@mkbsoft.net
