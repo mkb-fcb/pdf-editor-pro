@@ -36,15 +36,16 @@ Ohne Lizenz läuft die App als kostenlose Demo: Ganze Dokumente lesen und drucke
 Kindle ist eine Marke von Amazon.com, Inc. PDF Editor Pro steht in keiner Verbindung zu Amazon.
 
 --- What's new in this version ---
-• PDF Editor Pro kann jetzt in Windows als Standard-PDF-App festgelegt werden: Ein Doppelklick auf eine PDF öffnet sie direkt im Lesemodus.
-• Neuer Lesemodus: Ein Doppelklick auf eine PDF öffnet sie in einer übersichtlichen Leseansicht mit fortlaufendem Scrollen, Zoom und Seitennavigation. Mit „Bearbeiten“ öffnen Sie die Bearbeitungswerkzeuge.
-• Zoom: Seite beim Bearbeiten und Lesen vergrößern oder verkleinern (Strg + Mausrad, Strg +/−). Leseansichten: fortlaufend, Einzelseite, zwei Seiten, Titelblatt einzeln; Vollbild und ausblendbare Miniaturen.
-• Drucken überarbeitet: Drucker, Kopien, Seitenbereich, Papierformat, Ausrichtung, Ränder, Farbe, beidseitiger Druck und Druckqualität wählbar. Öffnet mit Strg+P.
-• Lesen und Drucken jetzt kostenlos: Auch die Demoversion zeigt und druckt das gesamte Dokument.
-• Die Vollversion kann jetzt direkt in der App über den Microsoft Store gekauft werden.
+• Gescannte PDFs lassen sich jetzt bearbeiten: Text in Scans und Kopien ändern, löschen oder verschieben. Neue Wörter erscheinen in Schrift, Größe, Stärke und Farbton des Scans, auch auf farbigem Papier und bei weißer Schrift auf farbigen Balken.
+• Integrierte Texterkennung (OCR) für gescannte Seiten: zwei Erkennungsprogramme arbeiten zusammen und lesen kleine, blasse und Nadeldrucker-Schrift sowie Umlaute und Sonderzeichen zuverlässig.
+• Neu: „Hintergrund säubern“ (Registerkarte Bearbeiten) macht den grauen Kopierton, vergilbtes oder farbiges Papier und Schatten gescannter Seiten weiß. Farben behalten oder Schwarzweiß; Formularkästchen bleiben erhalten.
+• Gescannte Dokumente werden als bearbeitbarer Text im Layout der Originalseite nach Word exportiert; Excel, Textdatei und „Text kopieren“ nutzen ebenfalls den erkannten Text.
+• Große Scans (600 dpi) öffnen, bearbeiten und exportieren schneller und brauchen viel weniger Arbeitsspeicher.
 
 --- Product features (her satır ayrı kutuya) ---
 Vorhandenen Text direkt auf der PDF-Seite bearbeiten
+Text in gescannten PDFs bearbeiten, mit integrierter Texterkennung (OCR)
+Hintergrund gescannter Seiten säubern (Kopiergrau, farbiges Papier)
 Seiten zusammenführen, teilen, drehen und sortieren
 Text, Bilder, Formen, Markierungen, Stempel und Wasserzeichen hinzufügen
 PDF nach Word, Excel, PowerPoint, Bilder oder Text exportieren
@@ -105,15 +106,16 @@ Sin licencia, la app funciona como demo gratuita: leer e imprimir documentos com
 Kindle es una marca comercial de Amazon.com, Inc. PDF Editor Pro no está afiliado a Amazon.
 
 --- What's new in this version ---
-• PDF Editor Pro ya se puede elegir como aplicación PDF predeterminada en Windows: al hacer doble clic en un PDF se abre directamente en modo lectura.
-• Nuevo modo lectura: al hacer doble clic en un PDF se abre en una vista de lectura limpia con desplazamiento continuo, zoom y navegación por páginas. Pulse «Editar» para abrir las herramientas de edición.
-• Zoom: amplíe o reduzca la página al editar y leer (Ctrl + rueda, Ctrl +/−). Vistas de lectura: continua, una página, dos páginas, portada aparte; pantalla completa y panel de miniaturas.
-• Impresión renovada: elija impresora, copias, intervalo de páginas, tamaño de papel, orientación, márgenes, color, impresión a doble cara y calidad. Se abre con Ctrl+P.
-• Leer e imprimir ahora es gratis: la versión demo muestra e imprime todo el documento.
-• Ahora puede comprar la versión completa desde la app a través de Microsoft Store.
+• Ahora se pueden editar PDF escaneados: cambie, borre o mueva el texto de escaneos y fotocopias. Las palabras nuevas se dibujan con la tipografía, el tamaño, el grosor y el tono del propio escaneo, también sobre papel de color y en texto blanco sobre franjas de color.
+• Reconocimiento de texto (OCR) integrado para páginas escaneadas: dos motores trabajan juntos y leen con precisión texto pequeño, tenue o de impresora matricial y caracteres acentuados.
+• Nuevo «Limpiar fondo» (pestaña Editar): vuelve blancos el tono gris de fotocopia, el papel amarillento o de color y las sombras de las páginas escaneadas. Conserve los colores o páselo a blanco y negro; las casillas de los formularios se mantienen.
+• Los documentos escaneados se exportan a Word como texto editable con el diseño de la página original; Excel, archivos de texto y «Copiar texto» también usan el texto reconocido.
+• Los escaneos grandes (600 ppp) se abren, editan y exportan más rápido y usan mucha menos memoria.
 
 --- Product features (her satır ayrı kutuya) ---
 Edita el texto existente directamente en la página
+Edite el texto de PDF escaneados, con reconocimiento de texto (OCR) integrado
+Limpie el fondo de las páginas escaneadas (gris de fotocopia, papel de color)
 Une, divide, gira y reordena páginas
 Añade texto, imágenes, formas, resaltados, sellos y marcas de agua
 Exporta PDF a Word, Excel, PowerPoint, imágenes o texto
@@ -174,15 +176,16 @@ Sans licence, l’application fonctionne en démo gratuite : lecture et impressi
 Kindle est une marque d’Amazon.com, Inc. PDF Editor Pro n’est pas affilié à Amazon.
 
 --- What's new in this version ---
-• PDF Editor Pro peut désormais être défini comme application PDF par défaut dans Windows : un double-clic sur un PDF l'ouvre directement en mode lecture.
-• Nouveau mode lecture : un double-clic sur un PDF l'ouvre dans une vue de lecture épurée avec défilement continu, zoom et navigation par page. Cliquez sur « Modifier » pour ouvrir les outils d'édition.
-• Zoom : agrandissez ou réduisez la page en édition comme en lecture (Ctrl + molette, Ctrl +/−). Affichages : continu, page unique, deux pages, couverture seule ; plein écran et panneau de miniatures.
-• Impression repensée : choix de l'imprimante, du nombre de copies, de la plage de pages, du format, de l'orientation, des marges, de la couleur, du recto verso et de la qualité. S'ouvre avec Ctrl+P.
-• Lecture et impression désormais gratuites : la version démo affiche et imprime tout le document.
-• La version complète s'achète désormais directement dans l'application via le Microsoft Store.
+• Les PDF numérisés sont désormais modifiables : modifiez, supprimez ou déplacez le texte des scans et des photocopies. Les nouveaux mots reprennent la police, la taille, la graisse et le ton du scan, y compris sur papier coloré et pour le texte blanc sur bandeau de couleur.
+• Reconnaissance de texte (OCR) intégrée pour les pages numérisées : deux moteurs travaillent ensemble et lisent fidèlement le texte petit, pâle ou d'imprimante matricielle et les caractères accentués.
+• Nouveau « Nettoyer le fond » (onglet Modifier) : rend blancs le gris de photocopie, le papier jauni ou coloré et les ombres des pages numérisées. Gardez les couleurs ou passez en noir et blanc ; les cases des formulaires sont conservées.
+• Les documents numérisés s'exportent vers Word en texte modifiable avec la mise en page d'origine ; Excel, les fichiers texte et « Copier le texte » utilisent aussi le texte reconnu.
+• Les grands scans (600 ppp) s'ouvrent, se modifient et s'exportent plus vite et consomment beaucoup moins de mémoire.
 
 --- Product features (her satır ayrı kutuya) ---
 Modifiez le texte existant directement sur la page
+Modifiez le texte des PDF numérisés, avec reconnaissance de texte (OCR) intégrée
+Nettoyez le fond des pages numérisées (gris de photocopie, papier coloré)
 Fusionnez, divisez, pivotez et réorganisez les pages
 Ajoutez texte, images, formes, surlignages, tampons et filigranes
 Exportez vers Word, Excel, PowerPoint, images ou texte
@@ -243,15 +246,16 @@ Senza licenza l’app funziona come demo gratuita: lettura e stampa gratuite di 
 Kindle è un marchio di Amazon.com, Inc. PDF Editor Pro non è affiliato ad Amazon.
 
 --- What's new in this version ---
-• PDF Editor Pro ora può essere impostato come app PDF predefinita in Windows: con un doppio clic il PDF si apre direttamente in modalità lettura.
-• Nuova modalità lettura: con un doppio clic il PDF si apre in una vista di lettura pulita con scorrimento continuo, zoom e navigazione tra le pagine. Premi «Modifica» per aprire gli strumenti di modifica.
-• Zoom: ingrandisci o riduci la pagina durante modifica e lettura (Ctrl + rotellina, Ctrl +/−). Viste di lettura: continua, pagina singola, due pagine, copertina separata; schermo intero e pannello miniature.
-• Stampa rinnovata: scegli stampante, copie, intervallo di pagine, formato carta, orientamento, margini, colore, fronte/retro e qualità di stampa. Si apre con Ctrl+P.
-• Lettura e stampa ora gratuite: anche la versione demo mostra e stampa l'intero documento.
-• Ora puoi acquistare la versione completa direttamente nell'app tramite Microsoft Store.
+• Ora i PDF scansionati si possono modificare: cambia, elimina o sposta il testo di scansioni e fotocopie. Le nuove parole vengono disegnate con il carattere, la dimensione, lo spessore e il tono della scansione, anche su carta colorata e per il testo bianco su fasce colorate.
+• Riconoscimento del testo (OCR) integrato per le pagine scansionate: due motori lavorano insieme e leggono con precisione testo piccolo, sbiadito o da stampante ad aghi e caratteri accentati.
+• Nuovo «Pulisci sfondo» (scheda Modifica): rende bianchi il grigio da fotocopia, la carta ingiallita o colorata e le ombre delle pagine scansionate. Mantieni i colori o passa al bianco e nero; le caselle dei moduli restano.
+• I documenti scansionati si esportano in Word come testo modificabile con l'impaginazione della pagina originale; anche Excel, i file di testo e «Copia testo» usano il testo riconosciuto.
+• Le scansioni grandi (600 dpi) si aprono, si modificano e si esportano più velocemente e usano molta meno memoria.
 
 --- Product features (her satır ayrı kutuya) ---
 Modifica il testo esistente direttamente sulla pagina
+Modifica il testo dei PDF scansionati, con riconoscimento del testo (OCR) integrato
+Pulisci lo sfondo delle pagine scansionate (grigio da fotocopia, carta colorata)
 Unisci, dividi, ruota e riordina le pagine
 Aggiungi testo, immagini, forme, evidenziazioni, timbri e filigrane
 Esporta PDF in Word, Excel, PowerPoint, immagini o testo
@@ -312,15 +316,16 @@ Sem licença, o app funciona como demo grátis: ler e imprimir documentos inteir
 Kindle é uma marca registrada da Amazon.com, Inc. O PDF Editor Pro não é afiliado à Amazon.
 
 --- What's new in this version ---
-• O PDF Editor Pro agora pode ser definido como aplicativo de PDF padrão no Windows: clique duas vezes em um PDF e ele abre direto no modo de leitura.
-• Novo modo de leitura: ao clicar duas vezes em um PDF, ele abre em uma visualização limpa com rolagem contínua, zoom e navegação entre páginas. Clique em "Editar" para abrir as ferramentas de edição.
-• Zoom: amplie ou reduza a página ao editar e ler (Ctrl + roda do mouse, Ctrl +/−). Exibições de leitura: contínua, página única, duas páginas, capa separada; tela cheia e painel de miniaturas.
-• Impressão reformulada: escolha impressora, cópias, intervalo de páginas, tamanho do papel, orientação, margens, cor, frente e verso e qualidade. Abre com Ctrl+P.
-• Ler e imprimir agora é grátis: a versão demo mostra e imprime o documento inteiro.
-• Agora você pode comprar a versão completa no próprio app pela Microsoft Store.
+• Agora é possível editar PDFs digitalizados: altere, apague ou mova o texto de digitalizações e fotocópias. As palavras novas são desenhadas com a fonte, o tamanho, o peso e o tom da própria digitalização, também em papel colorido e em texto branco sobre faixas coloridas.
+• Reconhecimento de texto (OCR) integrado para páginas digitalizadas: dois mecanismos trabalham juntos e leem com precisão texto pequeno, apagado ou de impressora matricial e caracteres acentuados.
+• Novo "Limpar fundo" (guia Editar): deixa brancos o tom cinza de fotocópia, o papel amarelado ou colorido e as sombras das páginas digitalizadas. Mantenha as cores ou deixe em preto e branco; as caixas dos formulários são mantidas.
+• Documentos digitalizados são exportados para o Word como texto editável com o layout da página original; Excel, arquivos de texto e "Copiar texto" também usam o texto reconhecido.
+• Digitalizações grandes (600 dpi) abrem, são editadas e exportadas mais rápido e usam muito menos memória.
 
 --- Product features (her satır ayrı kutuya) ---
 Edite o texto existente direto na página
+Edite o texto de PDFs digitalizados, com reconhecimento de texto (OCR) integrado
+Limpe o fundo das páginas digitalizadas (cinza de fotocópia, papel colorido)
 Una, divida, gire e reordene páginas
 Adicione texto, imagens, formas, destaques, carimbos e marcas d’água
 Exporte PDF para Word, Excel, PowerPoint, imagens ou texto
@@ -381,15 +386,16 @@ PDF Editor Pro — быстрый и лёгкий редактор PDF для Wi
 Kindle — товарный знак Amazon.com, Inc. PDF Editor Pro не связан с Amazon.
 
 --- What's new in this version ---
-• PDF Editor Pro теперь можно назначить приложением для PDF по умолчанию в Windows: двойной щелчок открывает PDF сразу в режиме чтения.
-• Новый режим чтения: по двойному щелчку PDF открывается в удобном режиме чтения с непрерывной прокруткой, масштабированием и переходом по страницам. Кнопка «Редактировать» открывает инструменты редактирования.
-• Масштаб: увеличивайте и уменьшайте страницу при редактировании и чтении (Ctrl + колесо, Ctrl +/−). Режимы просмотра: непрерывно, одна страница, две страницы, обложка отдельно; полный экран и панель миниатюр.
-• Обновлённая печать: выбор принтера, числа копий, диапазона страниц, формата бумаги, ориентации, полей, цвета, двусторонней печати и качества. Открывается по Ctrl+P.
-• Чтение и печать теперь бесплатны: демоверсия показывает и печатает весь документ.
-• Полную версию теперь можно купить прямо в приложении через Microsoft Store.
+• Отсканированные PDF теперь можно редактировать: изменяйте, удаляйте и перемещайте текст на сканах и ксерокопиях. Новые слова рисуются шрифтом, размером, насыщенностью и оттенком самого скана — в том числе на цветной бумаге и для белого текста на цветных полосах.
+• Встроенное распознавание текста (OCR) для отсканированных страниц: два движка работают вместе и точно читают мелкий, бледный и матричный шрифт и символы с диакритикой.
+• Новая функция «Очистить фон» (вкладка «Правка»): делает белыми серый тон ксерокопии, пожелтевшую или цветную бумагу и тени на отсканированных страницах. Можно сохранить цвета или сделать чёрно-белым; ячейки форм сохраняются.
+• Отсканированные документы экспортируются в Word как редактируемый текст с разметкой исходной страницы; Excel, текстовые файлы и «Копировать текст» тоже используют распознанный текст.
+• Большие сканы (600 dpi) открываются, редактируются и экспортируются быстрее и занимают намного меньше памяти.
 
 --- Product features (her satır ayrı kutuya) ---
 Правка существующего текста прямо на странице
+Редактируйте текст в отсканированных PDF со встроенным распознаванием (OCR)
+Очищайте фон отсканированных страниц (серый тон ксерокопии, цветная бумага)
 Объединение, разделение, поворот и порядок страниц
 Текст, изображения, фигуры, выделения, штампы и водяные знаки
 Экспорт PDF в Word, Excel, PowerPoint, изображения или текст

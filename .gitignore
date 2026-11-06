@@ -27,3 +27,7 @@ video_senaryo.txt
 # license.py ise programın parçasıdır ve AGPL gereği repoda olmalıdır
 worker.js
 wrangler.toml
+
+# Tesseract OCR: büyük ikili dosyalar, python get_tesseract.py ile hazırlanır
+tesseract/
+tessdata/

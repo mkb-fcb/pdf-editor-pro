@@ -11,6 +11,7 @@ a = Analysis(
         ('templates', 'templates'),
         ('static', 'static'),
         (certifi.where(), 'certifi'),
+        ('tesseract', 'tesseract'),   # OCR engine for scans: python get_tesseract.py first
     ],
     hiddenimports=[
         'epub_export',
@@ -47,6 +48,11 @@ a = Analysis(
         'winrt.windows.foundation',
         'winrt.windows.foundation.collections',
         'winrt.windows.services.store',
+        'scan_ocr',
+        'winrt.windows.media.ocr',
+        'winrt.windows.globalization',
+        'winrt.windows.graphics.imaging',
+        'winrt.windows.storage.streams',
     ],
     hookspath=[],
     hooksconfig={},

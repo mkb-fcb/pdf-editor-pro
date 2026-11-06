@@ -17,6 +17,8 @@ PACKAGES = [
     'MarkupSafe', 'itsdangerous', 'click', 'blinker', 'pywebview', 'proxy_tools', 'bottle', 'pythonnet',
     'clr_loader', 'cffi', 'pycparser', 'certifi', 'cryptography', 'winrt-runtime',
     'winrt-Windows.Services.Store', 'winrt-Windows.Foundation', 'winrt-Windows.Foundation.Collections',
+    'winrt-Windows.Media.Ocr', 'winrt-Windows.Globalization', 'winrt-Windows.Graphics.Imaging',
+    'winrt-Windows.Storage.Streams',
     'XlsxWriter', 'et_xmlfile', 'fire', 'termcolor', 'tqdm', 'typing_extensions',
 ]
 
@@ -33,6 +35,24 @@ OTHER = [
      'TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.'),
     (f'Python {sys.version.split()[0]} runtime', 'Python Software Foundation License',
      'Copyright (c) 2001 Python Software Foundation. All rights reserved.\nFull text: https://docs.python.org/3/license.html'),
+    ('Tesseract OCR 5.4.0 (tesseract/tesseract.exe) and its Turkish model (tessdata_fast tur.traineddata)',
+     'Apache License 2.0',
+     'Copyright Google Inc. and the Tesseract OCR contributors. Licensed under the Apache License, Version 2.0: '
+     'https://www.apache.org/licenses/LICENSE-2.0\nSource: https://github.com/tesseract-ocr/tesseract, '
+     'models: https://github.com/tesseract-ocr/tessdata_fast. Windows build: https://github.com/UB-Mannheim/tesseract '
+     '(debug information removed, otherwise unmodified). It runs as a separate program; PDF Editor Pro passes it page '
+     'images and reads its text output.'),
+    ('Libraries shipped with Tesseract (tesseract/*.dll)', 'various, listed below',
+     'Leptonica (Leptonica license, BSD-2-Clause style) - libarchive (BSD-2-Clause) - libb2 (CC0-1.0) - '
+     'bzip2 (bzip2 license) - OpenSSL libcrypto (Apache-2.0) - libdeflate (MIT) - Expat (MIT) - '
+     'GCC runtime libgcc_s / libstdc++ (GPL-3.0 with the GCC Runtime Library Exception) - giflib (MIT) - '
+     'GNU libiconv (LGPL-2.1-or-later) - JBIG-KIT libjbig (GPL-2.0-or-later) - libjpeg-turbo (IJG and BSD-3-Clause) - '
+     'LERC (Apache-2.0) - LZ4 (BSD-2-Clause) - XZ liblzma (0BSD / public domain) - OpenJPEG (BSD-2-Clause) - '
+     'libpng (libpng license) - libwebp / libsharpyuv (BSD-3-Clause) - LibTIFF (libtiff license) - '
+     'mingw-w64 winpthreads (MIT and ZPL-2.1) - Zstandard (BSD-3-Clause) - zlib (zlib license).\n'
+     'These are the unmodified MSYS2 / mingw-w64 builds used by the UB Mannheim Tesseract package; their complete '
+     'sources, including those of the LGPL and GPL components, are available at https://packages.msys2.org '
+     '(packages mingw-w64-x86_64-<name>) and from the projects themselves.'),
     ('PyInstaller bootloader', 'GPL-2.0 with the PyInstaller bootloader exception',
      'The bootloader may be used to run programs under any license. https://github.com/pyinstaller/pyinstaller/blob/develop/COPYING.txt'),
 ]

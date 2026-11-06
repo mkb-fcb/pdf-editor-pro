@@ -1,0 +1,57 @@
+Partner Center > Store listings > (her dil) > "What's new in this version" alanına yapıştırın.
+
+[TR]
+• Taranmış PDF'ler artık düzenlenebiliyor: tarayıcı ve fotokopi çıktılarındaki yazıları değiştirin, silin veya taşıyın. Yeni kelimeler taramanın kendi yazı tipi, boyu, kalınlığı ve tonuyla yazılır; renkli kâğıtta ve renkli bant üzerindeki beyaz yazıda da çalışır.
+• Taranmış sayfalar için yerleşik metin tanıma (OCR): iki tanıma motoru birlikte çalışır; küçük, soluk ve nokta vuruşlu yazıcı çıktılarını ve Türkçe karakterleri doğru okur.
+• Yeni "Arka Planı Temizle" (Düzenle sekmesi): taranmış sayfalardaki gri fotokopi tonunu, sararmış veya renkli kâğıdı ve gölgeleri beyaza çevirir. Renkleri koruyabilir ya da siyah-beyaz yapabilirsiniz; form kutucukları korunur.
+• Taranmış belgeler Word'e sayfa düzeni korunarak düzenlenebilir metin olarak aktarılır; Excel, metin dosyası ve "Metni Kopyala" da tanınan metni kullanır.
+• Büyük taramalar (600 dpi) daha hızlı açılır, düzenlenir ve aktarılır, çok daha az bellek kullanır.
+
+[EN]
+• Scanned PDFs can now be edited: change, delete or move text on scans and photocopies. New words are drawn in the scan's own typeface, size, weight and tone, also on coloured paper and for white text on coloured bars.
+• Built-in text recognition (OCR) for scanned pages: two engines work together and read small, faint and dot-matrix print and accented characters accurately.
+• New "Clean Background" (Edit tab): turns the grey copier tone, yellowed or coloured paper and shadows of scanned pages white. Keep the colours or make it black and white; form boxes are kept.
+• Scanned documents export to Word as editable text laid out like the original page; Excel, text files and "Copy Text" use the recognised text too.
+• Large scans (600 dpi) open, edit and export faster and use far less memory.
+
+[DE]
+• Gescannte PDFs lassen sich jetzt bearbeiten: Text in Scans und Kopien ändern, löschen oder verschieben. Neue Wörter erscheinen in Schrift, Größe, Stärke und Farbton des Scans, auch auf farbigem Papier und bei weißer Schrift auf farbigen Balken.
+• Integrierte Texterkennung (OCR) für gescannte Seiten: zwei Erkennungsprogramme arbeiten zusammen und lesen kleine, blasse und Nadeldrucker-Schrift sowie Umlaute und Sonderzeichen zuverlässig.
+• Neu: „Hintergrund säubern“ (Registerkarte Bearbeiten) macht den grauen Kopierton, vergilbtes oder farbiges Papier und Schatten gescannter Seiten weiß. Farben behalten oder Schwarzweiß; Formularkästchen bleiben erhalten.
+• Gescannte Dokumente werden als bearbeitbarer Text im Layout der Originalseite nach Word exportiert; Excel, Textdatei und „Text kopieren“ nutzen ebenfalls den erkannten Text.
+• Große Scans (600 dpi) öffnen, bearbeiten und exportieren schneller und brauchen viel weniger Arbeitsspeicher.
+
+[ES]
+• Ahora se pueden editar PDF escaneados: cambie, borre o mueva el texto de escaneos y fotocopias. Las palabras nuevas se dibujan con la tipografía, el tamaño, el grosor y el tono del propio escaneo, también sobre papel de color y en texto blanco sobre franjas de color.
+• Reconocimiento de texto (OCR) integrado para páginas escaneadas: dos motores trabajan juntos y leen con precisión texto pequeño, tenue o de impresora matricial y caracteres acentuados.
+• Nuevo «Limpiar fondo» (pestaña Editar): vuelve blancos el tono gris de fotocopia, el papel amarillento o de color y las sombras de las páginas escaneadas. Conserve los colores o páselo a blanco y negro; las casillas de los formularios se mantienen.
+• Los documentos escaneados se exportan a Word como texto editable con el diseño de la página original; Excel, archivos de texto y «Copiar texto» también usan el texto reconocido.
+• Los escaneos grandes (600 ppp) se abren, editan y exportan más rápido y usan mucha menos memoria.
+
+[FR]
+• Les PDF numérisés sont désormais modifiables : modifiez, supprimez ou déplacez le texte des scans et des photocopies. Les nouveaux mots reprennent la police, la taille, la graisse et le ton du scan, y compris sur papier coloré et pour le texte blanc sur bandeau de couleur.
+• Reconnaissance de texte (OCR) intégrée pour les pages numérisées : deux moteurs travaillent ensemble et lisent fidèlement le texte petit, pâle ou d'imprimante matricielle et les caractères accentués.
+• Nouveau « Nettoyer le fond » (onglet Modifier) : rend blancs le gris de photocopie, le papier jauni ou coloré et les ombres des pages numérisées. Gardez les couleurs ou passez en noir et blanc ; les cases des formulaires sont conservées.
+• Les documents numérisés s'exportent vers Word en texte modifiable avec la mise en page d'origine ; Excel, les fichiers texte et « Copier le texte » utilisent aussi le texte reconnu.
+• Les grands scans (600 ppp) s'ouvrent, se modifient et s'exportent plus vite et consomment beaucoup moins de mémoire.
+
+[IT]
+• Ora i PDF scansionati si possono modificare: cambia, elimina o sposta il testo di scansioni e fotocopie. Le nuove parole vengono disegnate con il carattere, la dimensione, lo spessore e il tono della scansione, anche su carta colorata e per il testo bianco su fasce colorate.
+• Riconoscimento del testo (OCR) integrato per le pagine scansionate: due motori lavorano insieme e leggono con precisione testo piccolo, sbiadito o da stampante ad aghi e caratteri accentati.
+• Nuovo «Pulisci sfondo» (scheda Modifica): rende bianchi il grigio da fotocopia, la carta ingiallita o colorata e le ombre delle pagine scansionate. Mantieni i colori o passa al bianco e nero; le caselle dei moduli restano.
+• I documenti scansionati si esportano in Word come testo modificabile con l'impaginazione della pagina originale; anche Excel, i file di testo e «Copia testo» usano il testo riconosciuto.
+• Le scansioni grandi (600 dpi) si aprono, si modificano e si esportano più velocemente e usano molta meno memoria.
+
+[PT-BR]
+• Agora é possível editar PDFs digitalizados: altere, apague ou mova o texto de digitalizações e fotocópias. As palavras novas são desenhadas com a fonte, o tamanho, o peso e o tom da própria digitalização, também em papel colorido e em texto branco sobre faixas coloridas.
+• Reconhecimento de texto (OCR) integrado para páginas digitalizadas: dois mecanismos trabalham juntos e leem com precisão texto pequeno, apagado ou de impressora matricial e caracteres acentuados.
+• Novo "Limpar fundo" (guia Editar): deixa brancos o tom cinza de fotocópia, o papel amarelado ou colorido e as sombras das páginas digitalizadas. Mantenha as cores ou deixe em preto e branco; as caixas dos formulários são mantidas.
+• Documentos digitalizados são exportados para o Word como texto editável com o layout da página original; Excel, arquivos de texto e "Copiar texto" também usam o texto reconhecido.
+• Digitalizações grandes (600 dpi) abrem, são editadas e exportadas mais rápido e usam muito menos memória.
+
+[RU]
+• Отсканированные PDF теперь можно редактировать: изменяйте, удаляйте и перемещайте текст на сканах и ксерокопиях. Новые слова рисуются шрифтом, размером, насыщенностью и оттенком самого скана — в том числе на цветной бумаге и для белого текста на цветных полосах.
+• Встроенное распознавание текста (OCR) для отсканированных страниц: два движка работают вместе и точно читают мелкий, бледный и матричный шрифт и символы с диакритикой.
+• Новая функция «Очистить фон» (вкладка «Правка»): делает белыми серый тон ксерокопии, пожелтевшую или цветную бумагу и тени на отсканированных страницах. Можно сохранить цвета или сделать чёрно-белым; ячейки форм сохраняются.
+• Отсканированные документы экспортируются в Word как редактируемый текст с разметкой исходной страницы; Excel, текстовые файлы и «Копировать текст» тоже используют распознанный текст.
+• Большие сканы (600 dpi) открываются, редактируются и экспортируются быстрее и занимают намного меньше памяти.

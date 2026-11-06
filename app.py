@@ -26,11 +26,12 @@ state = {'doc': None, 'path': None, 'history': []}
 
 import license as _lic
 import store_iap as _iap
+import scan_ocr
 
 MAX_HISTORY = 15
 
 # Keep in sync with installer.iss / installer_demo.iss (MyAppVersion) and build_msix.py's argument
-APP_VERSION = '1.1.1'
+APP_VERSION = '1.2.0'
 SOURCE_URL = 'https://github.com/mkb-fcb/pdf-editor-pro'
 
 # Lisans girilmemişse uygulama demo modunda çalışır (3 sayfa, filigranlı kayıt)
@@ -289,7 +290,7 @@ def _swap_doc(new_doc, path, name=None, reset_history=True):
     state['path'] = path
     state['name'] = name or Path(path).name
     if reset_history:
-        state['history'] = []
+        clear_history()
     if old is not None:
         try:
             old.close()
@@ -377,14 +378,43 @@ def _save_with_watermark(doc, path):
     wm_doc.save(path, garbage=4, deflate=True)
     wm_doc.close()
 
+# Undo snapshots are kept on disk, not in memory: a scanned document is tens of MB and 15 of
+# them would hold hundreds of MB for nothing
+_HISTORY_DIR = None
+
+
+def _history_dir():
+    global _HISTORY_DIR
+    if _HISTORY_DIR is None or not os.path.isdir(_HISTORY_DIR):
+        import shutil
+        _HISTORY_DIR = tempfile.mkdtemp(prefix='pdfeditor_undo_')
+        atexit.register(shutil.rmtree, _HISTORY_DIR, True)
+    return _HISTORY_DIR
+
+
+def _forget(snapshot):
+    try:
+        os.remove(snapshot)
+    except Exception:
+        pass
+
+
+def clear_history():
+    for snap in state['history']:
+        _forget(snap)
+    state['history'] = []
+
+
 def push_history():
     doc = state['doc']
     if not doc:
         return
-    buf = doc.tobytes(garbage=1)
-    state['history'].append(buf)
+    import uuid
+    snap = os.path.join(_history_dir(), uuid.uuid4().hex + '.pdf')
+    doc.save(snap, garbage=1)
+    state['history'].append(snap)
     if len(state['history']) > MAX_HISTORY:
-        state['history'].pop(0)
+        _forget(state['history'].pop(0))
 
 
 def find_unicode_font():
@@ -608,7 +638,16 @@ def _font_kwargs(page, spec):
         name = 'E' + format(abs(hash(spec['buffer'])) % 10**8, 'd')
         page.insert_font(fontname=name, fontbuffer=spec['buffer'])
         return {'fontname': name}
-    return dict(spec)
+    kw = dict(spec)
+    # "cour", "helv", "tiro"... are PyMuPDF's built-in Base-14 fonts: with such a name the font
+    # file is ignored and Turkish letters come out wrong (cour.ttf → İ printed as "·")
+    if kw.get('fontname', '').lower() in _BASE14_NAMES:
+        kw['fontname'] = 'F' + kw['fontname']
+    return kw
+
+
+_BASE14_NAMES = {'helv', 'heit', 'hebo', 'hebi', 'cour', 'coit', 'cobo', 'cobi',
+                 'tiro', 'tibo', 'tiit', 'tibi', 'symb', 'zadb'}
 
 
 def _text_width(spec, text, size):
@@ -830,7 +869,7 @@ def api_text():
     if not doc:
         return jsonify({'ok': False, 'error': 'Açık dosya yok'})
     try:
-        text = '\n\n'.join(doc[i].get_text() for i in range(len(doc)))
+        text = '\n\n'.join(_page_text(doc[i]) for i in range(len(doc)))
         return jsonify({'ok': True, 'text': text, 'chars': len(text)})
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)})
@@ -911,7 +950,7 @@ def demo_open():
         state['doc'] = fitz.open(tf.name)
         state['path'] = tf.name
         state['name'] = 'Demo_Report.pdf'
-        state['history'] = []
+        clear_history()
         return jsonify({'ok': True, 'pages': len(state['doc']), 'name': 'Demo_Report.pdf'})
     except Exception as e:
         import traceback as _tb
@@ -1164,8 +1203,15 @@ def api_replaceblock():
     color      = tuple(data.get('color', [0, 0, 0]))
 
     page = doc[page_idx]
+    if data.get('ocr'):
+        page = _upright_scan(page)
     pdf_w, pdf_h = page.rect.width, page.rect.height
     block_rect = fitz.Rect(bx0 * pdf_w, by0 * pdf_h, bx1 * pdf_w, by1 * pdf_h)
+
+    if data.get('ocr') and data.get('words'):
+        _replace_scan_words(page, data, new_text, effective_flags, font_flags, sz, orig_size,
+                            color, underline, block_rect, baseline_y)
+        return jsonify({'ok': True})
 
     # Same font as the original (or a size-matched substitute); the user's size change is kept as a ratio
     style_kept = effective_flags == font_flags
@@ -1195,6 +1241,853 @@ def api_replaceblock():
 
 
 
+_SCAN_ZOOM = 4
+
+
+def _scan_paper(px, letter_px):
+    """The paper under every pixel.
+
+    First a median over a square window a few letters wide: moved neither by the letters nor by
+    a few bright boxes or dark rules. Then only the pixels that look like that paper (not ink,
+    not white form fields, not a coloured bar) are averaged over a window wider than tall, so
+    the paper is the one beside the letters at their own height."""
+    import numpy as np
+    import cv2
+    k = min(255, max(15, int(letter_px * 1.5)) | 1)
+    rough = cv2.medianBlur(px, k)
+    gray = lambda a: a.astype(np.int16) if a.ndim == 2 else a.astype(np.int16).mean(axis=2)
+    like = (np.abs(gray(px) - gray(rough)) < 22).astype(np.float32)
+    win = (k, max(3, k // 3))
+    den = cv2.blur(like, win)
+    if px.ndim == 2:
+        num = cv2.blur(px.astype(np.float32) * like, win)
+        est = num / np.maximum(den, 1e-3)
+    else:
+        num = cv2.blur(px.astype(np.float32) * like[..., None], win)
+        est = num / np.maximum(den, 1e-3)[..., None]
+        den = den[..., None]
+    return np.where(den > 0.05, est, rough).clip(0, 255).astype(np.uint8)
+
+
+def _scan_ink(px, letter_px, paper=None):
+    """How much darker than the paper around it each pixel is (0..255): print, handwriting, stamps."""
+    import numpy as np
+    bg = _scan_paper(px, letter_px) if paper is None else paper
+    d = bg.astype(np.int16) - px.astype(np.int16)
+    return (d.max(axis=2) if d.ndim == 3 else d).clip(0, 255).astype(np.uint8)
+
+
+def _rebuild_paper(px, letter_px, scale):
+    """px with every bit of ink replaced by the paper around it, grain included.
+    scale is pixels per point."""
+    import numpy as np
+    import cv2
+    paper = _scan_paper(px, letter_px)
+    ink = _scan_ink(px, letter_px, paper)
+    # Wide enough to take the light JPEG halo around the letters too
+    mask = cv2.dilate((ink > 20).astype(np.uint8), np.ones((3, 3), np.uint8),
+                      iterations=max(2, round(1.0 * scale) + 1)) > 0
+    paper_px = ~mask
+    filled = np.where(paper_px if px.ndim == 2 else paper_px[..., None], px, paper)
+    # The rebuilt paper is smooth; give it the scan's grain so the letters do not show as blobs
+    if paper_px.sum() > 50:
+        smooth = cv2.GaussianBlur(px, (0, 0), 2).astype(np.float32)
+        grain = float(np.std((px.astype(np.float32) - smooth)[paper_px]))
+        noisy = (filled + np.random.normal(0, grain, px.shape)).clip(0, 255).astype(np.uint8)
+        filled = np.where(paper_px if px.ndim == 2 else paper_px[..., None], filled, noisy)
+    return filled
+
+
+# ── Edits written into the scan picture itself ──────────────────────────────
+# One picture stays one picture: no patches piling up on it, the erased text is really gone from
+# its pixels, and "clean background" or the Word export later see the page as it looks.
+
+def _upright_scan(page):
+    """A scanned page stored turned (/Rotate) made upright for real: its picture's pixels are
+    turned and the page set to 0°, looking exactly the same. What is shown (and read by OCR) and
+    what is edited then share one coordinate system; on a turned page edits landed turned and in
+    the wrong place. Returns the page to use from now on."""
+    import numpy as np
+    import cv2
+    rot = page.rotation
+    if not rot or not scan_ocr.is_scan_page(page):
+        return page
+    doc, i = page.parent, page.number
+    full = abs(page.mediabox) or 1
+    pic = None
+    for img in page.get_images(full=True):
+        try:
+            rects = page.get_image_rects(img[0], transform=True)
+        except Exception:
+            continue
+        if len(rects) == 1:
+            r, m = rects[0]
+            if abs(r & page.mediabox) / full > 0.9 and abs(m.b) < 1e-6 and abs(m.c) < 1e-6 and m.a > 0 and m.d > 0:
+                pic = img
+                break
+    if pic is None:
+        return page
+    pix = fitz.Pixmap(doc, pic[0])
+    if pix.alpha:
+        pix = fitz.Pixmap(pix, 0)
+    if pix.n not in (1, 3):
+        pix = fitz.Pixmap(fitz.csRGB, pix)
+    shape = (pix.height, pix.width) if pix.n == 1 else (pix.height, pix.width, 3)
+    arr = np.frombuffer(pix.samples, np.uint8).reshape(shape)
+    arr = np.ascontiguousarray(np.rot90(arr, -(rot // 90)))   # /Rotate turns clockwise
+    del pix
+    jpeg = 'DCT' in (doc.xref_get_key(pic[0], 'Filter')[1] or '')
+    out = arr
+    if arr.ndim == 3:
+        cv2.cvtColor(arr, cv2.COLOR_RGB2BGR, dst=arr)
+    ok, data = (cv2.imencode('.jpg', out, [cv2.IMWRITE_JPEG_QUALITY, 95]) if jpeg else cv2.imencode('.png', out))
+    if not ok:
+        return page
+    w, h = page.rect.width, page.rect.height        # as shown
+    new = doc.new_page(pno=i, width=w, height=h)
+    new.insert_image(new.rect, stream=data.tobytes())
+    doc.delete_page(i + 1)
+    return doc[i]
+
+
+def _scan_target(page):
+    """(xref, matrix) of the scan picture when it is placed upright on an unrotated page."""
+    if page.rotation:
+        return None
+    area = abs(page.rect) or 1
+    for img in page.get_images(full=True):
+        if img[1]:
+            continue
+        try:
+            rects = page.get_image_rects(img[0], transform=True)
+        except Exception:
+            continue
+        if len(rects) != 1:
+            continue
+        r, m = rects[0]
+        if abs(r & page.rect) / area > 0.6 and abs(m.b) < 1e-6 and abs(m.c) < 1e-6 and m.a > 0 and m.d > 0:
+            return img[0], m
+    return None
+
+
+class _ScanPixels:
+    """The scan picture's own pixels, edited in place and written back with save()."""
+
+    def __init__(self, page, xref, m):
+        import numpy as np
+        self.page, self.xref, self.m = page, xref, m
+        pix = fitz.Pixmap(page.parent, xref)
+        if pix.alpha:
+            pix = fitz.Pixmap(pix, 0)
+        if pix.n not in (1, 3):
+            pix = fitz.Pixmap(fitz.csRGB, pix)
+        shape = (pix.height, pix.width) if pix.n == 1 else (pix.height, pix.width, 3)
+        self.arr = np.frombuffer(pix.samples, np.uint8).reshape(shape).copy()
+        self.sx, self.sy = pix.width / m.a, pix.height / m.d     # pixels per point
+        del pix      # a 600 dpi page is 100 MB: do not hold MuPDF's copy next to ours
+
+    def box(self, rect):
+        h, w = self.arr.shape[:2]
+        return (max(0, round((rect.x0 - self.m.e) * self.sx)), max(0, round((rect.y0 - self.m.f) * self.sy)),
+                min(w, round((rect.x1 - self.m.e) * self.sx)), min(h, round((rect.y1 - self.m.f) * self.sy)))
+
+    def _crop(self, rect):
+        x0, y0, x1, y1 = self.box(rect)
+        mg = int(max(rect.height * self.sy * 0.6, 6))
+        h, w = self.arr.shape[:2]
+        return (x0, y0, x1, y1), (max(0, x0 - mg), max(0, y0 - mg), min(w, x1 + mg), min(h, y1 + mg))
+
+    def erase(self, rect):
+        import numpy as np
+        (x0, y0, x1, y1), (cx0, cy0, cx1, cy1) = self._crop(rect)
+        if x1 - x0 < 2 or y1 - y0 < 2:
+            return
+        filled = _rebuild_paper(np.ascontiguousarray(self.arr[cy0:cy1, cx0:cx1]), rect.height * self.sy, self.sy)
+        self.arr[y0:y1, x0:x1] = filled[y0 - cy0:y1 - cy0, x0 - cx0:x1 - cx0]
+
+    def ink(self, rect):
+        """(pixels, alpha 0..1, box) of the ink inside rect."""
+        import numpy as np
+        (x0, y0, x1, y1), (cx0, cy0, cx1, cy1) = self._crop(rect)
+        crop = np.ascontiguousarray(self.arr[cy0:cy1, cx0:cx1])
+        a = ((_scan_ink(crop, rect.height * self.sy).astype(np.float32) - 12) * 4).clip(0, 255) / 255
+        sl = (slice(y0 - cy0, y1 - cy0), slice(x0 - cx0, x1 - cx0))
+        return crop[sl].astype(np.float32), a[sl], (x0, y0, x1, y1)
+
+    def paste(self, px, a, x, y):
+        import numpy as np
+        h, w = self.arr.shape[:2]
+        ph, pw = a.shape
+        dx0, dy0, dx1, dy1 = max(0, x), max(0, y), min(w, x + pw), min(h, y + ph)
+        if dx1 <= dx0 or dy1 <= dy0:
+            return
+        sp, sa = px[dy0 - y:dy1 - y, dx0 - x:dx1 - x], a[dy0 - y:dy1 - y, dx0 - x:dx1 - x]
+        if self.arr.ndim == 3:
+            sa = sa[..., None]
+        dst = self.arr[dy0:dy1, dx0:dx1].astype(np.float32)
+        self.arr[dy0:dy1, dx0:dx1] = (dst * (1 - sa) + sp * sa).clip(0, 255).astype(np.uint8)
+
+    # ── Typing into the picture ──
+    # Re-typed words drawn as crisp computer text never quite match a scan, however well the font,
+    # size and colour are chosen: the scan's letters are soft, spread and toned. So the word is
+    # drawn into the picture itself, looking the way the scan's own words were measured to look.
+
+    def _clip(self, box):
+        return fitz.Rect(self.m.e + box[0] / self.sx, self.m.f + box[1] / self.sy,
+                         self.m.e + box[2] / self.sx, self.m.f + box[3] / self.sy)
+
+    _HI = 4   # typing is shaped at 4× the picture's resolution: its strokes are only ~2 px wide
+
+    def text_cover(self, spec, size, text, x, baseline, box):
+        """How much of each picture pixel in box the text covers (0..1), on a grid _HI times finer
+        than the picture's and aligned with it."""
+        import numpy as np
+        k = self._HI
+        scratch = fitz.open()
+        sp = scratch.new_page(width=self.page.rect.width, height=self.page.rect.height)
+        sp.insert_text(fitz.Point(x, baseline), text, fontsize=size, color=(0, 0, 0), **_font_kwargs(sp, spec))
+        mat = fitz.Matrix(self.sx * k, 0, 0, self.sy * k, -self.m.e * self.sx * k, -self.m.f * self.sy * k)
+        pm = sp.get_pixmap(matrix=mat, clip=self._clip(box), colorspace=fitz.csGRAY, alpha=False)
+        g = np.frombuffer(pm.samples, np.uint8).reshape(pm.height, pm.width)
+        scratch.close()
+        out = np.zeros(((box[3] - box[1]) * k, (box[2] - box[0]) * k), np.float32)
+        oy, ox = pm.y - box[1] * k, pm.x - box[0] * k     # the pixmap may start a pixel off the box
+        ys, xs = max(0, oy), max(0, ox)
+        ye, xe = min(out.shape[0], oy + pm.height), min(out.shape[1], ox + pm.width)
+        if ye > ys and xe > xs:
+            out[ys:ye, xs:xe] = (255 - g[ys - oy:ye - oy, xs - ox:xe - ox]) / 255
+        return out
+
+    @classmethod
+    def _shape(cls, cover, grow, blur):
+        """The fine cover thickened/thinned by grow fine pixels and softened by blur picture
+        pixels, brought down to the picture's grid."""
+        import numpy as np
+        import cv2
+        k = cls._HI
+        c = cover
+        if grow > 0:
+            c = cv2.dilate(c, np.ones((3, 3), np.uint8), iterations=grow)
+        elif grow < 0:
+            c = cv2.erode(c, np.ones((3, 3), np.uint8), iterations=-grow)
+        if blur:
+            c = cv2.GaussianBlur(c, (0, 0), blur * k)
+        h, w = c.shape[0] // k, c.shape[1] // k
+        return cv2.resize(c, (w, h), interpolation=cv2.INTER_AREA).clip(0, 1)
+
+    @staticmethod
+    def _shift(a, dx, dy):
+        import numpy as np
+        return np.roll(np.roll(a, dy, axis=0), dx, axis=1)
+
+    def _ink_box(self, rect, size):
+        return self.box(fitz.Rect(rect.x0 - size * 0.4, rect.y0 - size * 0.4, rect.x1 + size * 0.4, rect.y1 + size * 0.4))
+
+    def measure_look(self, spec, size, words, baseline):
+        """How the scan's own words differ from the same words typed in spec/size: size factor,
+        stroke growth, softness, a small offset and tone. Measured on the longest words, before
+        anything is erased. Also returns the ink colour."""
+        import numpy as np
+        sample = sorted((w for w in words if len(w[1]) >= 2), key=lambda w: -len(w[1]))[:2] or words[:1]
+        inks, trials = [], []
+        for r, t in sample:
+            box = self._ink_box(r, size)
+            if box[2] - box[0] < 4 or box[3] - box[1] < 4:
+                continue
+            crop = self.arr[box[1]:box[3], box[0]:box[2]].astype(np.float32)
+            gray = crop if crop.ndim == 2 else crop.mean(axis=2)
+            paper, dark = np.percentile(gray, 95), np.percentile(gray, 2)
+            if paper - dark < 30:
+                continue
+            seen = ((paper - gray) / (paper - dark)).clip(0, 1)     # 1 where the ink is darkest
+            inks.append(crop[seen > 0.85].mean(axis=0) if (seen > 0.85).any() else dark)
+            covers = {s: self.text_cover(spec, size * s, t, r.x0, baseline, box) for s in (0.88, 0.94, 1.0, 1.06, 1.12)}
+            # Ink is compared inside the word's own box only, not in the margin where
+            # neighbouring letters and specks would count too
+            wb = self.box(r)
+            inner = (slice(max(0, wb[1] - box[1]), wb[3] - box[1]), slice(max(0, wb[0] - box[0]), wb[2] - box[0]))
+            trials.append((seen, covers, inner))
+        if not trials:
+            return None
+        import cv2
+
+        def sharpness(a):
+            # How steeply ink turns into paper, against how dark the ink gets: independent of
+            # which letters are drawn, so a look-alike face cannot bias it the way a fit does
+            gx, gy = cv2.Sobel(a, cv2.CV_32F, 1, 0), cv2.Sobel(a, cv2.CV_32F, 0, 1)
+            mag = np.hypot(gx, gy)
+            top = float(np.percentile(a, 99)) or 1.0
+            return float(np.percentile(mag[a > 0.1], 90)) / top if (a > 0.1).any() else 0.0
+
+        want = float(np.median([sharpness(seen[inner]) for seen, _, inner in trials]))
+        blur = min((0, 0.3, 0.5, 0.7, 1.0, 1.4), key=lambda b: abs(float(np.median(
+            [sharpness(self._shape(c[1.0], 0, b)[inner]) for _, c, inner in trials])) - want))
+        best = None
+        for s in (0.88, 0.94, 1.0, 1.06, 1.12):
+            for blur in (blur,):
+                shaped = [(seen, self._shape(c[s], 0, blur)) for seen, c, _ in trials]
+                for dx in range(-5, 6):
+                    for dy in range(-3, 4):
+                        err = sum(float(np.abs(self._shift(a, dx, dy) - seen).mean()) for seen, a in shaped)
+                        if best is None or err < best[0]:
+                            best = (err, s, blur, dx, dy)
+        _, s, blur, dx, dy = best
+        # The weight from the amount of ink the scan's own words put down, in fine steps
+        def ink_sum(a):
+            return float(np.where(a > 0.35, a, 0).sum())   # paper grain is not ink
+
+        def ratio(g):
+            made = sum(ink_sum(self._shift(self._shape(c[s], g, blur), dx, dy)[inner]) for _, c, inner in trials)
+            return sum(ink_sum(seen[inner]) for seen, _, inner in trials) / max(made, 1e-3)
+
+        grow = min(range(-3, 5), key=lambda g: abs(np.log(max(ratio(g), 1e-3))))
+        gain = float(np.clip(ratio(grow), 0.75, 1.25))   # what the steps cannot reach, the tone does
+        return (s, grow, blur, dx, dy, gain), np.mean(inks, axis=0)
+
+    def type_text(self, spec, size, text, x, baseline, look, ink):
+        """Draw text into the picture with the measured look."""
+        import numpy as np
+        scale, grow, blur, dx, dy, gain = look
+        w = _text_width(spec, text, size * scale)
+        rect = fitz.Rect(x, baseline - size * 1.1, x + w, baseline + size * 0.4)
+        box = self._ink_box(rect, size)
+        if box[2] - box[0] < 2 or box[3] - box[1] < 2:
+            return
+        cover = self.text_cover(spec, size * scale, text, x, baseline, box)
+        a = (self._shift(self._shape(cover, grow, blur), dx, dy) * gain).clip(0, 1)
+        dst = self.arr[box[1]:box[3], box[0]:box[2]].astype(np.float32)
+        ink = np.asarray(ink, np.float32)
+        if dst.ndim == 3:
+            a = a[..., None]
+        self.arr[box[1]:box[3], box[0]:box[2]] = (dst * (1 - a) + ink * a).clip(0, 255).astype(np.uint8)
+
+    def save(self):
+        import cv2
+        jpeg = 'DCT' in (self.page.parent.xref_get_key(self.xref, 'Filter')[1] or '')
+        img = self.arr
+        if img.ndim == 3:
+            cv2.cvtColor(img, cv2.COLOR_RGB2BGR, dst=img)    # in place: no second full-page copy
+        ok, data = (cv2.imencode('.jpg', img, [cv2.IMWRITE_JPEG_QUALITY, 92]) if jpeg
+                    else cv2.imencode('.png', img))
+        if ok:
+            self.page.replace_image(self.xref, stream=data.tobytes())
+
+
+def _remove_hidden_text(page, rect):
+    """Drop the text under rect (the scanner's invisible OCR layer) and nothing else."""
+    page.add_redact_annot(rect, fill=None)
+    page.apply_redactions(images=0, graphics=0)
+
+
+# ── Fallback for pictures placed rotated or shared: patch images laid on top ───
+
+def _scan_pixmap(page, rect):
+    """RGB pixels of rect plus a margin of paper around it, and rect in those pixels."""
+    import numpy as np
+    m = max(rect.height * 0.6, 3)
+    clip = fitz.Rect(rect.x0 - m, rect.y0 - m, rect.x1 + m, rect.y1 + m) & page.rect
+    pix = page.get_pixmap(matrix=fitz.Matrix(_SCAN_ZOOM, _SCAN_ZOOM), clip=clip, colorspace=fitz.csRGB,
+                          alpha=False, annots=False)
+    arr = np.frombuffer(pix.samples, np.uint8).reshape(pix.height, pix.width, 3).copy()
+    box = [max(0, round((rect.x0 - clip.x0) * _SCAN_ZOOM)), max(0, round((rect.y0 - clip.y0) * _SCAN_ZOOM)),
+           min(pix.width, round((rect.x1 - clip.x0) * _SCAN_ZOOM)),
+           min(pix.height, round((rect.y1 - clip.y0) * _SCAN_ZOOM))]
+    exact = fitz.Rect(clip.x0 + box[0] / _SCAN_ZOOM, clip.y0 + box[1] / _SCAN_ZOOM,
+                      clip.x0 + box[2] / _SCAN_ZOOM, clip.y0 + box[3] / _SCAN_ZOOM)
+    return arr, box, exact
+
+
+def _erase_scan(page, rect, paper):
+    """Remove the scanned print (and invisible OCR text) under rect.
+
+    The hole is not painted in one flat colour: on grey copies, coloured forms or gradients that
+    leaves a visible patch. Only the ink is taken out and rebuilt from the paper around it, so
+    the paper between the letters stays the original picture."""
+    t = _scan_target(page)
+    if t:
+        sp = _ScanPixels(page, *t)
+        sp.erase(rect)
+        _remove_hidden_text(page, rect)
+        sp.save()
+        return
+    arr, (x0, y0, x1, y1), exact = _scan_pixmap(page, rect)
+    patch = None
+    if x1 - x0 >= 2 and y1 - y0 >= 2:
+        filled = _rebuild_paper(arr, rect.height * _SCAN_ZOOM, _SCAN_ZOOM)
+        # The redaction blanks whole scan pixels, which can reach a little past rect: the patch
+        # overlaps it by a few pixels of untouched paper so no sliver of fill colour shows
+        e = 2 * _SCAN_ZOOM
+        h, w = arr.shape[:2]
+        px0, py0, px1, py1 = max(0, x0 - e), max(0, y0 - e), min(w, x1 + e), min(h, y1 + e)
+        patch = arr[py0:py1, px0:px1].copy()
+        patch[y0 - py0:y1 - py0, x0 - px0:x1 - px0] = filled[y0:y1, x0:x1]
+        cover = fitz.Rect(exact.x0 - (x0 - px0) / _SCAN_ZOOM, exact.y0 - (y0 - py0) / _SCAN_ZOOM,
+                          exact.x1 + (px1 - x1) / _SCAN_ZOOM, exact.y1 + (py1 - y1) / _SCAN_ZOOM)
+    page.add_redact_annot(exact, fill=tuple(paper or (1, 1, 1)))
+    page.apply_redactions(images=getattr(fitz, 'PDF_REDACT_IMAGE_PIXELS', 2), graphics=0)
+    if patch is not None:
+        page.insert_image(cover, pixmap=fitz.Pixmap(fitz.csRGB, patch.shape[1], patch.shape[0],
+                                                    patch.tobytes(), False))
+
+
+def _move_scan(page, src, dx, dy, paper):
+    """Move the scanned print inside src by (dx, dy) points. Only the ink moves: its own paper
+    pasted onto tinted or gradient paper would show as a box."""
+    import numpy as np
+    t = _scan_target(page)
+    if t:
+        sp = _ScanPixels(page, *t)
+        px, a, (x0, y0, _, _) = sp.ink(src)
+        sp.erase(src)
+        sp.paste(px, a, x0 + round(dx * sp.sx), y0 + round(dy * sp.sy))
+        _remove_hidden_text(page, src)
+        sp.save()
+        return
+    arr, (x0, y0, x1, y1), exact = _scan_pixmap(page, src)
+    ink = _scan_ink(arr, src.height * _SCAN_ZOOM)
+    alpha = ((ink.astype(np.int16) - 12) * 4).clip(0, 255).astype(np.uint8)
+    rgba = np.ascontiguousarray(np.dstack([arr, alpha])[y0:y1, x0:x1])
+    pix = fitz.Pixmap(fitz.csRGB, rgba.shape[1], rgba.shape[0], rgba.tobytes(), True)
+    _erase_scan(page, exact, paper)
+    page.insert_image(exact + (dx, dy, dx, dy), pixmap=pix)
+
+
+# Typefaces tried on scans: office documents, receipts and typewriter / dot-matrix print
+_SCAN_FONTS = {
+    'arial':   ('arial.ttf', 'arialbd.ttf'),
+    'times':   ('times.ttf', 'timesbd.ttf'),
+    'courier': ('cour.ttf', 'courbd.ttf'),
+    'calibri': ('calibri.ttf', 'calibrib.ttf'),
+    'verdana': ('verdana.ttf', 'verdanab.ttf'),
+    'tahoma':  ('tahoma.ttf', 'tahomabd.ttf'),
+    'segoe':   ('segoeui.ttf', 'segoeuib.ttf'),
+    'corbel':  ('corbel.ttf', 'corbelb.ttf'),
+    'candara': ('Candara.ttf', 'Candarab.ttf'),
+    'gothic':  ('GOTHIC.TTF', 'GOTHICB.TTF'),
+}
+
+
+_GRAY = {'key': None, 'img': None}
+
+
+def _gray_clip(page, clip, zoom=4):
+    """Grey pixels of clip at zoom 4, cut from one rendering of the whole page kept while the page
+    is unchanged. On a 600 dpi scan every separate clip rendering decodes the whole 100 MB
+    picture again (0.6 s each): reading a page's lines took minutes, one edit 10+ seconds."""
+    import numpy as np
+    if zoom != 4:
+        pm = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), clip=clip, colorspace=fitz.csGRAY, alpha=False, annots=False)
+        return np.frombuffer(pm.samples, np.uint8).reshape(pm.height, pm.width)
+    key = (id(page.parent), page.number, scan_ocr._fingerprint(page))
+    if _GRAY['key'] != key:
+        _GRAY['img'] = None          # let the old one go first
+        pm = page.get_pixmap(matrix=fitz.Matrix(4, 4), colorspace=fitz.csGRAY, alpha=False, annots=False)
+        _GRAY['img'] = np.frombuffer(pm.samples, np.uint8).reshape(pm.height, pm.width).copy()
+        _GRAY['key'] = key
+    g = _GRAY['img']
+    x0, y0 = max(0, int(clip.x0 * 4)), max(0, int(clip.y0 * 4))
+    x1, y1 = min(g.shape[1], int(np.ceil(clip.x1 * 4))), min(g.shape[0], int(np.ceil(clip.y1 * 4)))
+    return g[y0:max(y0, y1), x0:max(x0, x1)]
+
+
+def _ink_baseline(page, rect, invert=False):
+    """The baseline of the print in rect, read from the pixels: OCR word boxes often reach into
+    the next line, and a baseline taken from their bottom puts re-typed words a line too low.
+    The line's own band of ink is found in the row profile; its baseline is the lowest row still
+    carrying a good share of the band's ink (descenders carry little)."""
+    import numpy as np
+    import cv2
+    h = rect.height
+    clip = fitz.Rect(rect.x0, rect.y0 - h * 0.6, rect.x1, rect.y1 + h * 0.6) & page.rect
+    if clip.is_empty:
+        return None
+    z = 4
+    g = _gray_clip(page, clip, z)
+    if g.size == 0:
+        return None
+    if invert:
+        g = 255 - g
+    _, ink = cv2.threshold(g, 0, 1, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    prof = ink.sum(axis=1).astype(np.float32)
+    if prof.max() <= 0:
+        return None
+    on = prof > prof.max() * 0.06
+    runs, start = [], None
+    for y, v in enumerate(list(on) + [False]):
+        if v and start is None:
+            start = y
+        elif not v and start is not None:
+            runs.append((start, y))
+            start = None
+    mid = ((rect.y0 + rect.y1) / 2 - clip.y0) * z
+    # The band the word boxes are centred on (or nearest to it)
+    a, b = min(runs, key=lambda r: 0 if r[0] <= mid <= r[1] else min(abs(r[0] - mid), abs(r[1] - mid)))
+    band = prof[a:b]
+    strong = np.nonzero(band > band.max() * 0.35)[0]
+    if not len(strong):
+        return None
+    return clip.y0 + (a + strong[-1] + 1) / z
+
+
+def _light_on_dark(page, rect):
+    """True for light print on dark paper (white text in a coloured bar)."""
+    import numpy as np
+    clip = fitz.Rect(rect.x0 - 2, rect.y0 - 2, rect.x1 + 2, rect.y1 + 2) & page.rect
+    if clip.is_empty:
+        return False
+    g = _gray_clip(page, clip, 4).astype(np.float32)
+    if g.size == 0:
+        return False
+    med, lo, hi = np.median(g), np.percentile(g, 5), np.percentile(g, 95)
+    return med < 180 and (hi - med) > (med - lo) * 1.3
+
+
+def _ink_crop(mask):
+    """mask cut to the bounding box of its ink, with that box's (x0, y0, x1, y1) in pixels."""
+    import numpy as np
+    ys, xs = np.nonzero(mask)
+    if not len(ys):
+        return None, None
+    return mask[ys.min():ys.max() + 1, xs.min():xs.max() + 1], (xs.min(), ys.min(), xs.max() + 1, ys.max() + 1)
+
+
+_PIL_FONTS = {}
+
+
+def _word_ink(fontfile, text, px=40):
+    """Ink mask of text set in fontfile at px pixels (FreeType via Pillow: ~100× faster than a
+    PDF page per trial, which made reading every line of a big scan take minutes)."""
+    import numpy as np
+    from PIL import Image, ImageDraw, ImageFont
+    font = _PIL_FONTS.get(fontfile)
+    if font is None:
+        font = _PIL_FONTS[fontfile] = ImageFont.truetype(fontfile, px)
+    img = Image.new('L', (int(px * len(text)) + 2 * px, 2 * px + px // 2), 255)
+    ImageDraw.Draw(img).text((px // 2, px // 2), text, font=font, fill=0)
+    return np.asarray(img) < 128
+
+
+def _guess_scan_font(page, words, baseline, only=None, samples=3, invert=False):
+    """(fontfile, fontname, size, baseline) of the Windows font that looks most like the scanned words.
+
+    OCR word boxes are a few pixels off and scanned ink is thicker and blurrier than any rendering,
+    so each candidate is rendered, scaled onto the word's ink box and thinned / thickened to the
+    same amount of ink before the shapes are compared; only then do Courier, Arial and Times differ
+    by their letter shapes instead of by their weight."""
+    import numpy as np
+    import cv2
+    sample = sorted((w for w in words if len(w[1]) >= 2), key=lambda w: -len(w[1]))[:samples] or words[:1]
+    zoom = 4
+    refs = []
+    for r, t in sample:
+        clip = fitz.Rect(r.x0 - 2, r.y0 - 2, r.x1 + 2, r.y1 + 2) & page.rect
+        g = _gray_clip(page, clip, zoom).astype(np.int16)
+        if g.size == 0:
+            continue
+        if invert:
+            g = 255 - g
+        lo, hi = np.percentile(g, 3), np.percentile(g, 90)
+        if hi - lo < 40:
+            continue
+        mask = g < (lo + hi) / 2
+        # OCR boxes can reach into the next line: keep the word's own band of rows (its accents
+        # just above or below stay, the tops of the next line's letters past a gap go)
+        rows = mask.sum(axis=1)
+        on = rows > max(1, rows.max() * 0.08)
+        runs, start = [], None
+        for y, v in enumerate(list(on) + [False]):
+            if v and start is None:
+                start = y
+            elif not v and start is not None:
+                runs.append((start, y))
+                start = None
+        if runs:
+            main = max(runs, key=lambda r: r[1] - r[0])
+            keep = [r for r in runs if r == main or
+                    min(abs(r[0] - main[1]), abs(main[0] - r[1])) <= (main[1] - main[0]) * 0.3]
+            band = np.zeros_like(on)
+            for a, b in keep:
+                band[a:b] = True
+            mask = mask & band[:, None]
+        ref, box = _ink_crop(mask)
+        if ref is not None and ref.shape[0] >= 6 and ref.shape[1] >= 6:
+            refs.append((t, clip, ref, box))
+    if not refs:
+        return None
+    kernel = np.ones((3, 3), np.uint8)
+    best = None
+    for fam, files in _SCAN_FONTS.items():
+        for bold, fn in enumerate(files):
+            ff = 'C:/Windows/Fonts/' + fn
+            if not os.path.exists(ff) or (only and ff not in only):
+                continue
+            # Scanned ink always looks heavier: bold has to win clearly, not by a hair
+            score, sizes, hsizes = 0.04 * len(refs) * bold, [], []
+            for t, clip, ref, box in refs:
+                cand, cbox = _ink_crop(_word_ink(ff, t))
+                if cand is None:
+                    score += 1
+                    continue
+                sizes.append(40 * (ref.shape[1] / zoom) / cand.shape[1])
+                hsizes.append(40 * (ref.shape[0] / zoom) / cand.shape[0])
+                c = cv2.resize(cand.astype(np.uint8), (ref.shape[1], ref.shape[0]),
+                               interpolation=cv2.INTER_AREA)
+                share = ref.mean()
+                for _ in range(6):
+                    if c.mean() < share * 0.85:
+                        c2 = cv2.dilate(c, kernel)
+                    elif c.mean() > share * 1.15:
+                        c2 = cv2.erode(c, kernel)
+                    else:
+                        break
+                    if not c2.any():
+                        break
+                    c = c2
+                c = c.astype(bool)
+                score += 1 - (c & ref).sum() / max((c | ref).sum(), 1)
+            if sizes and (best is None or score < best[0]):
+                # Size between what the word's width and its letter height say: a look-alike
+                # face is rarely exactly as wide as the original, and the height is what the eye
+                # compares (the rest of the line slides to absorb the width)
+                w_size, h_size = sorted(sizes)[len(sizes) // 2], sorted(hsizes)[len(hsizes) // 2]
+                best = (score, ff, os.path.splitext(fn)[0], (w_size * h_size) ** 0.5)
+    if not best:
+        return None
+    # Baseline from the ink of words without descenders (OCR boxes are only roughly placed)
+    bottoms = [clip.y0 + box[3] / zoom for t, clip, ref, box in refs
+               if not (set(t) & set('gjpqyşçğŞÇQ,;()[]{}|/'))]
+    _guess_scan_font.last_fit = 1 - best[0] / len(refs)   # how well the best font matched (0..1)
+    return best[1], best[2], float(best[3]), float(sorted(bottoms)[len(bottoms) // 2] if bottoms else baseline)
+
+
+def _scan_tone(page, words, spec, size, baseline, color):
+    """color adjusted so re-typed text looks as dark as the scanned print around it.
+
+    Solid computer text in the measured ink colour still looks heavier than dotted, grey or
+    worn print (dot-matrix, ribbon, faint copies): match the line's average ink instead. Only
+    grey/black is adjusted, a colour the user picked is kept."""
+    import numpy as np
+    if max(color) - min(color) > 0.15:
+        return color
+    line = fitz.Rect(words[0][0])
+    for r, _ in words[1:]:
+        line |= r
+    clip = fitz.Rect(line.x0 - 1, line.y0 - 1, line.x1 + 1, line.y1 + 1) & page.rect
+    if clip.is_empty:
+        return color
+    z = 4
+    g = _gray_clip(page, clip, z).astype(np.float32)
+    if g.size == 0:
+        return color
+    paper = float(np.percentile(g, 90))
+    dark = float(np.clip(paper - g, 0, None).mean())
+    # The same words typed in black, where they stand
+    scratch = fitz.open()
+    sp = scratch.new_page(width=page.rect.width, height=page.rect.height)
+    kw = _font_kwargs(sp, spec)
+    for r, t in words:
+        sp.insert_text(fitz.Point(r.x0, baseline), t, fontsize=size, color=(0, 0, 0), **kw)
+    pm = sp.get_pixmap(matrix=fitz.Matrix(z, z), clip=clip, colorspace=fitz.csGRAY, alpha=False)
+    cover = float((255 - np.frombuffer(pm.samples, np.uint8).astype(np.float32)).mean() / 255)
+    scratch.close()
+    if cover < 1e-3 or dark < 1:
+        return color
+    level = (paper - dark / cover) / 255          # the grey that gives the same average ink
+    cur = sum(color) / 3
+    if level <= cur:
+        return color                                # never darker than the measured ink
+    level = min(level, 0.75)                        # and still clearly print, not a ghost
+    return tuple(round(level, 3) for _ in range(3))
+
+
+def _replace_scan_words(page, data, new_text, flags, orig_flags, sz, orig_size, color, underline,
+                        line_rect, baseline):
+    """Edit an OCR'd line of a scan word by word: only the words that changed are erased and
+    re-typed, the rest stays the original scanned picture. Re-typing the whole line would also
+    bake in every OCR misreading and swap the scanner's look for a computer font."""
+    import difflib
+    words = [(fitz.Rect(w[:4]), w[4]) for w in data['words']]
+    old = [t for _, t in words]
+    new = new_text.split()
+    style_changed = flags != orig_flags or underline or abs(sz - orig_size) > 0.1
+    ops = [o for o in difflib.SequenceMatcher(a=old, b=new, autojunk=False).get_opcodes() if o[0] != 'equal']
+    if style_changed:
+        spans = [(0, len(old), 0, len(new))]
+    elif not ops:
+        return
+    else:
+        # Each change on its own ("Aidat:" and "1120" in one line): the words between them stay
+        # the scanned picture
+        spans = []
+        for _, i0, i1, j0, j1 in ops:
+            if i0 == i1:  # pure insertion: re-type a neighbouring word with it so it has a place
+                if i0 > 0:
+                    i0, j0 = i0 - 1, j0 - 1
+                else:
+                    i1, j1 = i1 + 1, j1 + 1
+            i1, j1 = min(i1, len(old)), min(j1, len(new))
+            if spans and i0 <= spans[-1][1]:
+                spans[-1] = (spans[-1][0], max(i1, spans[-1][1]), spans[-1][2], max(j1, spans[-1][3]))
+            else:
+                spans.append((i0, i1, j0, j1))
+
+    # Font read from the scanned words themselves, before anything is erased
+    # White print in a coloured bar is handled as its negative: everything below assumes ink
+    # darker than the paper
+    inverted = _light_on_dark(page, line_rect)
+    guess = _guess_scan_font(page, words, baseline, invert=inverted)
+    if guess and not any(ch.isalpha() for _, t in words for ch in t):
+        # Digits alone barely tell typefaces apart: read the font off the nearest line with
+        # letters in the same column ("TUTAR" above "2.885,50") and only measure the size here
+        h = max(w.height for w, _ in words)
+        near = [l for l in (scan_ocr.ocr_page(page) or [])
+                if any(ch.isalpha() for ch in l['text'])
+                and min(l['bbox'][2], line_rect.x1) > max(l['bbox'][0], line_rect.x0)
+                and abs(l['bbox'][1] - line_rect.y0) < h * 5 and abs(l['bbox'][3] - l['bbox'][1] - h) < h * 0.4]
+        if near:
+            ln = min(near, key=lambda l: abs(l['bbox'][1] - line_rect.y0))
+            other = _guess_scan_font(page, [(fitz.Rect(r), t) for r, t in ln['words']], ln['baseline'], invert=inverted)
+            if other:
+                guess = _guess_scan_font(page, words, baseline, only=(other[0],), invert=inverted) or guess
+    if guess:
+        ff, fn, size, baseline = guess
+        try:
+            seen_base = _ink_baseline(page, line_rect, inverted)
+        except Exception:
+            seen_base = None
+        if seen_base is not None and abs(seen_base - baseline) > size * 0.12:
+            baseline = seen_base
+        look_spec, look_size = {'fontfile': ff, 'fontname': fn}, size   # the scan's own style
+        if flags != orig_flags:  # the user switched bold on/off
+            base = next((k for k, v in _SCAN_FONTS.items() if fn + '.ttf' in v), 'arial')
+            alt = 'C:/Windows/Fonts/' + _SCAN_FONTS[base][1 if flags & 16 else 0]
+            if os.path.exists(alt):
+                ff, fn = alt, os.path.splitext(os.path.basename(alt))[0]
+        spec = {'fontfile': ff, 'fontname': fn}
+        size = max(size * sz / (orig_size or sz), 4.0)
+    else:
+        spec, factor = _match_font(page, '', flags, ' '.join(old), line_rect.width, orig_size,
+                                   new_text, keep_style=not style_changed, rect=line_rect, baseline=baseline)
+        size = max(sz * factor, 4.0)
+        look_spec, look_size = spec, size
+    try:
+        color = _scan_tone(page, words, spec, size, baseline, tuple(color))
+    except Exception:
+        pass
+    target = _scan_target(page)
+    if not target:  # no sliding without the picture's own pixels: one span, as before
+        spans = [(spans[0][0], spans[-1][1], spans[0][2], spans[-1][3])]
+    h = max(w.height for w, _ in words)
+    pad = fitz.Rect(-min(1.0, h * 0.12), -h * 0.18, min(1.0, h * 0.12), h * 0.12)
+
+    def padded(r):
+        return fitz.Rect(r.x0 + pad.x0, r.y0 + pad.y0, r.x1 + pad.x1, r.y1 + pad.y1)
+
+    push_history()
+    # With the picture's own pixels at hand every change is made in them, in one go: erase, slide,
+    # and the new words typed in with the look measured on the scan's own words
+    sp, look = (_ScanPixels(page, *target) if target else None), None
+    band = None
+    if sp is not None and inverted:
+        # The line's strip of the picture, turned into its negative while it is edited
+        lh = line_rect.height
+        band = sp.box(fitz.Rect(page.rect.x0, line_rect.y0 - lh, page.rect.x1, line_rect.y1 + lh))
+        sp.arr[band[1]:band[3], band[0]:band[2]] = 255 - sp.arr[band[1]:band[3], band[0]:band[2]]
+    if sp is not None:
+        try:
+            look = sp.measure_look(look_spec, look_size, words, baseline)
+        except Exception:
+            look = None
+    drawn = look[0][0] if look else 1.0   # the size factor the words will be drawn with
+    drawn_dx = look[0][3] / sp.sx if look else 0.0   # and how far right of the OCR box they start
+    off = 0.0   # how far the changes so far slid the rest of the line
+    for a0, a1, b0, b1 in spans:
+        W = [(r + (off, 0, off, 0), t) for r, t in words]
+
+        def region(i, j):
+            r = fitz.Rect(W[i][0])
+            for w, _ in W[i + 1:j]:
+                r |= w
+            return r
+
+        def clamp(r, i, j):
+            # The erase follows the measured line, not the OCR boxes (which can reach into the
+            # lines above and below): from a little over the capitals to under the descenders,
+            # and sideways up to, never into, the neighbouring words
+            if not guess:
+                return r
+            left = max(W[i - 1][0].x1 + 0.5, r.x0 - size * 0.3) if i > 0 else r.x0 - size * 0.4
+            # At the end of the line nothing is near: OCR's last box often stops short of the ink
+            right = min(W[j][0].x0 - 0.5, r.x1 + size * 0.3) if j < len(W) else r.x1 + size * 0.8
+            top = max(baseline - size * 1.25, min(r.y0, baseline - size * 1.0))
+            return fitz.Rect(left, top, right, baseline + size * 0.22)
+
+        text = ' '.join(new[b0:b1])
+        erase = region(a0, a1)
+        # The unchanged rest of the line slides (as the scanned ink it is) so it keeps its usual
+        # distance from the new text: no gap after a shorter word, no overlap after a longer one
+        shift, rest, whole_rest = 0.0, None, False
+        if a1 < len(W) and target:
+            rest = clamp(padded(region(a1, len(W))), a1, len(W))
+            if text:
+                shift = W[a0][0].x0 + drawn_dx + _text_width(spec, text, size * drawn) - W[a1 - 1][0].x1
+            else:
+                shift = W[a0][0].x0 - W[a1][0].x0
+            if abs(shift) < 0.5 or rest.x1 + shift > page.rect.x1 - 2:
+                shift = 0.0 if abs(shift) < 0.5 else None
+        if shift is None or (rest is None and a1 < len(W)):
+            room = W[a1][0].x0 - erase.x0 - size * 0.3
+            if _text_width(spec, text, size) > room:
+                # Longer text would run into the next unchanged word: re-type the rest of the line too
+                a1, b1, whole_rest = len(W), len(new), True
+                erase = region(a0, a1)
+                text = ' '.join(new[b0:b1])
+            shift = 0.0
+        if sp is not None:
+            erase = clamp(padded(erase), a0, a1)
+            sp.erase(erase)
+            _remove_hidden_text(page, erase)
+            if shift and rest is not None:
+                px, al, (rx0, ry0, _, _) = sp.ink(rest)
+                sp.erase(rest)
+                sp.paste(px, al, rx0 + round(shift * sp.sx), ry0)
+                _remove_hidden_text(page, rest)
+                off += shift
+            if text and look is not None:
+                # User size changes scale the measured look; bold switched on uses the bold face
+                (scale, grow, blur, dx, dy, gain), ink = look
+                if style_changed and spec != look_spec:
+                    grow, gain = max(grow, 0), max(gain, 1.0)
+                sp.type_text(spec, size, text, W[a0][0].x0, baseline, (scale, grow, blur, dx, dy, gain), ink)
+                # Invisible copy so the new words can still be found and copied
+                kw = {'fontsize': size * scale, 'render_mode': 3}
+                kw.update(_font_kwargs(page, spec))
+                page.insert_text(fitz.Point(W[a0][0].x0 + dx / sp.sx, baseline + dy / sp.sy), text, **kw)
+                if underline:
+                    ul_y = baseline + size * 0.12
+                    page.draw_line(fitz.Point(W[a0][0].x0, ul_y),
+                                   fitz.Point(W[a0][0].x0 + _text_width(spec, text, size), ul_y),
+                                   color=color, width=max(0.5, size * 0.04))
+                text = ''
+        else:
+            _erase_scan(page, padded(erase), data.get('paper'))
+        if text:
+            x = W[a0][0].x0
+            kw = {'fontsize': size, 'color': color}
+            kw.update(_font_kwargs(page, spec))
+            page.insert_text(fitz.Point(x, baseline), text, **kw)
+            if underline:
+                ul_y = baseline + size * 0.12
+                page.draw_line(fitz.Point(x, ul_y), fitz.Point(x + _text_width(spec, text, size), ul_y),
+                               color=color, width=max(0.5, size * 0.04))
+        if whole_rest:
+            break
+    if sp is not None:
+        if band is not None:
+            sp.arr[band[1]:band[3], band[0]:band[2]] = 255 - sp.arr[band[1]:band[3], band[0]:band[2]]
+        sp.save()
+
+
 @app.route('/api/redact', methods=['POST'])
 def api_redact():
     """Seçili alanı GERÇEKTEN siler: alttaki metin ve görsel içerik PDF'ten kaldırılır.
@@ -1203,7 +2096,7 @@ def api_redact():
     if not doc:
         return jsonify({'ok': False})
     data  = request.json
-    page  = doc[data['page']]
+    page  = _upright_scan(doc[data['page']])
     pdf_w, pdf_h = page.rect.width, page.rect.height
     rect  = fitz.Rect(
         data['x0'] * pdf_w, data['y0'] * pdf_h,
@@ -1222,6 +2115,8 @@ def api_movetext():
         return jsonify({'ok': False})
     data   = request.json
     page   = doc[data['page']]
+    if data.get('ocr'):
+        page = _upright_scan(page)
     pdf_w, pdf_h = page.rect.width, page.rect.height
 
     old_rect = fitz.Rect(
@@ -1231,6 +2126,14 @@ def api_movetext():
     new_x  = float(data['new_x'])
     new_bl = float(data['new_baseline_y'])
     text   = data['text']
+    if data.get('ocr'):
+        # A scanned line moves as the picture it is, with its exact look
+        src = fitz.Rect(old_rect.x0 - 1, old_rect.y0 - 1.5, old_rect.x1 + 1, old_rect.y1 + 1)
+        dx = new_x - old_rect.x0
+        dy = new_bl - float(data.get('baseline_y') or old_rect.y1)
+        push_history()
+        _move_scan(page, src, dx, dy, data.get('paper'))
+        return jsonify({'ok': True})
     size   = float(data.get('size', 12))
     color  = tuple(data.get('color', [0, 0, 0]))
     # Keep the original font when moving (it used to be rewritten in the default font)
@@ -1464,17 +2367,26 @@ def api_textblocks(i):
     pdf_w = page.rect.width
     pdf_h = page.rect.height
     result = []
+    # Scans: the scanner's invisible OCR layer is replaced by our own OCR of the picture
+    ocr_lines = scan_ocr.ocr_page(page) if scan_ocr.is_scan_page(page) else None
+    hidden = scan_ocr.invisible_rects(page) if ocr_lines is not None else []
+    visible = []
     for b in page.get_text('dict')['blocks']:
         if b.get('type') != 0:
             continue
         for line in b.get('lines', []):
             spans = line.get('spans', [])
+            if hidden:
+                spans = [s for s in spans if not _mostly_inside(fitz.Rect(s['bbox']), hidden)]
             if not spans:
                 continue
             full_text = ''.join(s.get('text', '') for s in spans).strip()
             if not full_text:
                 continue
-            bbox = line['bbox']
+            bbox = fitz.Rect(spans[0]['bbox'])
+            for s in spans[1:]:
+                bbox |= fitz.Rect(s['bbox'])
+            visible.append(fitz.Rect(bbox))
             geo_size = round((bbox[3] - bbox[1]) * 0.82, 1)
             first_span = next((s for s in spans if s.get('text', '').strip()), spans[0])
             baseline_y = first_span['origin'][1]
@@ -1507,14 +2419,53 @@ def api_textblocks(i):
                 'flags': first_span.get('flags', 0),
                 'underline': False,
             })
+    for ln in ocr_lines or []:
+        # Words already re-typed as real text are edited as that text, not as picture
+        words = [(fitz.Rect(r), t) for r, t in ln['words']]
+        keep = [not _mostly_inside(r, visible, 0.4) for r, _ in words]
+        run = []
+        for (r, t), k in zip(words + [(None, None)], keep + [False]):
+            if k:
+                run.append((r, t))
+                continue
+            if run:
+                result.append(_ocr_block(ln, run, pdf_w, pdf_h))
+                run = []
     return jsonify({'ok': True, 'blocks': result})
+
+
+def _mostly_inside(rect, rects, share=0.5):
+    """True when more than `share` of rect's area lies inside one of rects."""
+    area = abs(rect)
+    return area > 0 and any(abs(rect & r) > share * area for r in rects)
+
+
+def _ocr_block(line, words, pdf_w, pdf_h):
+    """Text block for an OCR'd line of a scan (words: [(Rect, text)])."""
+    bbox = fitz.Rect(words[0][0])
+    for r, _ in words[1:]:
+        bbox |= r
+    return {
+        'text': ' '.join(t for _, t in words),
+        'x0': bbox.x0 / pdf_w, 'y0': bbox.y0 / pdf_h,
+        'x1': bbox.x1 / pdf_w, 'y1': bbox.y1 / pdf_h,
+        'size': line['size'], 'span_size': line['size'], 'sys_size': line['size'],
+        'baseline_y': line['baseline'],
+        'color': list(line['ink']),
+        'font': '', 'flags': 0, 'underline': False,
+        'ocr': True, 'paper': list(line['paper']),
+        'words': [[r.x0, r.y0, r.x1, r.y1, t] for r, t in words],
+    }
 
 
 @app.route('/api/undo', methods=['POST'])
 def api_undo():
     if not state['history']:
         return jsonify({'ok': False, 'error': 'Geri alınacak işlem yok'})
-    buf = state['history'].pop()
+    snap = state['history'].pop()
+    with open(snap, 'rb') as f:
+        buf = f.read()
+    _forget(snap)
     if state['doc']:
         state['doc'].close()
     state['doc'] = fitz.open(stream=buf, filetype='pdf')
@@ -1571,7 +2522,7 @@ def api_export_txt():
     parts = []
     for i, page in enumerate(doc):
         parts.append(f'--- Sayfa {i + 1} ---')
-        parts.append(page.get_text())
+        parts.append(_page_text(page))
     buf = io.BytesIO('\n'.join(parts).encode('utf-8-sig'))
     stem = _doc_stem()
     return send_file(buf, mimetype='text/plain; charset=utf-8',
@@ -1786,6 +2737,341 @@ def api_open_link():
     return jsonify({'ok': True})
 
 
+def _page_text(page):
+    """Text of the page; scanned pages are read with OCR instead of the scanner's (often garbage)
+    invisible text layer. Lines of one row are joined with a tab."""
+    lines = scan_ocr.ocr_page(page) if scan_ocr.is_scan_page(page) else None
+    if lines is None:
+        return page.get_text()
+    rows = []
+    for ln in lines:
+        b = ln['bbox']
+        if rows and abs(rows[-1][0] - b[1]) < (b[3] - b[1]) * 0.5:
+            rows[-1][1].append(ln['text'])
+        else:
+            rows.append([b[1], [ln['text']]])
+    return '\n'.join('\t'.join(t) for _, t in rows) + '\n'
+
+
+def _ocr_rebuild_page(page, out, layout=None):
+    """Re-create a scanned page on a new page of out as real text in a look-alike font, with
+    its table rules as lines and its logos, stamps and signatures as pictures, so Word gets
+    editable text instead of one big photo of the page.
+
+    With layout (a list) nothing is drawn: the page is appended to it as its size, a picture
+    of everything but the text, and each text line's place and look (see _scan_docx)."""
+    import numpy as np
+    import cv2
+    lines = scan_ocr.ocr_page(page)
+    W, H = page.rect.width, page.rect.height
+    if not lines:
+        if layout is None:
+            out.insert_pdf(page.parent, from_page=page.number, to_page=page.number)
+        else:
+            pm = page.get_pixmap(matrix=fitz.Matrix(3, 3), colorspace=fitz.csRGB, alpha=False, annots=False)
+            a = np.frombuffer(pm.samples, np.uint8).reshape(pm.height, pm.width, 3)
+            ok, data = cv2.imencode('.jpg', scan_ocr.whiten(a, 'color')[:, :, ::-1], [cv2.IMWRITE_JPEG_QUALITY, 85])
+            layout.append({'w': W, 'h': H, 'bg': data.tobytes(), 'lines': []})
+        return
+    new = out.new_page(width=W, height=H) if layout is None else None
+    # Each line's own look-alike font (letterheads, forms and printer output mix typefaces). A
+    # line no font fits is not print OCR could read: handwriting, a logo, a stamp's lettering, or
+    # print read as garbage. It stays a picture rather than becoming wrong text.
+    heights = sorted(ln['bbox'][3] - ln['bbox'][1] for ln in lines)
+    tall = heights[len(heights) // 2] * 1.6
+    # A page uses few typefaces: find them on its longest lines with every candidate, then read
+    # each line against those only (all candidates for every line made big pages take minutes)
+    from collections import Counter
+    seen = Counter()
+    for ln in sorted(lines, key=lambda l: -len(l['text']))[:8]:
+        g = _guess_scan_font(page, [(fitz.Rect(r), t) for r, t in ln['words']], ln['baseline'], samples=2)
+        if g and getattr(_guess_scan_font, 'last_fit', 0) >= 0.22:
+            seen[next((k for k, v in _SCAN_FONTS.items() if os.path.basename(g[0]) in v), 'arial')] += 1
+    only = tuple('C:/Windows/Fonts/' + f for fam, _ in seen.most_common(3) for f in _SCAN_FONTS[fam]) or None
+    kept = []
+    for ln in lines:
+        g = _guess_scan_font(page, [(fitz.Rect(r), t) for r, t in ln['words']], ln['baseline'], samples=2,
+                             only=only)
+        fit_ = getattr(_guess_scan_font, 'last_fit', 0) if g else 0
+        short = sum(ch.isalnum() for ch in ln['text']) <= 3
+        # A low fit alone is no reason: a typeface we do not have (a company font) fits badly too.
+        # It takes a low fit and a reading that looks wrong to keep a line as a picture
+        garbled = scan_ocr._junk(ln['text']) > 0.12
+        if g is None or (fit_ < 0.22 and (garbled or short)) or                 (short and (fit_ < 0.3 or ln['bbox'][3] - ln['bbox'][1] > tall)):
+            continue
+        fam = next((k for k, v in _SCAN_FONTS.items() if os.path.basename(g[0]) in v), 'arial')
+        # The baseline from the pixels: OCR boxes reaching into the next line put baselines a
+        # few points off, which made neighbouring lines collide
+        try:
+            seen = _ink_baseline(page, fitz.Rect(ln['bbox']))
+        except Exception:
+            seen = None
+        b = fitz.Rect(ln['bbox'])
+        base = seen if seen is not None and b.y0 < seen <= b.y1 + b.height * 0.3 else ln['baseline']
+        kept.append(dict(ln, family=fam, baseline=base, ocr_baseline=ln['baseline']))
+    # Two lines whose boxes overlapped can both be read onto the same band of ink. The page's
+    # usual line pitch puts the lower one (by OCR's order) back where it belongs
+    def same_column(a, b2):
+        ra, rb = fitz.Rect(a['bbox']), fitz.Rect(b2['bbox'])
+        return min(ra.x1, rb.x1) - max(ra.x0, rb.x0) >= min(ra.width, rb.width) * 0.3
+
+    nearest = []
+    for a in kept:
+        ds = [abs(a['ocr_baseline'] - b2['ocr_baseline']) for b2 in kept
+              if b2 is not a and same_column(a, b2) and abs(a['ocr_baseline'] - b2['ocr_baseline']) > 3]
+        if ds:
+            nearest.append(min(ds))
+    usual = float(np.median(nearest)) if nearest else 0     # the distance to the next line
+    if usual:
+        for a in sorted(kept, key=lambda l: l['ocr_baseline']):
+            for b2 in kept:
+                if b2 is a or not same_column(a, b2) or b2['ocr_baseline'] <= a['ocr_baseline']:
+                    continue
+                if abs(a['baseline'] - b2['baseline']) < usual * 0.4 and                         b2['ocr_baseline'] - a['ocr_baseline'] >= usual * 0.4:
+                    b2['baseline'] = a['baseline'] + usual
+    lines = kept
+    z = 3
+    pix = page.get_pixmap(matrix=fitz.Matrix(z, z), colorspace=fitz.csRGB, alpha=False, annots=False)
+    arr = np.frombuffer(pix.samples, np.uint8).reshape(pix.height, pix.width, 3)
+    clean = scan_ocr.whiten(arr, 'color')
+    ink = clean.min(axis=2) < 170
+    core = clean.min(axis=2) < 128   # the stroke cores alone: soft edges would blur the weight
+
+    def px(r, pad=0.0):
+        p = (r[3] - r[1]) * pad
+        return (max(0, int((r[0] - p) * z)), max(0, int((r[1] - p) * z)),
+                min(pix.width, int((r[2] + p) * z) + 1), min(pix.height, int((r[3] + p) * z) + 1))
+
+    # Pen stroke width of each line (twice the distance from the middle of a stroke to its edge):
+    # set against the letter size it tells bold from regular. Ink coverage would depend on the
+    # letters themselves.
+    stroke = []
+    for ln in lines:
+        x0, y0, x1, y1 = px(ln['bbox'])
+        m = core[y0:y1, x0:x1].astype(np.uint8)
+        if m.size == 0 or not m.any():
+            stroke.append(0.0)
+            continue
+        dt = cv2.distanceTransform(m, cv2.DIST_L2, 3)
+        ridge = (dt >= cv2.dilate(dt, np.ones((3, 3), np.uint8))) & (m > 0)
+        stroke.append(2 * float(np.median(dt[ridge])))
+    graphics = ink.copy()
+    pictures = clean.copy()
+    for ln in lines:
+        x0, y0, x1, y1 = px(ln['bbox'], 0.15)
+        graphics[y0:y1, x0:x1] = False
+        # The text becomes real text: take it out of any logo or stamp picture it sits in
+        # (soft letter edges too: behind the real text they would show as a faint ghost)
+        pictures[y0:y1, x0:x1][clean[y0:y1, x0:x1].min(axis=2) < 235] = 255
+    if layout is not None:
+        ok, data = cv2.imencode('.jpg', np.ascontiguousarray(pictures[:, :, ::-1]), [cv2.IMWRITE_JPEG_QUALITY, 85])
+        page_layout = {'w': W, 'h': H, 'bg': data.tobytes(), 'lines': []}
+
+    # Table rules and separators: long thin runs of ink
+    g8 = graphics.astype(np.uint8) * 255
+    hor = cv2.morphologyEx(g8, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (max(20, pix.width // 25), 1)))
+    ver = cv2.morphologyEx(g8, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (1, max(20, pix.height // 40))))
+    for m, horizontal in ((hor, True), (ver, False)):
+        n, _, stats, _ = cv2.connectedComponentsWithStats(m)
+        for x, y, w, h, _a in stats[1:]:
+            if new is None:
+                break
+            if horizontal:
+                new.draw_line(fitz.Point(x / z, (y + h / 2) / z), fitz.Point((x + w) / z, (y + h / 2) / z),
+                              color=(0, 0, 0), width=max(0.4, h / z))
+            else:
+                new.draw_line(fitz.Point((x + w / 2) / z, y / z), fitz.Point((x + w / 2) / z, (y + h) / z),
+                              color=(0, 0, 0), width=max(0.4, w / z))
+    rest = graphics & ~cv2.dilate(hor | ver, np.ones((5, 5), np.uint8)).astype(bool)
+
+    # Whatever ink is left (logos, stamps, signatures, handwriting OCR did not read) as pictures
+    blobs = cv2.dilate(rest.astype(np.uint8), np.ones((int(4 * z), int(4 * z)), np.uint8))
+    n, _, stats, _ = cv2.connectedComponentsWithStats(blobs)
+    for x, y, w, h, _a in stats[1:]:
+        if new is None:
+            break
+        if w < 6 * z or h < 6 * z or rest[y:y + h, x:x + w].sum() < 30 * z:
+            continue
+        crop = np.ascontiguousarray(pictures[y:y + h, x:x + w])
+        ok, data = cv2.imencode('.png', crop[:, :, ::-1])
+        if ok:
+            new.insert_image(fitz.Rect(x / z, y / z, (x + w) / z, (y + h) / z), stream=data.tobytes())
+
+    fonts = {}
+    for fam, files in _SCAN_FONTS.items():
+        reg = 'C:/Windows/Fonts/' + files[0]
+        bld = 'C:/Windows/Fonts/' + files[1]
+        if os.path.exists(reg):
+            fonts[fam] = (reg, bld if os.path.exists(bld) else reg)
+
+    def fit(ln, ff):
+        # The line's width in the look-alike font is the better measure of its size: the box
+        # height is swollen by accents (Ç, İ, Ğ) and descenders
+        size = ln['size']
+        f = fitz.Font(fontfile=ff)
+        by_width = fitz.Rect(ln['bbox']).width / (f.text_length(ln['text'], fontsize=1) or 1)
+        return by_width if 0.55 * size < by_width < 1.6 * size else size
+
+    for ln in lines:
+        if ln['family'] not in fonts:
+            ln['family'] = next(iter(fonts))
+    sizes = [fit(ln, fonts[ln['family']][0]) for ln in lines]
+    # A misread line (letters missing, words run together) fits its width with a huge size: no
+    # line is set more than 1.6× the page's usual size, which still leaves headings their size
+    if sizes:
+        usual_size = float(np.median(sizes))
+        sizes = [min(sz, usual_size * 1.6) for sz in sizes]
+    ratios = [st / max(sz * z, 1) for st, sz in zip(stroke, sizes)]
+    # Bold against the other lines in the same typeface: stroke widths differ between faces
+    typical = {}
+    for fam in {ln['family'] for ln in lines}:
+        rs = [r for ln, r in zip(lines, ratios) if ln['family'] == fam and r > 0]
+        all_rs = [r for r in ratios if r > 0]
+        typical[fam] = float(np.median(rs if len(rs) >= 3 else all_rs or [0]))
+    # How far each line is from the nearest line above or below it in the same column: a line
+    # of text set taller than that overlaps its neighbour, and Word converters drop one of two
+    # overlapping lines (dense contracts lost a line in ten)
+    pitch = []
+    for i, ln in enumerate(lines):
+        b = fitz.Rect(ln['bbox'])
+        best = None
+        for j, other in enumerate(lines):
+            if i == j:
+                continue
+            o = fitz.Rect(other['bbox'])
+            if min(b.x1, o.x1) - max(b.x0, o.x0) < min(b.width, o.width) * 0.3:
+                continue
+            d = abs(other['baseline'] - ln['baseline'])
+            if d > 2 and (best is None or d < best):
+                best = d
+        pitch.append(best)
+    face = {}
+    for ln, size, ratio, room in zip(lines, sizes, ratios, pitch):
+        b = fitz.Rect(ln['bbox'])
+        reg, bld = fonts[ln['family']]
+        is_bold = typical[ln['family']] > 0 and ratio > typical[ln['family']] * 1.22
+        if is_bold:
+            size = fit(ln, bld)
+        if room:
+            ff = bld if is_bold else reg
+            f = face.get(ff) or face.setdefault(ff, fitz.Font(fontfile=ff))
+            # Never more than a fifth smaller: a neighbour much closer than that is a misread,
+            # not a reason to shrink the text to nothing
+            size = max(size * 0.8, min(size, room * 0.97 / max(f.ascender - f.descender, 0.8)))
+        size = max(4.0, int(size * 2) / 2)
+        ink_c = ln.get('ink') or (0, 0, 0)
+        color = (0, 0, 0) if max(ink_c) - min(ink_c) < 0.15 else tuple(ink_c)
+        ff = bld if is_bold else reg
+        if new is None:
+            f = face.get(ff) or face.setdefault(ff, fitz.Font(fontfile=ff))
+            page_layout['lines'].append({'text': ln['text'], 'x': b.x0, 'baseline': ln['baseline'], 'size': size,
+                                         'bold': is_bold, 'family': ln['family'], 'color': color,
+                                         'width': f.text_length(ln['text'], fontsize=size),
+                                         'ascender': f.ascender, 'descender': f.descender})
+            continue
+        name = ('B' if is_bold else 'R') + ln['family']
+        new.insert_text(fitz.Point(b.x0, ln['baseline']), ln['text'], fontsize=size, color=color,
+                        fontfile=ff, fontname=name)
+    if layout is not None:
+        layout.append(page_layout)
+
+
+def _export_source(doc):
+    """doc itself, or a copy with its scanned pages rebuilt as text (see _ocr_rebuild_page)."""
+    scans = [p.number for p in doc if scan_ocr.is_scan_page(p)] if scan_ocr.available() else []
+    if not scans:
+        return doc
+    out = fitz.open()
+    for p in doc:
+        if p.number in scans:
+            _ocr_rebuild_page(p, out)
+        else:
+            out.insert_pdf(doc, from_page=p.number, to_page=p.number)
+    return out
+
+
+_WORD_FONTS = {'arial': 'Arial', 'times': 'Times New Roman', 'courier': 'Courier New', 'calibri': 'Calibri',
+               'verdana': 'Verdana', 'tahoma': 'Tahoma', 'segoe': 'Segoe UI', 'corbel': 'Corbel',
+               'candara': 'Candara', 'gothic': 'Century Gothic'}
+
+
+def _scan_docx(layout, path):
+    """A Word document of scanned pages laid out like the scans: each page the same size, its
+    rules, logos, stamps and handwriting a picture behind the text, and each text line in a
+    frame at its exact place, in its look-alike font, size, weight and colour. Nothing flows,
+    so nothing spills onto another page or gets dropped for overlapping a neighbour, and the
+    text stays editable."""
+    import docx
+    from docx.enum.section import WD_SECTION
+    from docx.enum.text import WD_LINE_SPACING
+    from docx.oxml import OxmlElement, parse_xml
+    from docx.oxml.ns import qn, nsdecls
+    from docx.shared import Pt, RGBColor
+
+    d = docx.Document()
+    normal = d.styles['Normal']
+    normal.paragraph_format.space_before = Pt(0)
+    normal.paragraph_format.space_after = Pt(0)
+    body = d.element.body
+    for p in list(body.iterchildren(qn('w:p'))):
+        body.remove(p)
+
+    def twips(v):
+        return str(int(round(v * 20)))
+
+    for i, pg in enumerate(layout):
+        sec = d.sections[0] if i == 0 else d.add_section(WD_SECTION.NEW_PAGE)
+        sec.page_width, sec.page_height = Pt(pg['w']), Pt(pg['h'])
+        for side in ('left_margin', 'right_margin', 'top_margin', 'bottom_margin'):
+            setattr(sec, side, Pt(0))
+        sec.header_distance = sec.footer_distance = Pt(0)
+        # The page picture, behind the text and pinned to the page corner
+        para = d.add_paragraph()
+        para.paragraph_format.line_spacing_rule = WD_LINE_SPACING.EXACTLY
+        para.paragraph_format.line_spacing = Pt(1)
+        inline = para.add_run().add_picture(io.BytesIO(pg['bg']), width=Pt(pg['w']), height=Pt(pg['h']))._inline
+        anchor = parse_xml(
+            f'<wp:anchor {nsdecls("wp", "a", "pic", "r")} distT="0" distB="0" distL="0" distR="0" simplePos="0" '
+            f'relativeHeight="0" behindDoc="1" locked="1" layoutInCell="1" allowOverlap="1">'
+            f'<wp:simplePos x="0" y="0"/>'
+            f'<wp:positionH relativeFrom="page"><wp:posOffset>0</wp:posOffset></wp:positionH>'
+            f'<wp:positionV relativeFrom="page"><wp:posOffset>0</wp:posOffset></wp:positionV>'
+            f'</wp:anchor>')
+        anchor.append(inline.find(qn('wp:extent')))
+        anchor.append(parse_xml(f'<wp:effectExtent {nsdecls("wp")} l="0" t="0" r="0" b="0"/>'))
+        anchor.append(parse_xml(f'<wp:wrapNone {nsdecls("wp")}/>'))
+        for tag in ('wp:docPr', 'wp:cNvGraphicFramePr', 'a:graphic'):
+            el = inline.find(qn(tag))
+            if el is not None:
+                anchor.append(el)
+        inline.getparent().replace(inline, anchor)
+        for ln in pg['lines']:
+            size = ln['size']
+            line_h = size * max(ln['ascender'] - ln['descender'], 1.0)
+            para = d.add_paragraph()
+            fmt = para.paragraph_format
+            fmt.line_spacing_rule = WD_LINE_SPACING.EXACTLY
+            fmt.line_spacing = Pt(line_h)
+            frame = OxmlElement('w:framePr')
+            frame.set(qn('w:w'), twips(ln['width'] * 1.15 + 6))
+            frame.set(qn('w:h'), twips(line_h))
+            frame.set(qn('w:hRule'), 'exact')
+            frame.set(qn('w:x'), twips(ln['x']))
+            frame.set(qn('w:y'), twips(ln['baseline'] - size * ln['ascender']))
+            frame.set(qn('w:hAnchor'), 'page')
+            frame.set(qn('w:vAnchor'), 'page')
+            frame.set(qn('w:wrap'), 'none')
+            para._p.get_or_add_pPr().insert(0, frame)
+            run = para.add_run(ln['text'])
+            font = run.font
+            font.name = _WORD_FONTS.get(ln['family'], 'Arial')
+            run._r.get_or_add_rPr().get_or_add_rFonts().set(qn('w:cs'), font.name)
+            font.size = Pt(size)
+            font.bold = bool(ln['bold'])
+            font.color.rgb = RGBColor(*(int(round(c * 255)) for c in ln['color']))
+    d.save(path)
+
+
 @app.route('/api/export/docx')
 def api_export_docx():
     doc = state['doc']
@@ -1793,17 +3079,24 @@ def api_export_docx():
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
     if is_demo():
         return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
-    try:
-        from pdf2docx import Converter
-    except ImportError:
-        return jsonify({'ok': False, 'error': 'Word dönüştürücü yüklü değil. Kurmak için: pip install pdf2docx'})
     tmp_pdf = tempfile.mktemp(suffix='.pdf')
     tmp_docx = tempfile.mktemp(suffix='.docx')
     try:
-        doc.save(tmp_pdf, garbage=4, deflate=True)
-        cv = Converter(tmp_pdf)
-        cv.convert(tmp_docx, start=0, end=None)
-        cv.close()
+        if scan_ocr.available() and len(doc) and all(scan_ocr.is_scan_page(p) for p in doc):
+            # Scans: laid out page by page ourselves (see _scan_docx)
+            layout = []
+            for p in doc:
+                _ocr_rebuild_page(p, None, layout)
+            _scan_docx(layout, tmp_docx)
+        else:
+            try:
+                from pdf2docx import Converter
+            except ImportError:
+                return jsonify({'ok': False, 'error': 'Word dönüştürücü yüklü değil. Kurmak için: pip install pdf2docx'})
+            _export_source(doc).save(tmp_pdf, garbage=4, deflate=True)
+            cv = Converter(tmp_pdf)
+            cv.convert(tmp_docx, start=0, end=None)
+            cv.close()
         with open(tmp_docx, 'rb') as f:
             data = f.read()
         buf = io.BytesIO(data)
@@ -1901,6 +3194,35 @@ def api_reverse():
     push_history()
     doc.select(list(range(len(doc) - 1, -1, -1)))
     return jsonify({'ok': True, 'pages': len(doc)})
+
+
+@app.route('/api/scan_info')
+def api_scan_info():
+    """How many pages of the open document are scans (their text comes from OCR)."""
+    doc = state['doc']
+    if not doc:
+        return jsonify({'ok': False})
+    return jsonify({'ok': True, 'scanned': sum(1 for p in doc if scan_ocr.is_scan_page(p)), 'pages': len(doc)})
+
+
+@app.route('/api/clean_background', methods=['POST'])
+def api_clean_background():
+    """Whiten the paper of scanned pages (copier grey, yellowed or tinted paper, shading)."""
+    doc = state['doc']
+    if not doc:
+        return jsonify({'ok': False})
+    data = request.json or {}
+    mode = 'bw' if data.get('mode') == 'bw' else 'color'
+    if data.get('scope') == 'all':
+        pages = range(len(doc))
+    else:
+        pages = [min(max(int(data.get('page_idx', 0)), 0), len(doc) - 1)]
+    scans = [i for i in pages if scan_ocr.is_scan_page(doc[i])]
+    if not scans:
+        return jsonify({'ok': False, 'code': 'no_scan'})
+    push_history()
+    done = [i for i in scans if scan_ocr.clean_background(doc[i], mode)]
+    return jsonify({'ok': True, 'pages': done})
 
 
 @app.route('/api/addblank', methods=['POST'])
@@ -2477,6 +3799,12 @@ def api_export_excel():
     wb.remove(wb.active)
     for i, page in enumerate(doc):
         ws = wb.create_sheet(f'Sayfa {i + 1}')
+        if scan_ocr.is_scan_page(page) and scan_ocr.available():
+            # Scanned page: one row per printed row, its columns in separate cells
+            for row in _page_text(page).splitlines():
+                if row.strip():
+                    ws.append([c.strip() for c in row.split('\t')])
+            continue
         for block in page.get_text('blocks'):
             if block[6] == 0:
                 for line in block[4].strip().splitlines():

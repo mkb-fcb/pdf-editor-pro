@@ -1032,6 +1032,9 @@ body.has-file:not(.read-mode) #zoombar {
   .pp.fit img { max-width: 100%; max-height: 100%; }
   .pp.actual { align-items: flex-start; justify-content: flex-start; }
 }
+  .ocr-busy { position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:5;
+    background:rgba(15,23,42,.82); color:#fff; font-size:12px; padding:6px 12px; border-radius:14px;
+    pointer-events:none; }
 </style>
 </head>
 <body>
@@ -1063,6 +1066,7 @@ body.has-file:not(.read-mode) #zoombar {
   <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 15V3" /> <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <path d="m7 10 5 5 5-5" /></symbol>
   <symbol id="i-type" viewBox="0 0 24 24"><path d="M12 4v16" /> <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" /> <path d="M9 20h6" /></symbol>
   <symbol id="i-replace" viewBox="0 0 24 24"><path d="M14 4a1 1 0 0 1 1-1" /> <path d="M15 10a1 1 0 0 1-1-1" /> <path d="M21 4a1 1 0 0 0-1-1" /> <path d="M21 9a1 1 0 0 1-1 1" /> <path d="m3 7 3 3 3-3" /> <path d="M6 10V5a2 2 0 0 1 2-2h2" /> <rect x="3" y="14" width="7" height="7" rx="1" /></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" /> <path d="M20 3v4" /> <path d="M22 5h-4" /> <path d="M4 17v2" /> <path d="M5 18H3" /></symbol>
   <symbol id="i-eraser" viewBox="0 0 24 24"><path d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21" /> <path d="m5.082 11.09 8.828 8.828" /></symbol>
   <symbol id="i-shapes" viewBox="0 0 24 24"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z" /> <rect x="3" y="14" width="7" height="7" rx="1" /> <circle cx="17.5" cy="17.5" r="3.5" /></symbol>
   <symbol id="i-image-plus" viewBox="0 0 24 24"><path d="M16 5h6" /> <path d="M19 2v6" /> <path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /> <circle cx="9" cy="9" r="2" /></symbol>
@@ -1178,6 +1182,7 @@ body.has-file:not(.read-mode) #zoombar {
     <button class="rb" id="btn-addtext" onclick="openAddText()" disabled><svg class="ri" style="color:#2563eb"><use href="#i-type"/></svg><span><span data-i18n="addText">Metin Ekle</span></span></button>
     <button class="rb" id="btn-fr" onclick="openModal('m-fr')" disabled><svg class="ri" style="color:#4f46e5"><use href="#i-replace"/></svg><span><span data-i18n="findReplace">Bul & Değiştir</span></span></button>
     <button class="rb rb-toggle" id="btn-select" onclick="toggleSelectMode()" disabled><svg class="ri" style="color:#dc2626"><use href="#i-eraser"/></svg><span><span data-i18n="deleteArea">Alan Sil</span></span></button>
+    <button class="rb" id="btn-cleanbg" onclick="openCleanBg()" disabled title="Taranmış sayfanın gri / sararmış / renkli kâğıdını beyazlat"><svg class="ri" style="color:#0ea5e9"><use href="#i-sparkles"/></svg><span><span data-i18n="rbCleanBg">Arka Planı Temizle</span></span></button>
     <div class="rb-sep"></div>
     <div class="tb-dropdown" id="dd-shape">
     <button class="rb rb-toggle" id="btn-shape-dd" onclick="toggleShapeMenu(event)" disabled><svg class="ri" style="color:#ea580c"><use href="#i-shapes"/></svg><span><span data-i18n="rbShape">Şekil Çiz</span> <svg class="rb-caret" viewBox="0 0 20 20" fill="currentColor" width="10" height="10"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></span></button>
@@ -1797,6 +1802,44 @@ body.has-file:not(.read-mode) #zoombar {
   </div>
 </div>
 
+<!-- MODAL: Taranmış belge uyarısı -->
+<div class="modal-backdrop" id="m-scanwarn">
+  <div class="modal-card" style="max-width:460px">
+    <h3 data-i18n="swTitle">Taranmış belge</h3>
+    <p style="font-size:13px;line-height:1.5;margin-bottom:16px" data-i18n="swBody"></p>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="sw-cancel" data-i18n="swCancel">İptal</button>
+      <button class="btn-primary" id="sw-ok" data-i18n="swOk">Devam Et</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Arka Planı Temizle -->
+<div class="modal-backdrop" id="m-cleanbg">
+  <div class="modal-card">
+    <h3 data-i18n="cbTitle">Taramanın Arka Planını Temizle</h3>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px" data-i18n="cbDesc"></p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;cursor:pointer">
+        <input type="radio" name="cb-mode" value="color" checked style="margin-top:3px">
+        <span><span data-i18n="cbColor"></span><br><span style="color:var(--text-muted)" data-i18n="cbColorD"></span></span>
+      </label>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;cursor:pointer">
+        <input type="radio" name="cb-mode" value="bw" style="margin-top:3px">
+        <span><span data-i18n="cbBw"></span><br><span style="color:var(--text-muted)" data-i18n="cbBwD"></span></span>
+      </label>
+    </div>
+    <div style="display:flex;gap:16px;margin-bottom:16px;font-size:13px">
+      <label style="cursor:pointer"><input type="radio" name="cb-scope" value="page" checked> <span data-i18n="cbPage">Yalnızca bu sayfa</span></label>
+      <label style="cursor:pointer"><input type="radio" name="cb-scope" value="all"> <span data-i18n="cbAll">Tüm sayfalar</span></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('m-cleanbg')" data-i18n="cbCancel">İptal</button>
+      <button class="btn-primary" onclick="doCleanBg()" data-i18n="cbRun">Temizle</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: İmza Oluştur -->
 <div class="modal-backdrop" id="m-signature">
   <div class="modal-card" style="max-width:520px">
@@ -2149,6 +2192,26 @@ const LANGS = {
     rbSignature: 'İmza',
     rbAddBlank: 'Boş Sayfa',
     rbReverse: 'Ters Çevir',
+    swTitle: "Taranmış belge",
+    swBody: "Bu belgede taranmış (resim olarak kaydedilmiş) sayfalar var. Bu sayfalardaki yazılar OCR ile tanınarak aktarılır; taramanın kalitesine, yazı tipine ve sayfa düzenine göre sonuç tam doğru olmayabilir. Lütfen aktarılan belgeyi kontrol edin.",
+    swCancel: "İptal",
+    swOk: "Devam Et",
+    ocrBusy: 'Taranmış sayfadaki metin tanınıyor…',
+    rbCleanBg: 'Arka Planı Temizle',
+    cbTitle: 'Taramanın Arka Planını Temizle',
+    cbDesc: 'Taranmış sayfalardaki gri fotokopi tonunu, sararmış ya da renkli kâğıdı ve gölgeleri beyaza çevirir. Yazılar korunur.',
+    cbColor: '<b>Renkleri koru</b>',
+    cbColorD: 'Kaşe, logo ve renkli yazılar kalır',
+    cbBw: '<b>Siyah-beyaz</b>',
+    cbBwD: 'En net görünüm, en küçük dosya',
+    cbPage: 'Yalnızca bu sayfa',
+    cbAll: 'Tüm sayfalar',
+    cbRun: 'Temizle',
+    cbCancel: 'İptal',
+    cbDone: 'Arka plan temizlendi ({n} sayfa)',
+    cbNoScan: 'Bu sayfa taranmış bir görüntü değil; temizleme yalnızca taranmış sayfalarda çalışır.',
+    cbNoScanDoc: 'Belgede taranmış sayfa yok; temizleme yalnızca taranmış sayfalarda çalışır.',
+    cbFailed: 'Temizleme başarısız',
     rbEncrypt: 'Şifrele',
     rbWatermark: 'Filigran',
     rbTxt: 'Metin',
@@ -2287,6 +2350,26 @@ const LANGS = {
     rbSignature: 'Signature',
     rbAddBlank: 'Blank Page',
     rbReverse: 'Reverse',
+    swTitle: "Scanned document",
+    swBody: "This document has scanned pages (saved as pictures). Their text is recognised with OCR, so depending on the scan quality, the typeface and the layout the result may not be exact. Please check the exported document.",
+    swCancel: "Cancel",
+    swOk: "Continue",
+    ocrBusy: 'Reading the text of the scanned page…',
+    rbCleanBg: 'Clean Background',
+    cbTitle: 'Clean Scan Background',
+    cbDesc: 'Turns the grey copier tone, yellowed or coloured paper and shadows of scanned pages white. The text is kept.',
+    cbColor: '<b>Keep colours</b>',
+    cbColorD: 'Stamps, logos and coloured text stay',
+    cbBw: '<b>Black and white</b>',
+    cbBwD: 'Sharpest look, smallest file',
+    cbPage: 'This page only',
+    cbAll: 'All pages',
+    cbRun: 'Clean',
+    cbCancel: 'Cancel',
+    cbDone: 'Background cleaned ({n} pages)',
+    cbNoScan: 'This page is not a scanned image; cleaning works on scanned pages only.',
+    cbNoScanDoc: 'The document has no scanned pages; cleaning works on scanned pages only.',
+    cbFailed: 'Cleaning failed',
     rbEncrypt: 'Encrypt',
     rbWatermark: 'Watermark',
     rbTxt: 'Text',
@@ -2425,6 +2508,26 @@ const LANGS = {
     rbSignature: 'Unterschrift',
     rbAddBlank: 'Leere Seite',
     rbReverse: 'Umkehren',
+    swTitle: "Gescanntes Dokument",
+    swBody: "Dieses Dokument enthält gescannte Seiten (als Bilder gespeichert). Ihr Text wird per OCR erkannt; je nach Scanqualität, Schrift und Layout ist das Ergebnis möglicherweise nicht ganz genau. Bitte prüfen Sie das exportierte Dokument.",
+    swCancel: "Abbrechen",
+    swOk: "Fortfahren",
+    ocrBusy: 'Text der gescannten Seite wird erkannt…',
+    rbCleanBg: 'Hintergrund säubern',
+    cbTitle: 'Scan-Hintergrund säubern',
+    cbDesc: 'Macht den grauen Kopierton, vergilbtes oder farbiges Papier und Schatten gescannter Seiten weiß. Der Text bleibt erhalten.',
+    cbColor: '<b>Farben behalten</b>',
+    cbColorD: 'Stempel, Logos und farbiger Text bleiben',
+    cbBw: '<b>Schwarzweiß</b>',
+    cbBwD: 'Schärfstes Bild, kleinste Datei',
+    cbPage: 'Nur diese Seite',
+    cbAll: 'Alle Seiten',
+    cbRun: 'Säubern',
+    cbCancel: 'Abbrechen',
+    cbDone: 'Hintergrund gesäubert ({n} Seiten)',
+    cbNoScan: 'Diese Seite ist kein gescanntes Bild; die Säuberung funktioniert nur bei gescannten Seiten.',
+    cbNoScanDoc: 'Das Dokument hat keine gescannten Seiten; die Säuberung funktioniert nur bei gescannten Seiten.',
+    cbFailed: 'Säubern fehlgeschlagen',
     rbEncrypt: 'Verschlüsseln',
     rbWatermark: 'Wasserzeichen',
     rbTxt: 'Text',
@@ -2563,6 +2666,26 @@ const LANGS = {
     rbSignature: 'Firma',
     rbAddBlank: 'Página en blanco',
     rbReverse: 'Invertir',
+    swTitle: "Documento escaneado",
+    swBody: "Este documento tiene páginas escaneadas (guardadas como imágenes). Su texto se reconoce con OCR, por lo que, según la calidad del escaneo, la tipografía y el diseño, el resultado puede no ser exacto. Revise el documento exportado.",
+    swCancel: "Cancelar",
+    swOk: "Continuar",
+    ocrBusy: 'Reconociendo el texto de la página escaneada…',
+    rbCleanBg: 'Limpiar fondo',
+    cbTitle: 'Limpiar el fondo del escaneo',
+    cbDesc: 'Vuelve blancos el tono gris de fotocopia, el papel amarillento o de color y las sombras de las páginas escaneadas. El texto se conserva.',
+    cbColor: '<b>Conservar colores</b>',
+    cbColorD: 'Sellos, logotipos y texto en color se mantienen',
+    cbBw: '<b>Blanco y negro</b>',
+    cbBwD: 'Imagen más nítida, archivo más pequeño',
+    cbPage: 'Solo esta página',
+    cbAll: 'Todas las páginas',
+    cbRun: 'Limpiar',
+    cbCancel: 'Cancelar',
+    cbDone: 'Fondo limpiado ({n} páginas)',
+    cbNoScan: 'Esta página no es una imagen escaneada; la limpieza solo funciona en páginas escaneadas.',
+    cbNoScanDoc: 'El documento no tiene páginas escaneadas; la limpieza solo funciona en páginas escaneadas.',
+    cbFailed: 'La limpieza ha fallado',
     rbEncrypt: 'Cifrar',
     rbWatermark: 'Marca de agua',
     rbTxt: 'Texto',
@@ -2701,6 +2824,26 @@ const LANGS = {
     rbSignature: 'Signature',
     rbAddBlank: 'Page vierge',
     rbReverse: 'Inverser',
+    swTitle: "Document numérisé",
+    swBody: "Ce document contient des pages numérisées (enregistrées comme images). Leur texte est reconnu par OCR ; selon la qualité du scan, la police et la mise en page, le résultat peut ne pas être exact. Vérifiez le document exporté.",
+    swCancel: "Annuler",
+    swOk: "Continuer",
+    ocrBusy: 'Reconnaissance du texte de la page numérisée…',
+    rbCleanBg: 'Nettoyer le fond',
+    cbTitle: 'Nettoyer le fond du scan',
+    cbDesc: 'Rend blancs le gris de photocopie, le papier jauni ou coloré et les ombres des pages numérisées. Le texte est conservé.',
+    cbColor: '<b>Garder les couleurs</b>',
+    cbColorD: 'Tampons, logos et texte en couleur restent',
+    cbBw: '<b>Noir et blanc</b>',
+    cbBwD: 'Rendu le plus net, fichier le plus petit',
+    cbPage: 'Cette page seulement',
+    cbAll: 'Toutes les pages',
+    cbRun: 'Nettoyer',
+    cbCancel: 'Annuler',
+    cbDone: 'Fond nettoyé ({n} pages)',
+    cbNoScan: 'Cette page n’est pas une image numérisée ; le nettoyage ne fonctionne que sur les pages numérisées.',
+    cbNoScanDoc: 'Le document n’a pas de pages numérisées ; le nettoyage ne fonctionne que sur les pages numérisées.',
+    cbFailed: 'Échec du nettoyage',
     rbEncrypt: 'Chiffrer',
     rbWatermark: 'Filigrane',
     rbTxt: 'Texte',
@@ -2839,6 +2982,26 @@ const LANGS = {
     rbSignature: 'Firma',
     rbAddBlank: 'Pagina vuota',
     rbReverse: 'Inverti',
+    swTitle: "Documento scansionato",
+    swBody: "Questo documento contiene pagine scansionate (salvate come immagini). Il loro testo viene riconosciuto con l’OCR: a seconda della qualità della scansione, del carattere e dell’impaginazione il risultato potrebbe non essere esatto. Controlla il documento esportato.",
+    swCancel: "Annulla",
+    swOk: "Continua",
+    ocrBusy: 'Riconoscimento del testo della pagina scansionata…',
+    rbCleanBg: 'Pulisci sfondo',
+    cbTitle: 'Pulisci lo sfondo della scansione',
+    cbDesc: 'Rende bianchi il grigio da fotocopia, la carta ingiallita o colorata e le ombre delle pagine scansionate. Il testo resta.',
+    cbColor: '<b>Mantieni i colori</b>',
+    cbColorD: 'Timbri, loghi e testo a colori restano',
+    cbBw: '<b>Bianco e nero</b>',
+    cbBwD: 'Immagine più nitida, file più piccolo',
+    cbPage: 'Solo questa pagina',
+    cbAll: 'Tutte le pagine',
+    cbRun: 'Pulisci',
+    cbCancel: 'Annulla',
+    cbDone: 'Sfondo pulito ({n} pagine)',
+    cbNoScan: 'Questa pagina non è un’immagine scansionata; la pulizia funziona solo sulle pagine scansionate.',
+    cbNoScanDoc: 'Il documento non ha pagine scansionate; la pulizia funziona solo sulle pagine scansionate.',
+    cbFailed: 'Pulizia non riuscita',
     rbEncrypt: 'Crittografa',
     rbWatermark: 'Filigrana',
     rbTxt: 'Testo',
@@ -2977,6 +3140,26 @@ const LANGS = {
     rbSignature: 'Assinatura',
     rbAddBlank: 'Página em branco',
     rbReverse: 'Inverter',
+    swTitle: "Documento digitalizado",
+    swBody: "Este documento tem páginas digitalizadas (salvas como imagens). O texto delas é reconhecido por OCR; conforme a qualidade da digitalização, a fonte e o layout, o resultado pode não ser exato. Confira o documento exportado.",
+    swCancel: "Cancelar",
+    swOk: "Continuar",
+    ocrBusy: 'Reconhecendo o texto da página digitalizada…',
+    rbCleanBg: 'Limpar fundo',
+    cbTitle: 'Limpar o fundo da digitalização',
+    cbDesc: 'Torna brancos o tom cinza de fotocópia, o papel amarelado ou colorido e as sombras das páginas digitalizadas. O texto é mantido.',
+    cbColor: '<b>Manter cores</b>',
+    cbColorD: 'Carimbos, logotipos e texto colorido ficam',
+    cbBw: '<b>Preto e branco</b>',
+    cbBwD: 'Imagem mais nítida, arquivo menor',
+    cbPage: 'Só esta página',
+    cbAll: 'Todas as páginas',
+    cbRun: 'Limpar',
+    cbCancel: 'Cancelar',
+    cbDone: 'Fundo limpo ({n} páginas)',
+    cbNoScan: 'Esta página não é uma imagem digitalizada; a limpeza só funciona em páginas digitalizadas.',
+    cbNoScanDoc: 'O documento não tem páginas digitalizadas; a limpeza só funciona em páginas digitalizadas.',
+    cbFailed: 'Falha na limpeza',
     rbEncrypt: 'Criptografar',
     rbWatermark: 'Marca d’água',
     rbTxt: 'Texto',
@@ -3115,6 +3298,26 @@ const LANGS = {
     rbSignature: 'Подпись',
     rbAddBlank: 'Пустая страница',
     rbReverse: 'Обратный порядок',
+    swTitle: "Отсканированный документ",
+    swBody: "В этом документе есть отсканированные страницы (сохранённые как изображения). Их текст распознаётся с помощью OCR, поэтому в зависимости от качества скана, шрифта и вёрстки результат может быть неточным. Проверьте экспортированный документ.",
+    swCancel: "Отмена",
+    swOk: "Продолжить",
+    ocrBusy: 'Распознавание текста отсканированной страницы…',
+    rbCleanBg: 'Очистить фон',
+    cbTitle: 'Очистить фон скана',
+    cbDesc: 'Делает белыми серый тон ксерокопии, пожелтевшую или цветную бумагу и тени на отсканированных страницах. Текст сохраняется.',
+    cbColor: '<b>Сохранить цвета</b>',
+    cbColorD: 'Печати, логотипы и цветной текст остаются',
+    cbBw: '<b>Чёрно-белый</b>',
+    cbBwD: 'Самое чёткое изображение, самый маленький файл',
+    cbPage: 'Только эта страница',
+    cbAll: 'Все страницы',
+    cbRun: 'Очистить',
+    cbCancel: 'Отмена',
+    cbDone: 'Фон очищен (страниц: {n})',
+    cbNoScan: 'Эта страница не является отсканированным изображением; очистка работает только для сканов.',
+    cbNoScanDoc: 'В документе нет отсканированных страниц; очистка работает только для сканов.',
+    cbFailed: 'Не удалось очистить',
     rbEncrypt: 'Пароль',
     rbWatermark: 'Водяной знак',
     rbTxt: 'Текст',
@@ -3347,9 +3550,28 @@ document.addEventListener('click', () => {
   document.getElementById('lang-menu')?.classList.remove('open');
 });
 
+// Scanned pages are read with OCR: before turning them into editable text, say once that the
+// result may not be exact
+let _scanWarned = false;
+function scanWarning() {
+  return new Promise(resolve => {
+    const done = ok => { closeModal('m-scanwarn'); resolve(ok); };
+    document.getElementById('sw-ok').onclick = () => done(true);
+    document.getElementById('sw-cancel').onclick = () => done(false);
+    openModal('m-scanwarn');
+  });
+}
+
 async function doExport(format) {
   document.getElementById('export-menu').classList.remove('open');
   if (!S.pageCount) { toast(t('noDocErr'), 'err'); return; }
+  if (!_scanWarned && ['docx', 'excel', 'txt'].includes(format)) {
+    const si = await fetch('/api/scan_info').then(x => x.json()).catch(() => ({}));
+    if (si.ok && si.scanned) {
+      if (!await scanWarning()) return;
+      _scanWarned = true;
+    }
+  }
   spin(true);
   try {
     const r = await fetch(`/api/export/${format}`);
@@ -3560,7 +3782,7 @@ function setDocButtons(enabled) {
   [
     'btn-undo','btn-save','btn-merge','btn-split','btn-fr','btn-addtext','btn-select','btn-export',
     'btn-shape-dd','btn-hl','btn-stamp','btn-watermark','btn-addimg',
-    'btn-reverse','btn-addblank','btn-compress','btn-signature','btn-encrypt',
+    'btn-reverse','btn-cleanbg','btn-addblank','btn-compress','btn-signature','btn-encrypt',
     'btn-print','btn-copy-text','btn-pages','qa-save','qa-print','qa-undo','btn-read','qa-read',
     'btn-cv-docx','btn-cv-excel','btn-cv-pptx','btn-cv-images','btn-cv-jpg','btn-cv-txt',
     'btn-cv-epub','btn-cv-azw3','btn-kindle'
@@ -3861,10 +4083,24 @@ function findChangedWords(original, updated) {
   return (find && find !== replace) ? { find, replace } : null;
 }
 
+let _tbSeq = 0;
 async function loadTextBlocks(i) {
   const overlay = document.getElementById('text-overlay');
   overlay.innerHTML = '';
+  const seq = ++_tbSeq;
+  // Scanned pages are read with OCR first, which takes a few seconds: say so, or the page looks
+  // as if nothing on it could be selected
+  const busy = setTimeout(() => {
+    if (seq !== _tbSeq) return;
+    const b = document.createElement('div');
+    b.className = 'ocr-busy';
+    b.textContent = t('ocrBusy');
+    overlay.appendChild(b);
+  }, 700);
   const r = await fetch(`/api/textblocks/${i}`).then(x => x.json()).catch(() => ({ok: false}));
+  clearTimeout(busy);
+  if (seq !== _tbSeq || i !== S.currentPage) return;   // the user moved on meanwhile
+  overlay.innerHTML = '';
   if (!r.ok) return;
   overlay.style.pointerEvents = 'auto';
   r.blocks.forEach(b => {
@@ -3996,6 +4232,9 @@ function startEdit(div, block, clickEvent) {
       force_bold:    forceBold,
       force_italic:  fmtItalic,
       underline:     fmtUnderline,
+      ocr:           !!block.ocr,
+      words:         block.words || null,
+      paper:         block.paper || null,
     });
     spin(false);
     if (!r.ok) { toast(r.error || "Hata", "err"); return; }
@@ -4239,7 +4478,12 @@ function showAddTextWidget(leftPct, topPct, img) {
 async function doDeleteBlock(block, div) {
   hoveredBlock = null;
   spin(true);
-  const r = await post('/api/findreplace', {
+  const r = block.ocr ? await post('/api/replaceblock', {
+    replace: '', original_text: block.text, page_idx: S.currentPage,
+    bx0: block.x0, by0: block.y0, bx1: block.x1, by1: block.y1,
+    baseline_y: block.baseline_y, color: block.color, size: _defaultSz(block),
+    ocr: true, words: block.words, paper: block.paper,
+  }).then(x => (x.ok ? {...x, count: 1} : x)) : await post('/api/findreplace', {
     find: block.text, replace: '',
     page_idx: S.currentPage,
     bx0: block.x0, by0: block.y0, bx1: block.x1, by1: block.y1,
@@ -4465,7 +4709,10 @@ document.addEventListener('mouseup', async e => {
     size: _defaultSz(drag.block),
     color: drag.block.color || [0,0,0],
     font: drag.block.font || null,
-    flags: drag.block.flags || 0
+    flags: drag.block.flags || 0,
+    ocr: !!drag.block.ocr,
+    paper: drag.block.paper || null,
+    baseline_y: drag.block.baseline_y
   });
   spin(false);
   if (!r.ok) { toast('Taşıma başarısız', 'err'); return; }
@@ -4757,6 +5004,30 @@ async function doReverse() {
   if (!r.ok) { toast('Ters çevirme başarısız', 'err'); return; }
   S.ts = Date.now(); rebuildSidebarFull(); await selectPage(0);
   toast('Sayfa sırası ters çevrildi', 'ok');
+}
+
+// ── clean scan background ────────────────────────────────
+
+function openCleanBg() {
+  if (!S.pageCount) return;
+  openModal('m-cleanbg');
+}
+
+async function doCleanBg() {
+  const mode = (document.querySelector('input[name="cb-mode"]:checked') || {}).value || 'color';
+  const scope = (document.querySelector('input[name="cb-scope"]:checked') || {}).value || 'page';
+  closeModal('m-cleanbg');
+  spin(true);
+  const r = await post('/api/clean_background', { mode, scope, page_idx: S.currentPage });
+  spin(false);
+  if (!r.ok) {
+    toast(r.code === 'no_scan' ? t(scope === 'all' ? 'cbNoScanDoc' : 'cbNoScan') : (r.error || t('cbFailed')), 'err');
+    return;
+  }
+  S.ts = Date.now();
+  r.pages.forEach(i => refreshThumb(i));
+  await selectPage(S.currentPage);
+  toast(t('cbDone').replace('{n}', r.pages.length), 'ok');
 }
 
 // ── compress ─────────────────────────────────────────────

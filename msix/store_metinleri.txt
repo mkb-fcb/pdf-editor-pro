@@ -55,15 +55,16 @@ The app is free to download and runs as a demo without a license: complete docum
 Kindle is a trademark of Amazon.com, Inc. PDF Editor Pro is not affiliated with Amazon.
 
 --- What's new in this version ---
-• PDF Editor Pro can now be set as the default PDF app in Windows: double-click a PDF and it opens straight in reading mode.
-• New Reading Mode: double-click a PDF and it opens in a clean reading view with continuous scrolling, zoom and page navigation. Press "Edit" to open the editing tools.
-• Zoom: enlarge or shrink the page while editing and reading (Ctrl + wheel, Ctrl +/−). Reading layouts: continuous, single page, two pages, cover separate; full screen and a thumbnail panel toggle.
-• Printing rebuilt: choose printer, copies, page range, paper size, orientation, margins, color, two-sided printing and print quality. Opens with Ctrl+P.
-• Reading and printing are now free: the demo version reads and prints the whole document.
-• You can now buy the full version right in the app through the Microsoft Store.
+• Scanned PDFs can now be edited: change, delete or move text on scans and photocopies. New words are drawn in the scan's own typeface, size, weight and tone, also on coloured paper and for white text on coloured bars.
+• Built-in text recognition (OCR) for scanned pages: two engines work together and read small, faint and dot-matrix print and accented characters accurately.
+• New "Clean Background" (Edit tab): turns the grey copier tone, yellowed or coloured paper and shadows of scanned pages white. Keep the colours or make it black and white; form boxes are kept.
+• Scanned documents export to Word as editable text laid out like the original page; Excel, text files and "Copy Text" use the recognised text too.
+• Large scans (600 dpi) open, edit and export faster and use far less memory.
 
 --- Product features (her satır ayrı kutuya) ---
 Edit existing text directly on the PDF page
+Edit text in scanned PDFs, with built-in text recognition (OCR)
+Clean the background of scanned pages (copier grey, coloured paper)
 Merge, split, rotate and reorder pages
 Add text, images, shapes, highlights, stamps and watermarks
 Export PDF to Word, images or text
@@ -133,15 +134,16 @@ Lisans girilmeden uygulama ücretsiz demo olarak çalışır: belgelerin tamamı
 Kindle, Amazon.com, Inc.'in ticari markasıdır. PDF Editor Pro'nun Amazon ile bağlantısı yoktur.
 
 --- What's new in this version ---
-• PDF Editor Pro artık Windows'ta varsayılan PDF uygulaması olarak seçilebilir: PDF'e çift tıklayınca doğrudan okuma modunda açılır.
-• Yeni Okuma Modu: PDF'e çift tıklayınca belge sade okuma ekranında açılır; sayfalar alt alta kayar, yakınlaştırma ve sayfa gezintisi var. Düzenlemek için "Düzenle" düğmesine basın.
-• Yakınlaştırma: düzenlerken ve okurken sayfayı büyütüp küçültün (Ctrl + tekerlek, Ctrl +/−). Okuma görünümü: sürekli, tek sayfa, iki sayfa, kapak ayrı; tam ekran ve küçük resim paneli.
-• Yazdırma yenilendi: yazıcı, kopya sayısı, sayfa aralığı, kağıt boyutu, yön, kenar boşlukları, renk, çift taraflı baskı ve baskı kalitesi seçilebilir. Ctrl+P ile açılır.
-• Okuma ve yazdırma artık ücretsiz: demo sürümünde de belgenin tamamını okuyup yazdırabilirsiniz.
-• Tam sürümü artık doğrudan Microsoft Store üzerinden, uygulamanın içinden satın alabilirsiniz.
+• Taranmış PDF'ler artık düzenlenebiliyor: tarayıcı ve fotokopi çıktılarındaki yazıları değiştirin, silin veya taşıyın. Yeni kelimeler taramanın kendi yazı tipi, boyu, kalınlığı ve tonuyla yazılır; renkli kâğıtta ve renkli bant üzerindeki beyaz yazıda da çalışır.
+• Taranmış sayfalar için yerleşik metin tanıma (OCR): iki tanıma motoru birlikte çalışır; küçük, soluk ve nokta vuruşlu yazıcı çıktılarını ve Türkçe karakterleri doğru okur.
+• Yeni "Arka Planı Temizle" (Düzenle sekmesi): taranmış sayfalardaki gri fotokopi tonunu, sararmış veya renkli kâğıdı ve gölgeleri beyaza çevirir. Renkleri koruyabilir ya da siyah-beyaz yapabilirsiniz; form kutucukları korunur.
+• Taranmış belgeler Word'e sayfa düzeni korunarak düzenlenebilir metin olarak aktarılır; Excel, metin dosyası ve "Metni Kopyala" da tanınan metni kullanır.
+• Büyük taramalar (600 dpi) daha hızlı açılır, düzenlenir ve aktarılır, çok daha az bellek kullanır.
 
 --- Product features (her satır ayrı kutuya) ---
 PDF sayfasındaki metni doğrudan düzenleyin
+Taranmış PDF'lerde yazıları düzenleyin; yerleşik metin tanıma (OCR)
+Taranmış sayfaların arka planını temizleyin (fotokopi grisi, renkli kâğıt)
 Sayfaları birleştirin, bölün, döndürün ve sıralayın
 Metin, görsel, şekil, vurgulama, damga ve filigran ekleyin
 PDF'i Word, görsel veya metne dönüştürün
