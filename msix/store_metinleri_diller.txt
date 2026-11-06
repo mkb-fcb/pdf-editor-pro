@@ -1,6 +1,6 @@
 PARTNER CENTER — EK DİLLER (DE, ES, FR, IT, PT-BR, RU)
 Partner Center > Store listings > "Add/remove languages" ile dilleri ekleyin; her dilde aşağıdaki kutuları doldurun.
-Fiyatlar: bireysel $9.99, kurumsal $29.99 (python msix/store_diller.py <bireysel> <kurumsal> ile yeniden üretin).
+Bu dosya ELLE güncellenir. msix/store_diller.py eski metinleri üretir; ÇALIŞTIRMAYIN (dosyanın üzerine yazar).
 Ekran görüntüleri: images\site_shots\<dil>_01_main.png … <dil>_07_kindle.png (1366x768), her dilin kendi görüntüleri.
 
 #####################################################################
@@ -33,14 +33,15 @@ Oberfläche in 8 Sprachen: Deutsch, Englisch, Türkisch, Französisch, Spanisch,
 
 KOSTENLOSE DEMO & VOLLVERSION
 Ohne Lizenz läuft die App als kostenlose Demo: Ganze Dokumente lesen und drucken ist gratis, bearbeitet werden die ersten 3 Seiten, gespeicherte Dateien mit „DEMO“-Wasserzeichen; Passwortschutz sowie Export nach Word/Excel/PowerPoint/JPG/EPUB sind deaktiviert. Für die Vollversion klicken Sie in der App auf „Vollversion kaufen“ und bezahlen über den Microsoft Store (einmalig, kein Abo). Ein auf https://mkbsoft.net gekaufter Lizenzschlüssel funktioniert ebenfalls über „Lizenz eingeben“; dort gibt es auch die Unternehmenslizenz für bis zu 5 PCs ($29.99 einmalig). PDF Editor Pro ist Open Source unter der AGPL-3.0-Lizenz; Quellcode: https://github.com/mkb-fcb/pdf-editor-pro
+Kindle ist eine Marke von Amazon.com, Inc. PDF Editor Pro steht in keiner Verbindung zu Amazon.
 
 --- What's new in this version ---
-• PDF zu E-Book: PDFs in EPUB umwandeln — mit umfließendem Text, Überschriften, Kapiteln, Bildern, Diagrammen und Tabellen.
-• An Kindle senden: direkt auf einen per USB verbundenen Kindle kopieren oder per E-Mail-Programm bzw. Amazon-Webseite senden.
-• AZW3-Export für Kindle, wenn das kostenlose Calibre installiert ist.
-• Lizenzaktivierung in Ihrer Sprache, mit direktem Kauflink.
-• Suchen & Ersetzen behält Schriftart, Stärke, Größe und Farbe bei.
-• Dateinamen gespeicherter Dateien in der gewählten Sprache.
+• PDF Editor Pro kann jetzt in Windows als Standard-PDF-App festgelegt werden: Ein Doppelklick auf eine PDF öffnet sie direkt im Lesemodus.
+• Neuer Lesemodus: Ein Doppelklick auf eine PDF öffnet sie in einer übersichtlichen Leseansicht mit fortlaufendem Scrollen, Zoom und Seitennavigation. Mit „Bearbeiten“ öffnen Sie die Bearbeitungswerkzeuge.
+• Zoom: Seite beim Bearbeiten und Lesen vergrößern oder verkleinern (Strg + Mausrad, Strg +/−). Leseansichten: fortlaufend, Einzelseite, zwei Seiten, Titelblatt einzeln; Vollbild und ausblendbare Miniaturen.
+• Drucken überarbeitet: Drucker, Kopien, Seitenbereich, Papierformat, Ausrichtung, Ränder, Farbe, beidseitiger Druck und Druckqualität wählbar. Öffnet mit Strg+P.
+• Lesen und Drucken jetzt kostenlos: Auch die Demoversion zeigt und druckt das gesamte Dokument.
+• Die Vollversion kann jetzt direkt in der App über den Microsoft Store gekauft werden.
 
 --- Product features (her satır ayrı kutuya) ---
 Vorhandenen Text direkt auf der PDF-Seite bearbeiten
@@ -63,6 +64,9 @@ PDF teilen
 PDF verkleinern
 PDF zu EPUB
 PDF Kindle
+
+--- Copyright and trademark info ---
+© 2026 MKBSoft. Kindle ist eine Marke von Amazon.com, Inc. PDF Editor Pro steht in keiner Verbindung zu Amazon.
 
 --- Screenshots ---
 images\site_shots\de_01_main.png … de_07_kindle.png (7 adet)
@@ -98,14 +102,15 @@ Interfaz en 8 idiomas: español, inglés, turco, alemán, francés, italiano, po
 
 DEMO GRATUITA Y VERSIÓN COMPLETA
 Sin licencia, la app funciona como demo gratuita: leer e imprimir documentos completos es gratis, la edición funciona en las 3 primeras páginas, archivos guardados con marca de agua «DEMO» y sin protección con contraseña ni exportación a Word/Excel/PowerPoint/JPG/EPUB. Para la versión completa, pulsa «Comprar versión completa» en la app y paga a través de Microsoft Store (pago único, sin suscripción). Una clave de licencia comprada en https://mkbsoft.net también funciona con el botón «Introducir licencia»; allí está la licencia de empresa para hasta 5 PC ($29.99 pago único). PDF Editor Pro es de código abierto con licencia AGPL-3.0; código fuente: https://github.com/mkb-fcb/pdf-editor-pro
+Kindle es una marca comercial de Amazon.com, Inc. PDF Editor Pro no está afiliado a Amazon.
 
 --- What's new in this version ---
-• PDF a libro electrónico: convierte PDF a EPUB con texto adaptable, títulos, capítulos, imágenes, gráficos y tablas.
-• Enviar a Kindle: copia directamente a un Kindle conectado por USB o envía el libro con tu programa de correo o la web de Amazon.
-• Exportación AZW3 para Kindle si está instalado el programa gratuito Calibre.
-• Pantalla de activación de licencia en tu idioma, con enlace de compra directo.
-• Buscar y reemplazar conserva la fuente, el grosor, el tamaño y el color originales.
-• Nombres de archivo guardados en el idioma elegido.
+• PDF Editor Pro ya se puede elegir como aplicación PDF predeterminada en Windows: al hacer doble clic en un PDF se abre directamente en modo lectura.
+• Nuevo modo lectura: al hacer doble clic en un PDF se abre en una vista de lectura limpia con desplazamiento continuo, zoom y navegación por páginas. Pulse «Editar» para abrir las herramientas de edición.
+• Zoom: amplíe o reduzca la página al editar y leer (Ctrl + rueda, Ctrl +/−). Vistas de lectura: continua, una página, dos páginas, portada aparte; pantalla completa y panel de miniaturas.
+• Impresión renovada: elija impresora, copias, intervalo de páginas, tamaño de papel, orientación, márgenes, color, impresión a doble cara y calidad. Se abre con Ctrl+P.
+• Leer e imprimir ahora es gratis: la versión demo muestra e imprime todo el documento.
+• Ahora puede comprar la versión completa desde la app a través de Microsoft Store.
 
 --- Product features (her satır ayrı kutuya) ---
 Edita el texto existente directamente en la página
@@ -128,6 +133,9 @@ dividir PDF
 comprimir PDF
 PDF a EPUB
 PDF Kindle
+
+--- Copyright and trademark info ---
+© 2026 MKBSoft. Kindle es una marca comercial de Amazon.com, Inc. PDF Editor Pro no está afiliado a Amazon.
 
 --- Screenshots ---
 images\site_shots\es_01_main.png … es_07_kindle.png (7 adet)
@@ -163,14 +171,15 @@ Interface en 8 langues : français, anglais, turc, allemand, espagnol, italien, 
 
 DÉMO GRATUITE ET VERSION COMPLÈTE
 Sans licence, l’application fonctionne en démo gratuite : lecture et impression gratuites des documents entiers, édition limitée aux 3 premières pages, fichiers enregistrés avec un filigrane « DEMO », protection par mot de passe et export Word/Excel/PowerPoint/JPG/EPUB désactivés. Pour la version complète, cliquez sur « Acheter la version complète » dans l’application et payez via le Microsoft Store (paiement unique, sans abonnement). Une clé de licence achetée sur https://mkbsoft.net fonctionne aussi via le bouton « Saisir la licence » ; la licence entreprise pour 5 PC maximum ($29.99 en paiement unique) y est disponible. PDF Editor Pro est open source sous licence AGPL-3.0 ; code source : https://github.com/mkb-fcb/pdf-editor-pro
+Kindle est une marque d’Amazon.com, Inc. PDF Editor Pro n’est pas affilié à Amazon.
 
 --- What's new in this version ---
-• PDF en livre numérique : convertissez vos PDF en EPUB avec texte adaptable, titres, chapitres, images, graphiques et tableaux.
-• Envoyer au Kindle : copie directe sur un Kindle branché en USB, ou envoi par votre messagerie ou le site d’Amazon.
-• Export AZW3 pour Kindle lorsque le logiciel gratuit Calibre est installé.
-• Écran d’activation de la licence dans votre langue, avec lien d’achat direct.
-• Rechercher et remplacer conserve la police, la graisse, la taille et la couleur d’origine.
-• Noms des fichiers enregistrés dans la langue choisie.
+• PDF Editor Pro peut désormais être défini comme application PDF par défaut dans Windows : un double-clic sur un PDF l'ouvre directement en mode lecture.
+• Nouveau mode lecture : un double-clic sur un PDF l'ouvre dans une vue de lecture épurée avec défilement continu, zoom et navigation par page. Cliquez sur « Modifier » pour ouvrir les outils d'édition.
+• Zoom : agrandissez ou réduisez la page en édition comme en lecture (Ctrl + molette, Ctrl +/−). Affichages : continu, page unique, deux pages, couverture seule ; plein écran et panneau de miniatures.
+• Impression repensée : choix de l'imprimante, du nombre de copies, de la plage de pages, du format, de l'orientation, des marges, de la couleur, du recto verso et de la qualité. S'ouvre avec Ctrl+P.
+• Lecture et impression désormais gratuites : la version démo affiche et imprime tout le document.
+• La version complète s'achète désormais directement dans l'application via le Microsoft Store.
 
 --- Product features (her satır ayrı kutuya) ---
 Modifiez le texte existant directement sur la page
@@ -193,6 +202,9 @@ diviser PDF
 compresser PDF
 PDF en EPUB
 PDF Kindle
+
+--- Copyright and trademark info ---
+© 2026 MKBSoft. Kindle est une marque d’Amazon.com, Inc. PDF Editor Pro n’est pas affilié à Amazon.
 
 --- Screenshots ---
 images\site_shots\fr_01_main.png … fr_07_kindle.png (7 adet)
@@ -228,14 +240,15 @@ Interfaccia in 8 lingue: italiano, inglese, turco, tedesco, francese, spagnolo, 
 
 DEMO GRATUITA E VERSIONE COMPLETA
 Senza licenza l’app funziona come demo gratuita: lettura e stampa gratuite di documenti interi, modifica limitata alle prime 3 pagine, file salvati con filigrana «DEMO», protezione con password ed esportazione in Word/Excel/PowerPoint/JPG/EPUB disattivate. Per la versione completa fai clic su «Acquista versione completa» nell’app e paga tramite Microsoft Store (una tantum, nessun abbonamento). Anche una chiave di licenza acquistata su https://mkbsoft.net funziona con il pulsante «Inserisci licenza»; lì è disponibile la licenza aziendale per un massimo di 5 PC ($29.99 una tantum). PDF Editor Pro è open source con licenza AGPL-3.0; codice sorgente: https://github.com/mkb-fcb/pdf-editor-pro
+Kindle è un marchio di Amazon.com, Inc. PDF Editor Pro non è affiliato ad Amazon.
 
 --- What's new in this version ---
-• Da PDF a e-book: converti i PDF in EPUB con testo adattabile, titoli, capitoli, immagini, grafici e tabelle.
-• Invia a Kindle: copia direttamente su un Kindle collegato via USB, oppure invia l’e-book con il programma di posta o il sito di Amazon.
-• Esportazione AZW3 per Kindle se è installato il programma gratuito Calibre.
-• Schermata di attivazione della licenza nella tua lingua, con link d’acquisto diretto.
-• Trova e sostituisci mantiene carattere, spessore, dimensione e colore originali.
-• Nomi dei file salvati nella lingua scelta.
+• PDF Editor Pro ora può essere impostato come app PDF predefinita in Windows: con un doppio clic il PDF si apre direttamente in modalità lettura.
+• Nuova modalità lettura: con un doppio clic il PDF si apre in una vista di lettura pulita con scorrimento continuo, zoom e navigazione tra le pagine. Premi «Modifica» per aprire gli strumenti di modifica.
+• Zoom: ingrandisci o riduci la pagina durante modifica e lettura (Ctrl + rotellina, Ctrl +/−). Viste di lettura: continua, pagina singola, due pagine, copertina separata; schermo intero e pannello miniature.
+• Stampa rinnovata: scegli stampante, copie, intervallo di pagine, formato carta, orientamento, margini, colore, fronte/retro e qualità di stampa. Si apre con Ctrl+P.
+• Lettura e stampa ora gratuite: anche la versione demo mostra e stampa l'intero documento.
+• Ora puoi acquistare la versione completa direttamente nell'app tramite Microsoft Store.
 
 --- Product features (her satır ayrı kutuya) ---
 Modifica il testo esistente direttamente sulla pagina
@@ -258,6 +271,9 @@ dividere PDF
 comprimere PDF
 PDF in EPUB
 PDF Kindle
+
+--- Copyright and trademark info ---
+© 2026 MKBSoft. Kindle è un marchio di Amazon.com, Inc. PDF Editor Pro non è affiliato ad Amazon.
 
 --- Screenshots ---
 images\site_shots\it_01_main.png … it_07_kindle.png (7 adet)
@@ -293,14 +309,15 @@ Interface em 8 idiomas: português, inglês, turco, alemão, francês, espanhol,
 
 DEMO GRÁTIS E VERSÃO COMPLETA
 Sem licença, o app funciona como demo grátis: ler e imprimir documentos inteiros é grátis, a edição funciona nas 3 primeiras páginas, arquivos salvos com marca d’água "DEMO" e proteção por senha e exportação para Word/Excel/PowerPoint/JPG/EPUB desativadas. Para a versão completa, clique em "Comprar versão completa" no app e pague pela Microsoft Store (pagamento único, sem assinatura). Uma chave de licença comprada em https://mkbsoft.net também funciona no botão "Inserir licença"; lá está a licença empresarial para até 5 PCs (US$ 29.99 pagamento único). O PDF Editor Pro é de código aberto sob a licença AGPL-3.0; código-fonte: https://github.com/mkb-fcb/pdf-editor-pro
+Kindle é uma marca registrada da Amazon.com, Inc. O PDF Editor Pro não é afiliado à Amazon.
 
 --- What's new in this version ---
-• PDF para e-book: converta PDFs em EPUB com texto ajustável, títulos, capítulos, imagens, gráficos e tabelas.
-• Enviar para Kindle: copia direto para um Kindle conectado por USB ou envia o e-book pelo seu programa de e-mail ou pelo site da Amazon.
-• Exportação AZW3 para Kindle quando o programa gratuito Calibre está instalado.
-• Tela de ativação da licença no seu idioma, com link de compra direto.
-• Localizar e substituir mantém a fonte, o peso, o tamanho e a cor originais.
-• Nomes dos arquivos salvos no idioma escolhido.
+• O PDF Editor Pro agora pode ser definido como aplicativo de PDF padrão no Windows: clique duas vezes em um PDF e ele abre direto no modo de leitura.
+• Novo modo de leitura: ao clicar duas vezes em um PDF, ele abre em uma visualização limpa com rolagem contínua, zoom e navegação entre páginas. Clique em "Editar" para abrir as ferramentas de edição.
+• Zoom: amplie ou reduza a página ao editar e ler (Ctrl + roda do mouse, Ctrl +/−). Exibições de leitura: contínua, página única, duas páginas, capa separada; tela cheia e painel de miniaturas.
+• Impressão reformulada: escolha impressora, cópias, intervalo de páginas, tamanho do papel, orientação, margens, cor, frente e verso e qualidade. Abre com Ctrl+P.
+• Ler e imprimir agora é grátis: a versão demo mostra e imprime o documento inteiro.
+• Agora você pode comprar a versão completa no próprio app pela Microsoft Store.
 
 --- Product features (her satır ayrı kutuya) ---
 Edite o texto existente direto na página
@@ -323,6 +340,9 @@ dividir PDF
 comprimir PDF
 PDF para EPUB
 PDF Kindle
+
+--- Copyright and trademark info ---
+© 2026 MKBSoft. Kindle é uma marca registrada da Amazon.com, Inc. O PDF Editor Pro não é afiliado à Amazon.
 
 --- Screenshots ---
 images\site_shots\pt_01_main.png … pt_07_kindle.png (7 adet)
@@ -358,14 +378,15 @@ PDF Editor Pro — быстрый и лёгкий редактор PDF для Wi
 
 БЕСПЛАТНАЯ ДЕМО И ПОЛНАЯ ВЕРСИЯ
 Без лицензии приложение работает как бесплатная демо: документы целиком можно читать и печатать бесплатно, редактировать — первые 3 страницы, сохранённые файлы с водяным знаком «DEMO», защита паролем и экспорт в Word/Excel/PowerPoint/JPG/EPUB отключены. Для полной версии нажмите в приложении «Купить полную версию» и оплатите через Microsoft Store (разово, без подписки). Лицензионный ключ, купленный на https://mkbsoft.net, тоже работает через кнопку «Ввести лицензию»; там же доступна корпоративная лицензия до 5 ПК ($29.99 разово). PDF Editor Pro — программа с открытым исходным кодом под лицензией AGPL-3.0; исходный код: https://github.com/mkb-fcb/pdf-editor-pro
+Kindle — товарный знак Amazon.com, Inc. PDF Editor Pro не связан с Amazon.
 
 --- What's new in this version ---
-• PDF в электронную книгу: конвертация PDF в EPUB с переносом текста, заголовками, главами, изображениями, диаграммами и таблицами.
-• Отправка на Kindle: копирование прямо на Kindle, подключённый по USB, или отправка книги через почтовую программу или сайт Amazon.
-• Экспорт в AZW3 для Kindle, если установлена бесплатная программа Calibre.
-• Экран активации лицензии на вашем языке с прямой ссылкой на покупку.
-• Поиск и замена сохраняет исходный шрифт, начертание, размер и цвет.
-• Имена сохранённых файлов на выбранном языке.
+• PDF Editor Pro теперь можно назначить приложением для PDF по умолчанию в Windows: двойной щелчок открывает PDF сразу в режиме чтения.
+• Новый режим чтения: по двойному щелчку PDF открывается в удобном режиме чтения с непрерывной прокруткой, масштабированием и переходом по страницам. Кнопка «Редактировать» открывает инструменты редактирования.
+• Масштаб: увеличивайте и уменьшайте страницу при редактировании и чтении (Ctrl + колесо, Ctrl +/−). Режимы просмотра: непрерывно, одна страница, две страницы, обложка отдельно; полный экран и панель миниатюр.
+• Обновлённая печать: выбор принтера, числа копий, диапазона страниц, формата бумаги, ориентации, полей, цвета, двусторонней печати и качества. Открывается по Ctrl+P.
+• Чтение и печать теперь бесплатны: демоверсия показывает и печатает весь документ.
+• Полную версию теперь можно купить прямо в приложении через Microsoft Store.
 
 --- Product features (her satır ayrı kutuya) ---
 Правка существующего текста прямо на странице
@@ -388,6 +409,9 @@ PDF в электронную книгу (EPUB) и отправка на Kindle
 сжать PDF
 PDF в EPUB
 PDF Kindle
+
+--- Copyright and trademark info ---
+© 2026 MKBSoft. Kindle — товарный знак Amazon.com, Inc. PDF Editor Pro не связан с Amazon.
 
 --- Screenshots ---
 images\site_shots\ru_01_main.png … ru_07_kindle.png (7 adet)

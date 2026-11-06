@@ -52,15 +52,15 @@ Multilingual interface: English, Turkish, German, French, Spanish, Italian, Port
 
 FREE DEMO & FULL VERSION
 The app is free to download and runs as a demo without a license: complete documents can be read and printed for free, editing works on the first 3 pages, saved files carry a "DEMO" watermark, and password protection and Word/Excel/PowerPoint/JPG/EPUB export are disabled. To unlock the full version, click "Buy Full Version" in the app and pay through the Microsoft Store (one-time, no subscription). A license key bought at https://mkbsoft.net also works via the "Enter License" button; a corporate license for up to 5 PCs ($29.99 one-time) is available there. PDF Editor Pro is open source under the AGPL-3.0 license; source code: https://github.com/mkb-fcb/pdf-editor-pro
+Kindle is a trademark of Amazon.com, Inc. PDF Editor Pro is not affiliated with Amazon.
 
 --- What's new in this version ---
-• PDF to e-book: convert PDFs to EPUB with reflowing text, headings, chapters, images, charts and tables.
-• Send to Kindle: copies straight to a Kindle connected by USB, or sends the e-book with your email program or Amazon's web page.
-• AZW3 export for Kindle when the free Calibre app is installed.
-• License activation screen in your language, with a direct buy link.
-• Find & replace keeps the original font, weight, size and colour.
-• Saved file names follow the chosen language.
-• Lower price: $9.99 for 1 PC, $29.99 for up to 5 PCs.
+• PDF Editor Pro can now be set as the default PDF app in Windows: double-click a PDF and it opens straight in reading mode.
+• New Reading Mode: double-click a PDF and it opens in a clean reading view with continuous scrolling, zoom and page navigation. Press "Edit" to open the editing tools.
+• Zoom: enlarge or shrink the page while editing and reading (Ctrl + wheel, Ctrl +/−). Reading layouts: continuous, single page, two pages, cover separate; full screen and a thumbnail panel toggle.
+• Printing rebuilt: choose printer, copies, page range, paper size, orientation, margins, color, two-sided printing and print quality. Opens with Ctrl+P.
+• Reading and printing are now free: the demo version reads and prints the whole document.
+• You can now buy the full version right in the app through the Microsoft Store.
 
 --- Product features (her satır ayrı kutuya) ---
 Edit existing text directly on the PDF page
@@ -85,7 +85,7 @@ PDF to Word
 PDF password
 
 --- Copyright and trademark info ---
-© 2026 MKBSoft
+© 2026 MKBSoft. Kindle is a trademark of Amazon.com, Inc. PDF Editor Pro is not affiliated with Amazon.
 
 --- Screenshots (Desktop) ---
 images\screenshot_01_main.png
@@ -130,15 +130,15 @@ DÖNÜŞTÜR & KORU
 
 ÜCRETSİZ DEMO VE TAM SÜRÜM
 Lisans girilmeden uygulama ücretsiz demo olarak çalışır: belgelerin tamamı ücretsiz okunur ve yazdırılır, düzenleme ilk 3 sayfada yapılır, kaydedilen dosyalarda "DEMO" filigranı; şifreleme ve Word/Excel/PowerPoint/JPG/EPUB dışa aktarma kapalıdır. Tam sürüm için uygulamadaki "Tam Sürümü Satın Al" düğmesine basıp Microsoft Store üzerinden ödeme yapın (tek seferlik, abonelik yok). https://mkbsoft.net adresinden alınan lisans anahtarı da "Lisans Gir" butonuyla çalışır; 5 bilgisayara kadar kurumsal lisans (tek seferlik 29,99 $) oradan alınabilir. PDF Editor Pro, AGPL-3.0 lisanslı açık kaynak bir yazılımdır; kaynak kodu: https://github.com/mkb-fcb/pdf-editor-pro
+Kindle, Amazon.com, Inc.'in ticari markasıdır. PDF Editor Pro'nun Amazon ile bağlantısı yoktur.
 
 --- What's new in this version ---
-• PDF'ten e-kitaba: PDF'leri EPUB'a dönüştürün; metin ekrana göre akar, başlıklar, bölümler, resimler, grafikler ve tablolar korunur.
-• Kindle'a Gönder: USB ile bağlı Kindle'a doğrudan kopyalar ya da e-kitabı e-posta programınızla veya Amazon'un web sayfasıyla gönderir.
-• Ücretsiz Calibre programı kuruluysa Kindle için AZW3 dışa aktarma.
-• Lisans etkinleştirme ekranı seçilen dilde, doğrudan satın alma bağlantısıyla.
-• Bul ve Değiştir orijinal yazı tipini, kalınlığı, boyutu ve rengi koruyor.
-• Kaydedilen dosya adları seçilen dilde.
-• Yeni fiyat: 1 bilgisayar 9,99 $, 5 bilgisayara kadar 29,99 $.
+• PDF Editor Pro artık Windows'ta varsayılan PDF uygulaması olarak seçilebilir: PDF'e çift tıklayınca doğrudan okuma modunda açılır.
+• Yeni Okuma Modu: PDF'e çift tıklayınca belge sade okuma ekranında açılır; sayfalar alt alta kayar, yakınlaştırma ve sayfa gezintisi var. Düzenlemek için "Düzenle" düğmesine basın.
+• Yakınlaştırma: düzenlerken ve okurken sayfayı büyütüp küçültün (Ctrl + tekerlek, Ctrl +/−). Okuma görünümü: sürekli, tek sayfa, iki sayfa, kapak ayrı; tam ekran ve küçük resim paneli.
+• Yazdırma yenilendi: yazıcı, kopya sayısı, sayfa aralığı, kağıt boyutu, yön, kenar boşlukları, renk, çift taraflı baskı ve baskı kalitesi seçilebilir. Ctrl+P ile açılır.
+• Okuma ve yazdırma artık ücretsiz: demo sürümünde de belgenin tamamını okuyup yazdırabilirsiniz.
+• Tam sürümü artık doğrudan Microsoft Store üzerinden, uygulamanın içinden satın alabilirsiniz.
 
 --- Product features (her satır ayrı kutuya) ---
 PDF sayfasındaki metni doğrudan düzenleyin
@@ -163,7 +163,7 @@ PDF Word çevir
 PDF şifre
 
 --- Copyright and trademark info ---
-© 2026 MKBSoft
+© 2026 MKBSoft. Kindle, Amazon.com, Inc.'in ticari markasıdır. PDF Editor Pro'nun Amazon ile bağlantısı yoktur.
 
 (Ekran görüntüleri ve logolar İngilizce listedekiyle aynı.)
 
