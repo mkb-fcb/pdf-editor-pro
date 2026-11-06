@@ -248,8 +248,42 @@ def _default_out(suffix_text: str) -> str:
     return str(cand)
 
 
+def _make_writable(doc):
+    """Some PDFs (seen from Word 2016) list objects in the xref that do not exist. They display fine,
+    but MuPDF refuses to save them, so undo snapshots, edits and saving all failed. Such a document
+    is copied page by page into a fresh PDF (the broken accessibility structure tree is dropped)."""
+    if not doc.is_pdf or doc.needs_pass:
+        return doc
+    for x in range(1, doc.xref_length()):
+        try:
+            doc.xref_object(x, compressed=True)
+        except Exception:
+            break
+    else:
+        return doc
+    try:
+        doc.tobytes(garbage=1)
+        return doc
+    except Exception:
+        pass
+    try:
+        fresh = fitz.open()
+        fresh.insert_pdf(doc)
+        toc = doc.get_toc(False)
+        if toc:
+            fresh.set_toc(toc)
+        fresh.set_metadata({k: v for k, v in (doc.metadata or {}).items() if v and k != 'format' and k != 'encryption'})
+        fresh.tobytes(garbage=1)
+        app.logger.warning('Repaired a PDF with missing xref objects by copying its pages')
+        doc.close()
+        return fresh
+    except Exception:
+        return doc
+
+
 def _swap_doc(new_doc, path, name=None, reset_history=True):
     """Yeni belgeyi etkinleştir; eskisini ancak yenisi başarıyla açıldıktan sonra kapat."""
+    new_doc = _make_writable(new_doc)
     old = state['doc']
     state['doc'] = new_doc
     state['path'] = path
@@ -261,6 +295,7 @@ def _swap_doc(new_doc, path, name=None, reset_history=True):
             old.close()
         except Exception:
             pass
+    return new_doc
 
 
 
@@ -416,7 +451,95 @@ def _embedded_font(page, span_font):
     return None
 
 
-def _match_font(page, span_font, flags, orig_text, orig_width, orig_size, new_text, keep_style=True):
+# Look-alike families tried when a PDF font has no usable name (Chromium "Save as PDF" writes
+# every font as a Type3 "Unnamed-T3" with no bold/italic flags). Keys are resolve_font() MAP keys;
+# files are (regular, bold, italic, bold italic).
+_LOOKALIKES = {
+    'arial':   ('arial.ttf', 'arialbd.ttf', 'ariali.ttf', 'arialbi.ttf'),
+    'calibri': ('calibri.ttf', 'calibrib.ttf', 'calibrii.ttf', 'calibriz.ttf'),
+    'segoeui': ('segoeui.ttf', 'segoeuib.ttf', 'segoeuii.ttf', 'segoeuiz.ttf'),
+    'times':   ('times.ttf', 'timesbd.ttf', 'timesi.ttf', 'timesbi.ttf'),
+    'verdana': ('verdana.ttf', 'verdanab.ttf', 'verdanai.ttf', 'verdanaz.ttf'),
+    'georgia': ('georgia.ttf', 'georgiab.ttf', 'georgiai.ttf', 'georgiaz.ttf'),
+}
+
+
+def _unknown_font(span_font):
+    """True when resolve_font() cannot map the name to a real typeface."""
+    name = (span_font or '').lower()
+    if not name or 'unnamed' in name:
+        return True
+    return resolve_font(span_font)[0] == UNICODE_FONT and 'calibri' not in name
+
+
+def _closest_lookalike(page, rect, text, size, baseline):
+    """(score, family, bold, italic, size factor) of the look-alike whose rendering is closest to the original
+    pixels in rect (each candidate fitted to the same width), plus the Arial regular/bold ink ratios."""
+    clip = fitz.Rect(rect.x0 - 1, rect.y0 - 1, rect.x1 + 1, rect.y1 + 1)
+    mat = fitz.Matrix(3, 3)
+    try:
+        ref = page.get_pixmap(matrix=mat, clip=clip, colorspace=fitz.csGRAY, alpha=False).samples
+    except Exception:
+        return None, {}
+    ref_ink = sum(255 - b for b in ref) or 1
+
+    def render(ff, sz):
+        scratch = fitz.open()
+        sp = scratch.new_page(width=page.rect.width, height=page.rect.height)
+        sp.insert_text(fitz.Point(rect.x0, baseline), text, fontsize=sz, fontfile=ff, fontname='G', color=(0, 0, 0))
+        img = sp.get_pixmap(matrix=mat, clip=clip, colorspace=fitz.csGRAY, alpha=False).samples
+        scratch.close()
+        return img
+
+    best, ink = None, {}
+    for fam, files in _LOOKALIKES.items():
+        for style, fn in enumerate(files):
+            ff = 'C:/Windows/Fonts/' + fn
+            if not os.path.exists(ff):
+                continue
+            try:
+                w = fitz.Font(fontfile=ff).text_length(text, fontsize=size)
+                fit = min(1.3, max(0.77, rect.width / w)) if w else 1.0
+                img = render(ff, size * fit)
+            except Exception:
+                continue
+            if len(img) != len(ref):
+                continue
+            score = sum(abs(a - b) for a, b in zip(ref, img)) / ref_ink
+            if best is None or score < best[0]:
+                best = (score, fam, bool(style & 1), bool(style & 2), fit)
+            if fam == 'arial' and style < 2:
+                ink[style] = sum(255 - b for b in render(ff, size)) / ref_ink
+    return best, ink
+
+
+def _guess_font_visually(page, rect, text, size, baseline):
+    """Look-alike Windows font for text whose PDF font has no usable name. Call BEFORE redaction.
+    Returns (family, bold, italic, size factor at which it matched) or None."""
+    text = (text or '').rstrip()
+    if len(text.strip()) < 3 or rect.width < 5 or not size:
+        return None
+    best, ink = _closest_lookalike(page, rect, text, size, baseline)
+    if best and best[0] < 0.9:
+        return best[1:]
+    # Justified or letter-spaced lines never line up glyph by glyph: compare the longest word alone
+    try:
+        words = [w for w in page.get_text('words', clip=rect) if len(w[4]) >= 4]
+    except Exception:
+        words = []
+    if words:
+        w = max(words, key=lambda w: len(w[4]))
+        wbest, _ = _closest_lookalike(page, fitz.Rect(w[:4]), w[4], size, baseline)
+        if wbest and wbest[0] < 0.9:
+            return wbest[1:]
+    # Last resort: the amount of ink still tells the weight
+    if len(ink) == 2:
+        return 'arial', abs(ink[1] - 1) < abs(ink[0] - 1), False, 1.0
+    return None
+
+
+def _match_font(page, span_font, flags, orig_text, orig_width, orig_size, new_text, keep_style=True,
+                rect=None, baseline=None):
     """Font for re-typing a line so it looks like the original. Call BEFORE redaction.
 
     1. The PDF's own embedded font, if it reproduces the original line at its original width
@@ -438,6 +561,15 @@ def _match_font(page, span_font, flags, orig_text, orig_width, orig_size, new_te
             except Exception:
                 pass
     lookup = span_font or ''
+    guess = None
+    if rect is not None and baseline is not None and _unknown_font(span_font):
+        guess = _guess_font_visually(page, rect, orig, orig_size, baseline)
+    if guess:
+        family, bold, italic, fit = guess
+        if keep_style:
+            flags = ((flags | 16) if bold else (flags & ~16))
+            flags = ((flags | 2) if italic else (flags & ~2))
+        lookup = family + (' bold' if flags & 16 else '') + (' italic' if flags & 2 else '')
     if not (flags & 16):
         lookup = re.sub(r'(?i)(bold|heavy|black|demi)', '', lookup).strip(' -_') or lookup
     if not (flags & 2):
@@ -446,11 +578,25 @@ def _match_font(page, span_font, flags, orig_text, orig_width, orig_size, new_te
     if not ff:
         return {}, 1.0
     factor = 1.0
-    if orig and orig_width > 5 and len(orig) >= 3:
+    if guess:
+        # The look-alike already matched the original pixels at this size (on a single word for
+        # justified lines, whose stretched gaps would otherwise make the text up to 30% too big)
+        factor = guess[3]
+    elif orig and orig_width > 5 and len(orig) >= 3:
         try:
-            w = fitz.Font(fontfile=ff).text_length(orig, fontsize=orig_size)
+            font = fitz.Font(fontfile=ff)
+            w = font.text_length(orig, fontsize=orig_size)
             if w > 0:
                 factor = min(1.3, max(0.77, orig_width / w))
+            # A justified line's width includes stretched word gaps; if the longest word alone
+            # needs a smaller size, the gaps were stretched and the word is the honest measure
+            if rect is not None and len(orig.split()) > 1:
+                words = [x for x in page.get_text('words', clip=rect) if len(x[4]) >= 4]
+                if words:
+                    word = max(words, key=lambda x: len(x[4]))
+                    ww = font.text_length(word[4], fontsize=orig_size)
+                    if ww > 0:
+                        factor = min(factor, max(0.77, (word[2] - word[0]) / ww))
         except Exception:
             pass
     return {'fontfile': ff, 'fontname': fn}, factor
@@ -630,7 +776,7 @@ def api_open():
                 doc.close()
                 return jsonify({'ok': False, 'needs_password': True, 'wrong_password': True,
                                 'error': 'Şifre yanlış.'})
-        _swap_doc(doc, path, data.get('name'))
+        doc = _swap_doc(doc, path, data.get('name'))
         sigs   = detect_signatures(doc)
         fields = detect_form_fields(doc)
         return jsonify({'ok': True, 'pages': len(doc), 'name': _doc_name(),
@@ -897,6 +1043,7 @@ def api_findreplace():
 
     push_history()
     total = 0
+    guess_cache = {}
     pages_to_search = [doc[page_idx]] if single_occurrence else list(doc)
 
     for page in pages_to_search:
@@ -921,17 +1068,37 @@ def api_findreplace():
         # The span's own size; the bbox-based estimate came out ~9% too large and overlapped neighbours
         sizes     = [forced_size or (s['size'] if s else 0) or size_at_rect(page, r) for r, s in zip(hits, spans)]
         baselines = [_get_baseline_y(page, r, page_dict) for r in hits]
+        # Room to the right of each hit: up to the next word on the same line, else the page margin
+        words = page.get_text('words')
+        room = []
+        for r in hits:
+            right = [w[0] for w in words if w[0] >= r.x1 - 0.5 and min(w[3], r.y1) - max(w[1], r.y0) > r.height * 0.5]
+            room.append((min(right) - 2 if right else page.rect.width - 36) - r.x0)
+        # Unnamed fonts (Chromium PDFs): guess the look-alike from the whole span before it is redacted
+        guesses = []
+        for s in spans:
+            g = None
+            if s and _unknown_font(pdf_font or s['font']):
+                key = (s['text'], round(s['size'], 1))
+                if key not in guess_cache:
+                    guess_cache[key] = _guess_font_visually(page, fitz.Rect(s['bbox']), s['text'], s['size'], s['origin'][1])
+                g = guess_cache[key]
+            guesses.append(g)
 
         for rect in hits:
             page.add_redact_annot(rect, fill=(1, 1, 1))
         page.apply_redactions(graphics=0)
 
         if repl:
-            for rect, sz, fallback_bl, span in zip(hits, sizes, baselines, spans):
+            for rect, sz, fallback_bl, span, guess, space in zip(hits, sizes, baselines, spans, guesses, room):
                 bl_y  = provided_baseline if provided_baseline is not None else fallback_bl
                 # Global replace: keep each occurrence's own font, weight, style and colour
                 hit_font, hit_flags = (pdf_font, font_flags) if pdf_font else \
                     ((span['font'], span['flags']) if span else (None, 0))
+                if guess:
+                    hit_flags = (hit_flags | 16) if guess[1] else (hit_flags & ~16)
+                    hit_flags = (hit_flags | 2) if guess[2] else (hit_flags & ~2)
+                    hit_font = guess[0] + (' bold' if guess[1] else '') + (' italic' if guess[2] else '')
                 if provided_color:
                     color = tuple(provided_color)
                 elif span:
@@ -939,7 +1106,7 @@ def api_findreplace():
                     color = (((c >> 16) & 255) / 255, ((c >> 8) & 255) / 255, (c & 255) / 255)
                 else:
                     color = (0, 0, 0)
-                kw = {'fontsize': sz, 'color': color}
+                kw = {'fontsize': sz * (guess[3] if guess and not forced_size else 1.0), 'color': color}
                 if hit_font:
                     ff, fn, _, _ = resolve_font(hit_font, hit_flags)
                     if ff:
@@ -951,12 +1118,13 @@ def api_findreplace():
                 elif UNICODE_FONT:
                     kw['fontfile'] = UNICODE_FONT
                     kw['fontname'] = UNICODE_FONTNAME
-                # Longer replacement than the original: shrink it (to 75% at most) so it doesn't run into the next word
+                # Longer replacement: shrink it (to 75% at most) only if it would run into the next word
                 try:
                     width = fitz.Font(fontfile=kw['fontfile']).text_length(repl, fontsize=kw['fontsize']) \
                         if kw.get('fontfile') else fitz.get_text_length(repl, fontsize=kw['fontsize'])
-                    if width > rect.width * 1.02:
-                        kw['fontsize'] *= max(0.75, rect.width / width)
+                    limit = max(space, rect.width)
+                    if width > limit * 1.02:
+                        kw['fontsize'] *= max(0.75, limit / width)
                 except Exception:
                     pass
                 page.insert_text(fitz.Point(rect.x0, bl_y), repl, **kw)
@@ -1002,7 +1170,8 @@ def api_replaceblock():
     # Same font as the original (or a size-matched substitute); the user's size change is kept as a ratio
     style_kept = effective_flags == font_flags
     spec, factor = _match_font(page, pdf_font, effective_flags, data.get('original_text', ''),
-                               block_rect.width, orig_size, new_text, keep_style=style_kept)
+                               block_rect.width, orig_size, new_text, keep_style=style_kept,
+                               rect=block_rect, baseline=baseline_y)
     sz = max(sz * factor, 5.0)
 
     push_history()
@@ -1066,7 +1235,8 @@ def api_movetext():
     color  = tuple(data.get('color', [0, 0, 0]))
     # Keep the original font when moving (it used to be rewritten in the default font)
     spec, factor = _match_font(page, data.get('font'), int(data.get('flags', 0)), text,
-                               old_rect.width, size, text)
+                               old_rect.width, size, text,
+                               rect=old_rect, baseline=_get_baseline_y(page, old_rect))
 
     push_history()
     page.add_redact_annot(old_rect, fill=(1, 1, 1))
@@ -1274,7 +1444,7 @@ def api_upload():
                 return jsonify({'ok': False, 'needs_password': True, 'tmp_path': tmp,
                                 'name': f.filename,
                                 'error': 'Bu PDF şifreli. Açmak için şifreyi girin.'})
-        _swap_doc(doc, tmp, f.filename)
+        doc = _swap_doc(doc, tmp, f.filename)
         _cleanup_tmp(keep=tmp)
         sigs   = detect_signatures(doc)
         fields = detect_form_fields(doc)
@@ -2448,7 +2618,7 @@ def api_convert_to_pdf():
 
         truncated = _demo_truncate(new_doc)
         push_history()
-        _swap_doc(new_doc, os.path.splitext(src)[0] + _sfx('converted') + '.pdf', reset_history=False)
+        new_doc = _swap_doc(new_doc, os.path.splitext(src)[0] + _sfx('converted') + '.pdf', reset_history=False)
         sigs = detect_signatures(new_doc)
         fields = detect_form_fields(new_doc)
         return jsonify({'ok': True, 'pages': len(new_doc),
@@ -2498,7 +2668,7 @@ if __name__ == '__main__':
     else:
         if filepath:
             try:
-                doc = fitz.open(filepath)
+                doc = _make_writable(fitz.open(filepath))
                 state['doc'] = doc
                 state['path'] = filepath
             except Exception as e:
