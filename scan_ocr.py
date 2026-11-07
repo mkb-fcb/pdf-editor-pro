@@ -97,6 +97,29 @@ async def _recognize(pix):
     return await eng.recognize_async(sb)
 
 
+def _run(coro_fn, *args):
+    """Run an async OCR call to completion from plain code, also from a thread that already has
+    an event loop running (asyncio.run refuses there): then it runs in a thread of its own."""
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(coro_fn(*args))
+    box = {}
+
+    def work():
+        try:
+            box['r'] = asyncio.run(coro_fn(*args))
+        except Exception as e:
+            box['e'] = e
+
+    th = threading.Thread(target=work)
+    th.start()
+    th.join()
+    if 'e' in box:
+        raise box['e']
+    return box.get('r')
+
+
 def _colors(arr, rect, z):
     """(paper colour, ink colour) inside rect, sampled from the rendered page (RGB 0..1)."""
     h, w = arr.shape[:2]
@@ -288,17 +311,28 @@ def _missed_regions(arr, z, covered):
     return sorted(out, key=lambda r: -r.width)[:40]
 
 
-_OK_CHARS = set('ABCÇDEFGĞHIİJKLMNOÖPQRSŞTUÜVWXYZabcçdefgğhıijklmnoöpqrsştuüvwxyz0123456789 .,:;/()-+&@%')
+_OK_PUNCT = set(" .,:;/()-+&@%«»\"'’“”№€₺$£₽")
 
 
 def _junk(text):
-    """Share of a reading that cannot be right: stray symbols ("î!", "û", "$") and words with
-    capitals scattered inside ("LojIstIk", "MtjŞTERf")."""
+    """Share of a reading that cannot be right: stray symbols ("î!", "û", "$"), words with capitals
+    scattered inside ("LojIstIk", "MtjŞTERf") and words where letters and digits are shuffled
+    together ("1103HL4HR"). Letters of any script count as letters (Cyrillic is not junk)."""
     t = text.strip()
     if not t:
         return 9.0
-    bad = sum(ch not in _OK_CHARS for ch in t)
-    mixed = sum(1 for w in t.split() if any(c.isupper() for c in w[1:]) and any(c.islower() for c in w[1:]))
+    bad = sum(not (ch.isalnum() or ch in _OK_PUNCT) for ch in t)
+    mixed = 0
+    for w in t.split():
+        w = w.strip(''.join(_OK_PUNCT))     # «Студия», (Pbx): the capital after a quote is fine
+        if any(c.isupper() for c in w[1:]) and any(c.islower() for c in w[1:]):
+            mixed += 1
+        elif (len(w) >= 3 and set(w) <= set('OoОо0,.') and sum(c in 'OoОо' for c in w) >= 2
+              and any(c in ',.0' for c in w)):     # not the Russian "ООО"
+            mixed += 1                      # "OOO,OO": zeros read as the letter O
+        elif (sum(c.isalpha() for c in w) >= 2 and sum(c.isdigit() for c in w) >= 2
+              and any(a.isalpha() and b.isdigit() or a.isdigit() and b.isalpha() for a, b in zip(w, w[1:]))):
+            mixed += 1
     return (bad + mixed) / len(t)
 
 
@@ -320,7 +354,7 @@ def _read_enhanced(page, rect):
     g = cv2.copyMakeBorder(g, _PAD, _PAD, _PAD, _PAD, cv2.BORDER_CONSTANT, value=255)
     px = np.ascontiguousarray(np.dstack([g, g, g, np.full(g.shape, 255, np.uint8)]))
     try:
-        res = asyncio.run(_recognize(fitz.Pixmap(fitz.csRGB, g.shape[1], g.shape[0], px.tobytes(), True)))
+        res = _run(_recognize, fitz.Pixmap(fitz.csRGB, g.shape[1], g.shape[0], px.tobytes(), True))
     except Exception:
         return []
     if res is None:
@@ -432,6 +466,38 @@ def _tess_words(page):
     return out
 
 
+def _tess_line(page, rect):
+    """Tesseract on one line cut out and enlarged (single-line mode): reads text the whole-page
+    pass misses, as in the cells of ruled tables. Returns ([(rect, text)], confidence) or None."""
+    import cv2
+    t = _tesseract()
+    if not t:
+        return None
+    m = rect.height * 0.4
+    clip = fitz.Rect(rect.x0 - m, rect.y0 - m * 0.5, rect.x1 + m, rect.y1 + m * 0.5) & page.rect
+    zz = min(12.0, max(3.0, 48 / max(rect.height, 1)))
+    pm = page.get_pixmap(matrix=fitz.Matrix(zz, zz), clip=clip, colorspace=fitz.csGRAY, alpha=False, annots=False)
+    g = np.frombuffer(pm.samples, np.uint8).reshape(pm.height, pm.width)
+    lo, hi = np.percentile(g, 1), np.percentile(g, 95)
+    g = ((((g.astype(np.float32) - lo) / max(hi - lo, 1)).clip(0, 1) ** 2) * 255).astype(np.uint8)
+    g = cv2.copyMakeBorder(g, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=255)
+    ok, png = cv2.imencode('.png', g)
+    try:
+        p = subprocess.run([t[0], 'stdin', 'stdout', '--tessdata-dir', t[1], '-l', TESS_LANGS, '--psm', '7',
+                            '-c', 'tessedit_create_tsv=1'], input=png.tobytes(), capture_output=True,
+                           timeout=30, creationflags=0x08000000)
+    except Exception:
+        return None
+    words, confs = [], []
+    for r in csv.DictReader(io.StringIO(p.stdout.decode('utf-8', 'replace')), delimiter='	', quoting=csv.QUOTE_NONE):
+        if r.get('level') == '5' and (r.get('text') or '').strip():
+            x, y, w, h = (int(r[k]) - (20 if k in ('left', 'top') else 0) for k in ('left', 'top', 'width', 'height'))
+            words.append((fitz.Rect(clip.x0 + x / zz, clip.y0 + y / zz, clip.x0 + (x + w) / zz, clip.y0 + (y + h) / zz),
+                          r['text']))
+            confs.append(float(r['conf']))
+    return (words, sum(confs) / len(confs)) if words else None
+
+
 def _merge_tesseract(found, tw):
     """Lines read by Windows take Tesseract's words where Tesseract is confident; lines only
     Tesseract found (confidently) are added."""
@@ -442,7 +508,11 @@ def _merge_tesseract(found, tw):
         for r, _ in words[1:]:
             box |= r
         inside = [i for i, w in enumerate(tw) if abs(w[0] & box) > abs(w[0]) * 0.5]
-        if inside and sum(tw[i][2] for i in inside) / len(inside) >= _TESS_CONF:
+        conf = sum(tw[i][2] for i in inside) / len(inside) if inside else 0
+        # Tesseract wins when confident, or when only a little less sure but plainly cleaner than a
+        # garbled Windows reading (another script read as Latin letters: "MaKeT cağTa")
+        cleaner = inside and conf >= 35 and             _junk(' '.join(tw[i][1] for i in inside)) + 0.08 < _junk(' '.join(t for _, t in words))
+        if inside and (conf >= _TESS_CONF or cleaner):
             used.update(inside)
             ws = sorted(((tw[i][0], tw[i][1]) for i in inside), key=lambda w: w[0].x0)
             out.append((ws, None, None, None))      # no case fixing: Tesseract reads case well
@@ -473,7 +543,7 @@ def ocr_page(page):
     z = _TARGET_PX / max(page.rect.width, page.rect.height)
     pix = page.get_pixmap(matrix=fitz.Matrix(z, z), alpha=True, annots=False)
     try:
-        res = asyncio.run(_recognize(pix))
+        res = _run(_recognize, pix)
     except Exception:
         res = None
     if res is None:
@@ -494,6 +564,22 @@ def ocr_page(page):
         tw = None
     if tw is not None:
         found = _merge_tesseract(found, tw)
+        # Lines still read as garbage (table cells the whole-page pass skipped, another script
+        # read as Latin letters): read once more on their own, keep the cleaner reading
+        for i, entry in enumerate(found):
+            words = entry[0]
+            text = ' '.join(t for _, t in words)
+            if entry[1] is None or _junk(text) <= 0.1:
+                continue
+            box = fitz.Rect(words[0][0])
+            for r, _ in words[1:]:
+                box |= r
+            try:
+                alt = _tess_line(page, box)
+            except Exception:
+                alt = None
+            if alt and alt[1] >= 30 and _junk(' '.join(t for _, t in alt[0])) + 0.05 < _junk(text):
+                found[i] = (alt[0], None, None, None)
     else:
         try:
             found = _reread(page, found)

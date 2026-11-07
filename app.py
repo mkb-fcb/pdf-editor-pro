@@ -2908,6 +2908,8 @@ def _ocr_rebuild_page(page, out, layout=None):
         # The line's width in the look-alike font is the better measure of its size: the box
         # height is swollen by accents (Ç, İ, Ğ) and descenders
         size = ln['size']
+        if len(ln['text'].strip()) <= 2:
+            return size     # one or two characters: their width says little about the size
         f = fitz.Font(fontfile=ff)
         by_width = fitz.Rect(ln['bbox']).width / (f.text_length(ln['text'], fontsize=1) or 1)
         return by_width if 0.55 * size < by_width < 1.6 * size else size
