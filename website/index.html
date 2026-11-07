@@ -47,7 +47,7 @@
       "priceCurrency": "USD"
     }
   ],
-  "description": "Professional PDF editing software for Windows. Merge, split, rotate, encrypt, annotate, compress, share and convert PDFs, and turn them into e-books for Kindle. One-time payment, no subscription, works 100% offline.",
+  "description": "Professional PDF editing software for Windows. Merge, split, rotate, encrypt, annotate, compress, share and convert PDFs, edit scanned PDFs with built-in OCR, and turn them into e-books for Kindle. One-time payment, no subscription, works 100% offline.",
   "url": "https://mkbsoft.net",
   "downloadUrl": "https://apps.microsoft.com/detail/9PJJ019JKTP9",
   "softwareVersion": "1.2.1",
@@ -65,6 +65,14 @@
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Can I edit scanned PDFs?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Since v1.2 the text of scanned pages is recognised with built-in OCR and can be changed, deleted or moved, and Clean Background removes copier grey and tinted paper. Recognition depends on the scan quality, so check important documents after editing."
+      }
+    },
     {
       "@type": "Question",
       "name": "What Windows versions are supported?",
@@ -1020,7 +1028,7 @@
 
 <!-- HERO -->
 <div class="hero">
-  <a href="#new" class="new-pill" data-en="<b>NEW</b> v1.0.5 — PDF to e-book, send to Kindle →" data-tr="<b>YENİ</b> v1.0.5 — PDF'ten e-kitaba, Kindle'a gönder →"><b>NEW</b> v1.0.5 — PDF to e-book, send to Kindle →</a><br>
+  <a href="#new" class="new-pill" data-en="<b>NEW</b> v1.2 — Edit scanned PDFs with built-in OCR →" data-tr="<b>YENİ</b> v1.2 — Taranmış PDF'leri yerleşik OCR ile düzenle →"><b>NEW</b> v1.2 — Edit scanned PDFs with built-in OCR →</a><br>
   <div class="hero-badge" data-en="Windows 10 &amp; 11 · No subscription" data-tr="Windows 10 ve 11 · Abonelik yok">Windows 10 &amp; 11 · No subscription</div>
   <h1 data-en="Edit PDFs like a<br><span>pro. Without the cost.</span>" data-tr="PDF'leri profesyonel<br><span>gibi düzenle. Ucuza.</span>">Edit PDFs like a<br><span>pro. Without the cost.</span></h1>
   <p data-en="Merge, split, rotate, encrypt and annotate PDFs directly on your desktop. No cloud, no monthly fees — yours forever." data-tr="PDF'leri birleştir, böl, döndür, şifrele ve doğrudan masaüstünde düzenle. Bulut yok, aylık ücret yok — sonsuza kadar senin.">Merge, split, rotate, encrypt and annotate PDFs directly on your desktop. No cloud, no monthly fees — yours forever.</p>
@@ -1073,8 +1081,31 @@
 <!-- WHAT'S NEW -->
 <section id="new">
   <div class="section-inner">
-    <div class="section-label" data-en="New in v1.0.5" data-tr="v1.0.5 ile gelenler">New in v1.0.5</div>
-    <h2 class="section-title" data-en="From PDF to e-book.<br>Straight to your Kindle." data-tr="PDF'ten e-kitaba.<br>Doğrudan Kindle'ına.">From PDF to e-book.<br>Straight to your Kindle.</h2>
+    <div class="section-label" data-en="New in v1.2" data-tr="v1.2 ile gelenler">New in v1.2</div>
+    <h2 class="section-title" data-en="Scanned PDFs are editable now.<br>And they come out clean." data-tr="Taranmış PDF'ler artık düzenlenebilir.<br>Üstelik tertemiz.">Scanned PDFs are editable now.<br>And they come out clean.</h2>
+    <p class="section-sub" data-en="Copies and scans are pictures of pages. PDF Editor Pro reads their text with built-in OCR, so you can change, delete or move it in the scan's own look." data-tr="Fotokopi ve tarama çıktıları sayfaların resmidir. PDF Editor Pro yerleşik OCR ile yazılarını okur; onları taramanın kendi görünümüyle değiştirebilir, silebilir veya taşıyabilirsin.">Copies and scans are pictures of pages. PDF Editor Pro reads their text with built-in OCR, so you can change, delete or move it in the scan's own look.</p>
+
+    <div class="new-shot" style="max-width:1100px;margin:44px auto 0"><img data-shot="08_scan" src="/img/shots/en_08_scan.webp" alt="A scanned invoice before and after editing and cleaning in PDF Editor Pro" width="1280" height="469" loading="lazy"></div>
+    <div class="new-row" style="grid-template-columns:1fr;max-width:760px;margin-left:auto;margin-right:auto">
+      <div class="new-text">
+        <h3 data-en="Edit text in scans" data-tr="Taramalarda yazı düzenleme">Edit text in scans</h3>
+        <p data-en="Click a line on a scanned page and type. New words are drawn in the scan's own typeface, size, weight and tone, so they blend in, also on coloured paper and for white text on coloured bars." data-tr="Taranmış sayfada bir satıra tıkla ve yaz. Yeni kelimeler taramanın kendi yazı tipi, boyu, kalınlığı ve tonuyla çizilir, böylece göze batmaz; renkli kâğıtta ve renkli bant üzerindeki beyaz yazıda da.">Click a line on a scanned page and type. New words are drawn in the scan's own typeface, size, weight and tone, so they blend in, also on coloured paper and for white text on coloured bars.</p>
+        <ul>
+          <li data-en="Two OCR engines work together; small, faint and dot-matrix print is read too" data-tr="İki OCR motoru birlikte çalışır; küçük, soluk ve nokta vuruşlu yazılar da okunur">Two OCR engines work together; small, faint and dot-matrix print is read too</li>
+          <li data-en="Delete or move lines; the paper behind them is rebuilt, no white patches" data-tr="Satırları sil veya taşı; arkalarındaki kâğıt yeniden oluşturulur, beyaz yama kalmaz">Delete or move lines; the paper behind them is rebuilt, no white patches</li>
+          <li data-en="Everything runs on your PC; nothing is uploaded" data-tr="Her şey bilgisayarında çalışır; hiçbir şey internete gönderilmez">Everything runs on your PC; nothing is uploaded</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="new-mini">
+      <div><strong data-en="Clean background" data-tr="Arka planı temizle">Clean background</strong><span data-en="Turns copier grey, yellowed or coloured paper and shadows white. Keep the colours or go black and white; form boxes stay." data-tr="Fotokopi grisini, sararmış veya renkli kâğıdı ve gölgeleri beyaza çevirir. Renkleri koru ya da siyah-beyaz yap; form kutucukları kalır.">Turns copier grey, yellowed or coloured paper and shadows white. Keep the colours or go black and white; form boxes stay.</span></div>
+      <div><strong data-en="Scans to Word" data-tr="Taramaları Word'e aktar">Scans to Word</strong><span data-en="Export scanned documents to Word as editable text in the original page layout; Excel and text files too." data-tr="Taranmış belgeleri orijinal sayfa düzeniyle düzenlenebilir metin olarak Word'e aktar; Excel ve metin dosyası da olur.">Export scanned documents to Word as editable text in the original page layout; Excel and text files too.</span></div>
+      <div><strong data-en="Big scans, quick" data-tr="Büyük taramalar hızlı">Big scans, quick</strong><span data-en="600 dpi scans open, edit and export faster and use far less memory." data-tr="600 dpi taramalar daha hızlı açılır, düzenlenir, aktarılır ve çok daha az bellek kullanır.">600 dpi scans open, edit and export faster and use far less memory.</span></div>
+    </div>
+
+    <div class="section-label" style="margin-top:72px" data-en="New in v1.0.5" data-tr="v1.0.5 ile gelenler">New in v1.0.5</div>
+    <h3 style="font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:0" data-en="From PDF to e-book.<br>Straight to your Kindle." data-tr="PDF'ten e-kitaba.<br>Doğrudan Kindle'ına.">From PDF to e-book.<br>Straight to your Kindle.</h3>
     <p class="section-sub" data-en="Read your PDFs comfortably on an e-reader: text reflows to the screen and the font size is yours to choose." data-tr="PDF'lerini e-okuyucuda rahatça oku: metin ekrana göre akar, yazı boyutunu sen seçersin.">Read your PDFs comfortably on an e-reader: text reflows to the screen and the font size is yours to choose.</p>
 
     <div class="new-row">
@@ -1245,6 +1276,11 @@
     </div>
     <div class="features-grid">
       <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3 data-en="Edit Scanned PDFs" data-tr="Taranmış PDF Düzenleme">Edit Scanned PDFs</h3>
+        <p data-en="Built-in OCR reads scans and copies, so you can edit their text and clean their background." data-tr="Yerleşik OCR taramaları ve fotokopileri okur; yazılarını düzenle, arka planlarını temizle.">Built-in OCR reads scans and copies, so you can edit their text and clean their background.</p>
+      </div>
+      <div class="feature-card">
         <div class="feature-icon">🔗</div>
         <h3 data-en="Merge PDFs" data-tr="PDF Birleştirme">Merge PDFs</h3>
         <p data-en="Combine multiple PDF files into one document in seconds. Drag, drop, done." data-tr="Birden fazla PDF dosyasını saniyeler içinde tek belgede birleştir.">Combine multiple PDF files into one document in seconds. Drag, drop, done.</p>
@@ -1392,6 +1428,13 @@
     <div class="section-label" data-en="FAQ" data-tr="Sık Sorulan Sorular">FAQ</div>
     <h2 class="section-title" data-en="Common questions" data-tr="Merak edilenler">Common questions</h2>
     <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-en="Can I edit scanned PDFs?" data-tr="Taranmış PDF'leri düzenleyebilir miyim?">Can I edit scanned PDFs?</span>
+          <span class="arrow">+</span>
+        </button>
+        <div class="faq-a" data-en="Yes. Since v1.2 the text of scanned pages is recognised with built-in OCR and can be changed, deleted or moved, and Clean Background removes copier grey and tinted paper. Recognition depends on the scan quality, so check important documents after editing." data-tr="Evet. v1.2'den beri taranmış sayfaların yazıları yerleşik OCR ile tanınır ve değiştirilebilir, silinebilir veya taşınabilir; Arka Planı Temizle de fotokopi grisini ve renkli kâğıdı kaldırır. Tanıma taramanın kalitesine bağlıdır, bu yüzden önemli belgeleri düzenledikten sonra kontrol edin.">Yes. Since v1.2 the text of scanned pages is recognised with built-in OCR and can be changed, deleted or moved, and Clean Background removes copier grey and tinted paper. Recognition depends on the scan quality, so check important documents after editing.</div>
+      </div>
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
           <span data-en="What Windows versions are supported?" data-tr="Hangi Windows sürümleri destekleniyor?">What Windows versions are supported?</span>

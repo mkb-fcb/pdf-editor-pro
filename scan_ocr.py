@@ -383,6 +383,7 @@ def _second_pass(page, arr, z, covered):
 # ruled tables. Where both read a line, the one Tesseract is confident about wins.
 
 _TESS_CONF = 60
+TESS_LANGS = 'tur'    # Tesseract model(s) to read with ("tur", "rus", "tur+eng" …)
 
 
 def _tesseract():
@@ -397,7 +398,7 @@ def _tesseract():
         if not os.path.exists(exe):
             continue
         for data in (os.path.join(os.path.dirname(exe), 'tessdata'), os.path.join(here, 'tessdata')):
-            if os.path.exists(os.path.join(data, 'tur.traineddata')):
+            if all(os.path.exists(os.path.join(data, l + '.traineddata')) for l in TESS_LANGS.split('+')):
                 return exe, data
     return None
 
@@ -415,7 +416,7 @@ def _tess_words(page):
     g = ((((g.astype(np.float32) - lo) / max(hi - lo, 1)).clip(0, 1) ** 2) * 255).astype(np.uint8)
     ok, png = cv2.imencode('.png', g)
     try:
-        p = subprocess.run([t[0], 'stdin', 'stdout', '--tessdata-dir', t[1], '-l', 'tur', '--psm', '11',
+        p = subprocess.run([t[0], 'stdin', 'stdout', '--tessdata-dir', t[1], '-l', TESS_LANGS, '--psm', '11',
                             '-c', 'tessedit_create_tsv=1'], input=png.tobytes(), capture_output=True,
                            timeout=120, creationflags=0x08000000)
     except Exception:
