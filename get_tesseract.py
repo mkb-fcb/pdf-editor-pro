@@ -62,6 +62,14 @@ def strip_debug(path):
     struct.pack_into('<II', d, pe + 12, 0, 0)            # no COFF symbol table any more
     struct.pack_into('<I', d, opt + 56, size_img)
     struct.pack_into('<I', d, opt + 64, 0)               # checksum: not checked for user DLLs
+    # The UB Mannheim binaries carry an Authenticode signature at the very end of the file, which
+    # the cut removes; its certificate-table entry must go too, or the entry points past the end
+    # of the file and signing the package fails (SignTool 0x800700C1, "not a valid Win32 app")
+    ndirs, = struct.unpack_from('<I', d, opt + 108)
+    if ndirs > 4:
+        cert_off, cert_len = struct.unpack_from('<II', d, opt + 112 + 8 * 4)
+        if cert_len and cert_off >= end:
+            struct.pack_into('<II', d, opt + 112 + 8 * 4, 0, 0)
     for i in range(len(keep), nsec):
         d[table + i * 40:table + i * 40 + 40] = bytes(40)
     saved = len(d) - end
