@@ -31,7 +31,7 @@ import scan_ocr
 MAX_HISTORY = 15
 
 # Keep in sync with installer.iss / installer_demo.iss (MyAppVersion) and build_msix.py's argument
-APP_VERSION = '1.2.1'
+APP_VERSION = '1.2.2'
 SOURCE_URL = 'https://github.com/mkb-fcb/pdf-editor-pro'
 
 # Lisans girilmemişse uygulama demo modunda çalışır (3 sayfa, filigranlı kayıt)
@@ -234,7 +234,28 @@ def api_ui_lang():
     lang = (request.json or {}).get('lang')
     if lang in FILE_SUFFIXES:
         state['ui_lang'] = lang
+        pref = _ocr_pref()     # the page sends this on start: the saved choice applies from then on
+        scan_ocr.set_language(lang if pref == 'auto' else pref)
     return jsonify({'ok': True})
+
+
+def _ocr_pref() -> str:
+    """The language scans are read in: 'auto' (the UI language) or one the user picked."""
+    pref = _prompts_load().get('ocr_lang', 'auto')
+    return pref if pref == 'auto' or pref in scan_ocr.TESS_MODELS else 'auto'
+
+
+@app.route('/api/ocr_lang', methods=['GET', 'POST'])
+def api_ocr_lang():
+    if request.method == 'POST':
+        pref = (request.json or {}).get('lang')
+        if pref != 'auto' and pref not in scan_ocr.TESS_MODELS:
+            return jsonify({'ok': False}), 400
+        d = _prompts_load()
+        d['ocr_lang'] = pref
+        _prompts_save(d)
+        scan_ocr.set_language((state.get('ui_lang') or 'tr') if pref == 'auto' else pref)
+    return jsonify({'ok': True, 'pref': _ocr_pref(), 'lang': scan_ocr.OCR_LANG})
 
 
 def _default_out(suffix_text: str) -> str:
@@ -327,7 +348,7 @@ def _demo_over_limit() -> bool:
 # (düzenleme, kaydetme, dışa aktarma...) belgeyi önce ilk DEMO_MAX_PAGES sayfaya indirir.
 _DEMO_FULL_DOC_ENDPOINTS = {
     'api_status', 'api_page_sizes', 'api_view', 'api_print_page', 'api_thumb',
-    'api_open', 'api_upload', 'api_browse', 'api_ui_lang', 'api_rate_prompt',
+    'api_open', 'api_upload', 'api_browse', 'api_ui_lang', 'api_ocr_lang', 'api_rate_prompt',
     'api_activate', 'api_open_link', 'api_demo_edit',
 }
 

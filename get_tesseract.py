@@ -1,9 +1,9 @@
 """Prepares the tesseract\\ folder bundled into PDF Editor Pro: tesseract.exe, the DLLs it loads and
-the Turkish model. Run before PyInstaller:  python get_tesseract.py
+a model for each UI language. Run before PyInstaller:  python get_tesseract.py
 
 The binaries come from the UB Mannheim build (winget install UB-Mannheim.TesseractOCR); only the
-files tesseract.exe actually needs are copied, found by following its DLL imports. The model is
-tessdata_fast's tur.traineddata (as accurate as tessdata_best on scans in tests, half the size).
+files tesseract.exe actually needs are copied, found by following its DLL imports. The models are
+tessdata_fast's (as accurate as tessdata_best on scans in tests, half the size).
 """
 import os
 import re
@@ -15,7 +15,8 @@ import urllib.request
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, 'tesseract')
 SRC = os.path.join(os.environ.get('ProgramFiles', r'C:\Program Files'), 'Tesseract-OCR')
-MODEL_URL = 'https://github.com/tesseract-ocr/tessdata_fast/raw/main/tur.traineddata'
+MODEL_URL = 'https://github.com/tesseract-ocr/tessdata_fast/raw/main/{}.traineddata'
+MODELS = ('tur', 'eng', 'deu', 'spa', 'fra', 'ita', 'por', 'rus')     # scan_ocr.TESS_MODELS
 
 
 def imports(path):
@@ -99,18 +100,19 @@ def main():
             shutil.copy2(os.path.join(SRC, name), OUT)
     saved = sum(strip_debug(os.path.join(OUT, f)) for f in os.listdir(OUT) if f.lower().endswith(('.dll', '.exe')))
     print(f'debug info removed: {saved / 1e6:.1f} MB')
-    model = os.path.join(OUT, 'tessdata', 'tur.traineddata')
-    cached = os.path.join(ROOT, 'tessdata', 'tur.traineddata')
-    if os.path.exists(cached):
-        shutil.copy2(cached, model)
-    else:
-        urllib.request.urlretrieve(MODEL_URL, model)
+    os.makedirs(os.path.join(ROOT, 'tessdata'), exist_ok=True)
+    for m in MODELS:
+        cached = os.path.join(ROOT, 'tessdata', m + '.traineddata')
+        if not os.path.exists(cached):
+            urllib.request.urlretrieve(MODEL_URL.format(m), cached + '.part')
+            os.replace(cached + '.part', cached)
+        shutil.copy2(cached, os.path.join(OUT, 'tessdata', m + '.traineddata'))
 
     # It must run on its own, without the installed copy on PATH
     env = {'SystemRoot': os.environ['SystemRoot'], 'PATH': os.path.join(os.environ['SystemRoot'], 'System32')}
     p = subprocess.run([os.path.join(OUT, 'tesseract.exe'), '--list-langs', '--tessdata-dir',
                         os.path.join(OUT, 'tessdata')], capture_output=True, text=True, env=env)
-    if p.returncode != 0 or 'tur' not in p.stdout:
+    if p.returncode != 0 or not all(m in p.stdout.split() for m in MODELS):
         sys.exit('tesseract does not run from the copied folder:\n' + p.stdout + p.stderr)
     size = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(OUT) for f in fs)
     print(f'tesseract\\: {len(need)} DLLs, {size / 1e6:.1f} MB, runs on its own')

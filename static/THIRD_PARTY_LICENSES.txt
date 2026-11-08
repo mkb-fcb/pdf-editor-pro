@@ -18105,7 +18105,7 @@ Copyright (c) 2001 Python Software Foundation. All rights reserved.
 Full text: https://docs.python.org/3/license.html
 
 ------------------------------------------------------------------------------
-Tesseract OCR 5.4.0 (tesseract/tesseract.exe) and its Turkish model (tessdata_fast tur.traineddata)
+Tesseract OCR 5.4.0 (tesseract/tesseract.exe) and its language models (tessdata_fast tur, eng, deu, spa, fra, ita, por, rus .traineddata)
 License: Apache License 2.0
 
 Copyright Google Inc. and the Tesseract OCR contributors. Licensed under the Apache License, Version 2.0: https://www.apache.org/licenses/LICENSE-2.0

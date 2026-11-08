@@ -75,10 +75,25 @@ def _fingerprint(page):
 
 def _engine():
     eng = None
+    # The document language first, when Windows has its OCR pack (Settings > Language)
     try:
-        eng = OcrEngine.try_create_from_user_profile_languages()
+        lang = Language(OCR_LANG)
+        if OcrEngine.is_language_supported(lang):
+            eng = OcrEngine.try_create_from_language(lang)
     except Exception:
         pass
+    try:
+        if eng is None:
+            eng = OcrEngine.try_create_from_user_profile_languages()
+    except Exception:
+        pass
+    # Without the document language Windows reads its letters through another one (é as "â" on
+    # Turkish Windows): Tesseract, which has the right model, is then trusted sooner
+    global _WIN_LANG_OK
+    try:
+        _WIN_LANG_OK = eng.recognizer_language.language_tag.lower().startswith(OCR_LANG)
+    except Exception:
+        _WIN_LANG_OK = True
     if eng is None:
         langs = list(OcrEngine.available_recognizer_languages)
         if langs:
@@ -417,11 +432,29 @@ def _second_pass(page, arr, z, covered):
 # ruled tables. Where both read a line, the one Tesseract is confident about wins.
 
 _TESS_CONF = 60
-TESS_LANGS = 'tur'    # Tesseract model(s) to read with ("tur", "rus", "tur+eng" …)
+# The language scans are read in: the UI language unless the user picked another one. Each has a
+# tessdata_fast model bundled by get_tesseract.py
+TESS_MODELS = {'tr': 'tur', 'en': 'eng', 'de': 'deu', 'es': 'spa', 'fr': 'fra', 'it': 'ita', 'pt': 'por', 'ru': 'rus'}
+OCR_LANG = 'tr'
+_WIN_LANG_OK = True   # whether Windows OCR reads in OCR_LANG (set by _engine)
+TESS_LANGS = None     # set to force model(s) ("rus", "tur+eng" …); None follows OCR_LANG
+
+
+def set_language(code):
+    """Read scans in this language from now on (one of TESS_MODELS). Pages already read keep their
+    lines in the cache under the old language, so switching back is instant."""
+    global OCR_LANG
+    if code in TESS_MODELS:
+        OCR_LANG = code
+
+
+def _cache_key(page):
+    return _fingerprint(page) + ':' + (TESS_LANGS or OCR_LANG)
 
 
 def _tesseract():
-    """(tesseract.exe, tessdata folder with tur.traineddata), or None."""
+    """(tesseract.exe, tessdata folder, model(s) to read with), or None. Falls back to the Turkish
+    model when the one for the language is missing (an older install or a plain Tesseract)."""
     # Bundled (PyInstaller puts data in _internal = sys._MEIPASS), next to the sources (after
     # get_tesseract.py), or an installed copy
     here = os.path.dirname(os.path.abspath(__file__))
@@ -432,8 +465,9 @@ def _tesseract():
         if not os.path.exists(exe):
             continue
         for data in (os.path.join(os.path.dirname(exe), 'tessdata'), os.path.join(here, 'tessdata')):
-            if all(os.path.exists(os.path.join(data, l + '.traineddata')) for l in TESS_LANGS.split('+')):
-                return exe, data
+            for langs in (TESS_LANGS or TESS_MODELS.get(OCR_LANG, 'tur'), 'tur', 'eng'):
+                if all(os.path.exists(os.path.join(data, l + '.traineddata')) for l in langs.split('+')):
+                    return exe, data, langs
     return None
 
 
@@ -450,7 +484,7 @@ def _tess_words(page):
     g = ((((g.astype(np.float32) - lo) / max(hi - lo, 1)).clip(0, 1) ** 2) * 255).astype(np.uint8)
     ok, png = cv2.imencode('.png', g)
     try:
-        p = subprocess.run([t[0], 'stdin', 'stdout', '--tessdata-dir', t[1], '-l', TESS_LANGS, '--psm', '11',
+        p = subprocess.run([t[0], 'stdin', 'stdout', '--tessdata-dir', t[1], '-l', t[2], '--psm', '11',
                             '-c', 'tessedit_create_tsv=1'], input=png.tobytes(), capture_output=True,
                            timeout=120, creationflags=0x08000000)
     except Exception:
@@ -483,7 +517,7 @@ def _tess_line(page, rect):
     g = cv2.copyMakeBorder(g, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=255)
     ok, png = cv2.imencode('.png', g)
     try:
-        p = subprocess.run([t[0], 'stdin', 'stdout', '--tessdata-dir', t[1], '-l', TESS_LANGS, '--psm', '7',
+        p = subprocess.run([t[0], 'stdin', 'stdout', '--tessdata-dir', t[1], '-l', t[2], '--psm', '7',
                             '-c', 'tessedit_create_tsv=1'], input=png.tobytes(), capture_output=True,
                            timeout=30, creationflags=0x08000000)
     except Exception:
@@ -511,8 +545,9 @@ def _merge_tesseract(found, tw):
         conf = sum(tw[i][2] for i in inside) / len(inside) if inside else 0
         # Tesseract wins when confident, or when only a little less sure but plainly cleaner than a
         # garbled Windows reading (another script read as Latin letters: "MaKeT cağTa")
-        cleaner = inside and conf >= 35 and             _junk(' '.join(tw[i][1] for i in inside)) + 0.08 < _junk(' '.join(t for _, t in words))
-        if inside and (conf >= _TESS_CONF or cleaner):
+        cleaner = inside and conf >= 35 and \
+            _junk(' '.join(tw[i][1] for i in inside)) + 0.08 < _junk(' '.join(t for _, t in words))
+        if inside and (conf >= (_TESS_CONF if _WIN_LANG_OK else 40) or cleaner):
             used.update(inside)
             ws = sorted(((tw[i][0], tw[i][1]) for i in inside), key=lambda w: w[0].x0)
             out.append((ws, None, None, None))      # no case fixing: Tesseract reads case well
@@ -521,7 +556,10 @@ def _merge_tesseract(found, tw):
     covered = [r for e in out for r, _ in e[0]]
     rest = {}
     for i, w in enumerate(tw):
-        if i not in used and w[2] >= _TESS_CONF and not any(abs(w[0] & c) > abs(w[0]) * 0.3 for c in covered):
+        # overlap measured on the smaller box: in ruled tables Tesseract's boxes take in the cell
+        # borders and are far taller than the words Windows read there
+        if (i not in used and w[2] >= _TESS_CONF
+                and not any(abs(w[0] & c) > min(abs(w[0]), abs(c)) * 0.3 for c in covered)):
             rest.setdefault(w[3], []).append((w[0], w[1]))
     for ws in rest.values():
         text = ''.join(t for _, t in ws)
@@ -536,7 +574,7 @@ def ocr_page(page):
     Returns None when OCR is not available."""
     if not _AVAILABLE:
         return None
-    key = _fingerprint(page)
+    key = _cache_key(page)
     with _LOCK:
         if key in _CACHE:
             return _CACHE[key]
@@ -569,7 +607,12 @@ def ocr_page(page):
         for i, entry in enumerate(found):
             words = entry[0]
             text = ' '.join(t for _, t in words)
-            if entry[1] is None or _junk(text) <= 0.1:
+            if entry[1] is None:
+                continue
+            # Windows reading in another language mangles accents ("Crâation", "Disefio"): its
+            # lines with letters get a second reading with the right model
+            wrong_lang = not _WIN_LANG_OK and any(ch.isalpha() for ch in text)
+            if _junk(text) <= 0.1 and not wrong_lang:
                 continue
             box = fitz.Rect(words[0][0])
             for r, _ in words[1:]:
@@ -578,7 +621,10 @@ def ocr_page(page):
                 alt = _tess_line(page, box)
             except Exception:
                 alt = None
-            if alt and alt[1] >= 30 and _junk(' '.join(t for _, t in alt[0])) + 0.05 < _junk(text):
+            alt_text = ' '.join(t for _, t in alt[0]) if alt else ''
+            if alt and ((alt[1] >= 30 and _junk(alt_text) + 0.05 < _junk(text))
+                        or (wrong_lang and alt[1] >= 70 and _junk(alt_text) <= _junk(text)
+                            and abs(len(alt_text) - len(text)) <= max(2, len(text) * 0.2))):
                 found[i] = (alt[0], None, None, None)
     else:
         try:

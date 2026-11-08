@@ -35,7 +35,7 @@ OTHER = [
      'TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.'),
     (f'Python {sys.version.split()[0]} runtime', 'Python Software Foundation License',
      'Copyright (c) 2001 Python Software Foundation. All rights reserved.\nFull text: https://docs.python.org/3/license.html'),
-    ('Tesseract OCR 5.4.0 (tesseract/tesseract.exe) and its Turkish model (tessdata_fast tur.traineddata)',
+    ('Tesseract OCR 5.4.0 (tesseract/tesseract.exe) and its language models (tessdata_fast tur, eng, deu, spa, fra, ita, por, rus .traineddata)',
      'Apache License 2.0',
      'Copyright Google Inc. and the Tesseract OCR contributors. Licensed under the Apache License, Version 2.0: '
      'https://www.apache.org/licenses/LICENSE-2.0\nSource: https://github.com/tesseract-ocr/tesseract, '

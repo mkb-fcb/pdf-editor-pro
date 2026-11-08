@@ -637,6 +637,8 @@ body.has-file #sidebar {
   white-space: nowrap;
 }
 .tb-dropdown-item:hover { background: #f1f5f9; }
+.tb-dropdown-item.active { font-weight: 600; color: var(--primary); }
+.tb-dropdown-item.active::after { content: '  ✓'; }
 
 /* ── LANG SWITCH ── */
 #dd-lang { position: relative; flex-shrink: 0; margin-left: 2px; }
@@ -1066,6 +1068,7 @@ body.has-file:not(.read-mode) #zoombar {
   <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 15V3" /> <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <path d="m7 10 5 5 5-5" /></symbol>
   <symbol id="i-type" viewBox="0 0 24 24"><path d="M12 4v16" /> <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" /> <path d="M9 20h6" /></symbol>
   <symbol id="i-replace" viewBox="0 0 24 24"><path d="M14 4a1 1 0 0 1 1-1" /> <path d="M15 10a1 1 0 0 1-1-1" /> <path d="M21 4a1 1 0 0 0-1-1" /> <path d="M21 9a1 1 0 0 1-1 1" /> <path d="m3 7 3 3 3-3" /> <path d="M6 10V5a2 2 0 0 1 2-2h2" /> <rect x="3" y="14" width="7" height="7" rx="1" /></symbol>
+  <symbol id="i-languages" viewBox="0 0 24 24"><path d="m5 8 6 6" /> <path d="m4 14 6-6 2-3" /> <path d="M2 5h12" /> <path d="M7 2h1" /> <path d="m22 22-5-10-5 10" /> <path d="M14 18h6" /></symbol>
   <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" /> <path d="M20 3v4" /> <path d="M22 5h-4" /> <path d="M4 17v2" /> <path d="M5 18H3" /></symbol>
   <symbol id="i-eraser" viewBox="0 0 24 24"><path d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21" /> <path d="m5.082 11.09 8.828 8.828" /></symbol>
   <symbol id="i-shapes" viewBox="0 0 24 24"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z" /> <rect x="3" y="14" width="7" height="7" rx="1" /> <circle cx="17.5" cy="17.5" r="3.5" /></symbol>
@@ -1183,6 +1186,21 @@ body.has-file:not(.read-mode) #zoombar {
     <button class="rb" id="btn-fr" onclick="openModal('m-fr')" disabled><svg class="ri" style="color:#4f46e5"><use href="#i-replace"/></svg><span><span data-i18n="findReplace">Bul & Değiştir</span></span></button>
     <button class="rb rb-toggle" id="btn-select" onclick="toggleSelectMode()" disabled><svg class="ri" style="color:#dc2626"><use href="#i-eraser"/></svg><span><span data-i18n="deleteArea">Alan Sil</span></span></button>
     <button class="rb" id="btn-cleanbg" onclick="openCleanBg()" disabled title="Taranmış sayfanın gri / sararmış / renkli kâğıdını beyazlat"><svg class="ri" style="color:#0ea5e9"><use href="#i-sparkles"/></svg><span><span data-i18n="rbCleanBg">Arka Planı Temizle</span></span></button>
+    <div class="tb-dropdown" id="dd-ocrlang">
+    <button class="rb rb-toggle" id="btn-ocrlang" onclick="toggleOcrMenu(event)"><svg class="ri" style="color:#0d9488"><use href="#i-languages"/></svg><span><span data-i18n="rbOcrLang">Tarama Dili</span> <svg class="rb-caret" viewBox="0 0 20 20" fill="currentColor" width="10" height="10"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></span></button>
+    <div class="tb-dropdown-menu" id="ocrlang-menu">
+      <div style="padding:6px 14px 4px;font-size:11.5px;color:#666;max-width:240px;white-space:normal" data-i18n="ocrLangHelp">Taranmış belgelerdeki yazının dili</div>
+      <button class="tb-dropdown-item" data-ocr="auto" onclick="pickOcrLang('auto')" data-i18n="ocrLangAuto">Otomatik (program dili)</button>
+      <button class="tb-dropdown-item" data-ocr="tr" onclick="pickOcrLang('tr')">Türkçe</button>
+      <button class="tb-dropdown-item" data-ocr="en" onclick="pickOcrLang('en')">English</button>
+      <button class="tb-dropdown-item" data-ocr="de" onclick="pickOcrLang('de')">Deutsch</button>
+      <button class="tb-dropdown-item" data-ocr="es" onclick="pickOcrLang('es')">Español</button>
+      <button class="tb-dropdown-item" data-ocr="fr" onclick="pickOcrLang('fr')">Français</button>
+      <button class="tb-dropdown-item" data-ocr="it" onclick="pickOcrLang('it')">Italiano</button>
+      <button class="tb-dropdown-item" data-ocr="pt" onclick="pickOcrLang('pt')">Português</button>
+      <button class="tb-dropdown-item" data-ocr="ru" onclick="pickOcrLang('ru')">Русский</button>
+    </div>
+    </div>
     <div class="rb-sep"></div>
     <div class="tb-dropdown" id="dd-shape">
     <button class="rb rb-toggle" id="btn-shape-dd" onclick="toggleShapeMenu(event)" disabled><svg class="ri" style="color:#ea580c"><use href="#i-shapes"/></svg><span><span data-i18n="rbShape">Şekil Çiz</span> <svg class="rb-caret" viewBox="0 0 20 20" fill="currentColor" width="10" height="10"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></span></button>
@@ -2198,6 +2216,10 @@ const LANGS = {
     swOk: "Devam Et",
     ocrBusy: 'Taranmış sayfadaki metin tanınıyor…',
     rbCleanBg: 'Arka Planı Temizle',
+    rbOcrLang: 'Tarama Dili',
+    ocrLangHelp: 'Taranmış belgelerdeki yazının dili',
+    ocrLangAuto: 'Otomatik (program dili)',
+    ocrLangSet: 'Tarama dili',
     cbTitle: 'Taramanın Arka Planını Temizle',
     cbDesc: 'Taranmış sayfalardaki gri fotokopi tonunu, sararmış ya da renkli kâğıdı ve gölgeleri beyaza çevirir. Yazılar korunur.',
     cbColor: '<b>Renkleri koru</b>',
@@ -2356,6 +2378,10 @@ const LANGS = {
     swOk: "Continue",
     ocrBusy: 'Reading the text of the scanned page…',
     rbCleanBg: 'Clean Background',
+    rbOcrLang: 'Scan Language',
+    ocrLangHelp: 'Language of the text in scanned documents',
+    ocrLangAuto: 'Automatic (app language)',
+    ocrLangSet: 'Scan language',
     cbTitle: 'Clean Scan Background',
     cbDesc: 'Turns the grey copier tone, yellowed or coloured paper and shadows of scanned pages white. The text is kept.',
     cbColor: '<b>Keep colours</b>',
@@ -2514,6 +2540,10 @@ const LANGS = {
     swOk: "Fortfahren",
     ocrBusy: 'Text der gescannten Seite wird erkannt…',
     rbCleanBg: 'Hintergrund säubern',
+    rbOcrLang: 'Scan-Sprache',
+    ocrLangHelp: 'Sprache des Textes in gescannten Dokumenten',
+    ocrLangAuto: 'Automatisch (Programmsprache)',
+    ocrLangSet: 'Scan-Sprache',
     cbTitle: 'Scan-Hintergrund säubern',
     cbDesc: 'Macht den grauen Kopierton, vergilbtes oder farbiges Papier und Schatten gescannter Seiten weiß. Der Text bleibt erhalten.',
     cbColor: '<b>Farben behalten</b>',
@@ -2672,6 +2702,10 @@ const LANGS = {
     swOk: "Continuar",
     ocrBusy: 'Reconociendo el texto de la página escaneada…',
     rbCleanBg: 'Limpiar fondo',
+    rbOcrLang: 'Idioma del escaneo',
+    ocrLangHelp: 'Idioma del texto en los documentos escaneados',
+    ocrLangAuto: 'Automático (idioma del programa)',
+    ocrLangSet: 'Idioma del escaneo',
     cbTitle: 'Limpiar el fondo del escaneo',
     cbDesc: 'Vuelve blancos el tono gris de fotocopia, el papel amarillento o de color y las sombras de las páginas escaneadas. El texto se conserva.',
     cbColor: '<b>Conservar colores</b>',
@@ -2830,6 +2864,10 @@ const LANGS = {
     swOk: "Continuer",
     ocrBusy: 'Reconnaissance du texte de la page numérisée…',
     rbCleanBg: 'Nettoyer le fond',
+    rbOcrLang: 'Langue du scan',
+    ocrLangHelp: 'Langue du texte des documents numérisés',
+    ocrLangAuto: 'Automatique (langue du logiciel)',
+    ocrLangSet: 'Langue du scan',
     cbTitle: 'Nettoyer le fond du scan',
     cbDesc: 'Rend blancs le gris de photocopie, le papier jauni ou coloré et les ombres des pages numérisées. Le texte est conservé.',
     cbColor: '<b>Garder les couleurs</b>',
@@ -2988,6 +3026,10 @@ const LANGS = {
     swOk: "Continua",
     ocrBusy: 'Riconoscimento del testo della pagina scansionata…',
     rbCleanBg: 'Pulisci sfondo',
+    rbOcrLang: 'Lingua scansione',
+    ocrLangHelp: 'Lingua del testo nei documenti scansionati',
+    ocrLangAuto: 'Automatica (lingua del programma)',
+    ocrLangSet: 'Lingua scansione',
     cbTitle: 'Pulisci lo sfondo della scansione',
     cbDesc: 'Rende bianchi il grigio da fotocopia, la carta ingiallita o colorata e le ombre delle pagine scansionate. Il testo resta.',
     cbColor: '<b>Mantieni i colori</b>',
@@ -3146,6 +3188,10 @@ const LANGS = {
     swOk: "Continuar",
     ocrBusy: 'Reconhecendo o texto da página digitalizada…',
     rbCleanBg: 'Limpar fundo',
+    rbOcrLang: 'Idioma da digitalização',
+    ocrLangHelp: 'Idioma do texto em documentos digitalizados',
+    ocrLangAuto: 'Automático (idioma do programa)',
+    ocrLangSet: 'Idioma da digitalização',
     cbTitle: 'Limpar o fundo da digitalização',
     cbDesc: 'Torna brancos o tom cinza de fotocópia, o papel amarelado ou colorido e as sombras das páginas digitalizadas. O texto é mantido.',
     cbColor: '<b>Manter cores</b>',
@@ -3304,6 +3350,10 @@ const LANGS = {
     swOk: "Продолжить",
     ocrBusy: 'Распознавание текста отсканированной страницы…',
     rbCleanBg: 'Очистить фон',
+    rbOcrLang: 'Язык скана',
+    ocrLangHelp: 'Язык текста в отсканированных документах',
+    ocrLangAuto: 'Автоматически (язык программы)',
+    ocrLangSet: 'Язык скана',
     cbTitle: 'Очистить фон скана',
     cbDesc: 'Делает белыми серый тон ксерокопии, пожелтевшую или цветную бумагу и тени на отсканированных страницах. Текст сохраняется.',
     cbColor: '<b>Сохранить цвета</b>',
@@ -4795,6 +4845,31 @@ function toggleAnnotMode(mode) {
 }
 
 // ── shape dropdown ────────────────────────────────────────
+
+// Scan language: which OCR model reads scanned pages ('auto' = the UI language)
+let _ocrPref = 'auto';
+function markOcrLang() {
+  document.querySelectorAll('#ocrlang-menu [data-ocr]').forEach(b =>
+    b.classList.toggle('active', b.dataset.ocr === _ocrPref));
+}
+function toggleOcrMenu(e) {
+  e.stopPropagation();
+  markOcrLang();
+  document.getElementById('ocrlang-menu').classList.toggle('open');
+}
+document.addEventListener('click', () => document.getElementById('ocrlang-menu')?.classList.remove('open'));
+async function pickOcrLang(code) {
+  document.getElementById('ocrlang-menu').classList.remove('open');
+  const r = await fetch('/api/ocr_lang', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                                         body: JSON.stringify({lang: code})}).then(x => x.json()).catch(() => ({}));
+  if (!r.ok) return;
+  _ocrPref = r.pref;
+  markOcrLang();
+  const name = document.querySelector(`#ocrlang-menu [data-ocr="${r.lang}"]`)?.textContent || r.lang;
+  toast(t('ocrLangSet') + ': ' + name);
+  if (S.pageCount) loadTextBlocks(S.currentPage);     // read the page again in the new language
+}
+fetch('/api/ocr_lang').then(x => x.json()).then(r => { if (r.ok) _ocrPref = r.pref; }).catch(() => {});
 
 function toggleShapeMenu(e) {
   e.stopPropagation();
