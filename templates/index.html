@@ -1046,6 +1046,7 @@ body.has-file:not(.read-mode) #zoombar {
   <span>
     🎯 <strong data-i18n="demoBannerTitle">DEMO SÜRÜMÜ</strong>
     <span data-i18n="demoBannerDesc"> — Okuma ve yazdırma ücretsiz; düzenleme ilk 3 sayfada, kaydedilen dosyalara filigran eklenir.</span>
+    <span id="trial-chip" style="display:none;margin-left:10px;background:rgba(255,255,255,.18);padding:2px 9px;border-radius:10px;font-weight:600"></span>
   </span>
   <span style="display:flex;gap:6px">
     {% if can_activate %}<a href="/activate" style="background:#0891b2" data-i18n="demoBannerActivate">🔑 Lisans Gir</a>{% endif %}
@@ -1832,6 +1833,21 @@ body.has-file:not(.read-mode) #zoombar {
   </div>
 </div>
 
+<!-- MODAL: full-version trial -->
+<div class="modal-backdrop" id="m-trial">
+  <div class="modal-card" style="max-width:470px">
+    <h3>🎁 <span data-i18n="trTitle">Tam sürümü ücretsiz deneyin</span></h3>
+    <p id="tr-reason" style="font-size:13px;color:#64748b;margin-bottom:8px"></p>
+    <p id="tr-body" style="font-size:14px;line-height:1.5;margin-bottom:6px"></p>
+    <p id="tr-note" style="font-size:12px;color:#64748b;margin-bottom:16px"></p>
+    <div class="modal-actions" style="flex-wrap:wrap">
+      <button class="btn-secondary" id="tr-buy" data-i18n="trBuy">Satın al</button>
+      <button class="btn-secondary" id="tr-demo"></button>
+      <button class="btn-primary" id="tr-use" data-i18n="trUse">Bu belgede tam sürümü kullan</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: Arka Planı Temizle -->
 <div class="modal-backdrop" id="m-cleanbg">
   <div class="modal-card">
@@ -2217,6 +2233,20 @@ const LANGS = {
     ocrBusy: 'Taranmış sayfadaki metin tanınıyor…',
     rbCleanBg: 'Arka Planı Temizle',
     rbOcrLang: 'Tarama Dili',
+    trTitle: 'Tam sürümü ücretsiz deneyin',
+    trBody: '{docs} belgede, {days} gün boyunca tüm özellikler açık: sayfa sınırı ve filigran yok.',
+    trNote: 'Süre, tam sürümü ilk kullandığınızda başlar.',
+    trWhyPages: 'Demo sürümünde yalnızca ilk 3 sayfa düzenlenebilir.',
+    trWhySave: 'Demo sürümünde kaydedilen dosyalara filigran eklenir.',
+    trWhyFeature: 'Bu özellik tam sürümde kullanılabilir.',
+    trUse: 'Bu belgede tam sürümü kullan',
+    trDemo: 'Demo ile devam et',
+    trCancel: 'Vazgeç',
+    trBuy: 'Satın al',
+    trUsedToast: 'Bu belge tam sürümde açıldı · kalan {docs} belge, {days} gün',
+    trChipAvail: '🎁 Ücretsiz tam sürüm denemesi: {docs} belge · {days} gün',
+    trChipActive: '✔ Bu belge tam sürümde · kalan {docs} belge, {days} gün',
+    trChipEnded: 'Tam sürüm denemesi bitti',
     ocrLangHelp: 'Taranmış belgelerdeki yazının dili',
     ocrLangAuto: 'Otomatik (program dili)',
     ocrLangSet: 'Tarama dili',
@@ -2379,6 +2409,20 @@ const LANGS = {
     ocrBusy: 'Reading the text of the scanned page…',
     rbCleanBg: 'Clean Background',
     rbOcrLang: 'Scan Language',
+    trTitle: 'Try the full version for free',
+    trBody: 'Everything unlocked on {docs} documents for {days} days: no page limit, no watermark.',
+    trNote: 'The period starts when you first use the full version.',
+    trWhyPages: 'The demo edits only the first 3 pages.',
+    trWhySave: 'The demo adds a watermark to saved files.',
+    trWhyFeature: 'This feature is part of the full version.',
+    trUse: 'Use the full version on this document',
+    trDemo: 'Continue with the demo',
+    trCancel: 'Cancel',
+    trBuy: 'Buy',
+    trUsedToast: 'Full version on for this document · {docs} documents, {days} days left',
+    trChipAvail: '🎁 Free full-version trial: {docs} documents · {days} days',
+    trChipActive: '✔ This document runs the full version · {docs} documents, {days} days left',
+    trChipEnded: 'Full-version trial ended',
     ocrLangHelp: 'Language of the text in scanned documents',
     ocrLangAuto: 'Automatic (app language)',
     ocrLangSet: 'Scan language',
@@ -2541,6 +2585,20 @@ const LANGS = {
     ocrBusy: 'Text der gescannten Seite wird erkannt…',
     rbCleanBg: 'Hintergrund säubern',
     rbOcrLang: 'Scan-Sprache',
+    trTitle: 'Vollversion kostenlos testen',
+    trBody: 'Alles freigeschaltet für {docs} Dokumente, {days} Tage lang: keine Seitengrenze, kein Wasserzeichen.',
+    trNote: 'Der Zeitraum beginnt, wenn Sie die Vollversion zum ersten Mal nutzen.',
+    trWhyPages: 'In der Demo werden nur die ersten 3 Seiten bearbeitet.',
+    trWhySave: 'Die Demo versieht gespeicherte Dateien mit einem Wasserzeichen.',
+    trWhyFeature: 'Diese Funktion gehört zur Vollversion.',
+    trUse: 'Vollversion für dieses Dokument nutzen',
+    trDemo: 'Mit der Demo weiter',
+    trCancel: 'Abbrechen',
+    trBuy: 'Kaufen',
+    trUsedToast: 'Vollversion für dieses Dokument aktiv · noch {docs} Dokumente, {days} Tage',
+    trChipAvail: '🎁 Kostenloser Vollversionstest: {docs} Dokumente · {days} Tage',
+    trChipActive: '✔ Dieses Dokument nutzt die Vollversion · noch {docs} Dokumente, {days} Tage',
+    trChipEnded: 'Vollversionstest beendet',
     ocrLangHelp: 'Sprache des Textes in gescannten Dokumenten',
     ocrLangAuto: 'Automatisch (Programmsprache)',
     ocrLangSet: 'Scan-Sprache',
@@ -2703,6 +2761,20 @@ const LANGS = {
     ocrBusy: 'Reconociendo el texto de la página escaneada…',
     rbCleanBg: 'Limpiar fondo',
     rbOcrLang: 'Idioma del escaneo',
+    trTitle: 'Pruebe gratis la versión completa',
+    trBody: 'Todo desbloqueado en {docs} documentos durante {days} días: sin límite de páginas ni marca de agua.',
+    trNote: 'El periodo empieza cuando usa la versión completa por primera vez.',
+    trWhyPages: 'La demo solo edita las 3 primeras páginas.',
+    trWhySave: 'La demo añade una marca de agua a los archivos guardados.',
+    trWhyFeature: 'Esta función forma parte de la versión completa.',
+    trUse: 'Usar la versión completa en este documento',
+    trDemo: 'Seguir con la demo',
+    trCancel: 'Cancelar',
+    trBuy: 'Comprar',
+    trUsedToast: 'Versión completa activa en este documento · quedan {docs} documentos, {days} días',
+    trChipAvail: '🎁 Prueba gratis de la versión completa: {docs} documentos · {days} días',
+    trChipActive: '✔ Este documento usa la versión completa · quedan {docs} documentos, {days} días',
+    trChipEnded: 'La prueba de la versión completa terminó',
     ocrLangHelp: 'Idioma del texto en los documentos escaneados',
     ocrLangAuto: 'Automático (idioma del programa)',
     ocrLangSet: 'Idioma del escaneo',
@@ -2865,6 +2937,20 @@ const LANGS = {
     ocrBusy: 'Reconnaissance du texte de la page numérisée…',
     rbCleanBg: 'Nettoyer le fond',
     rbOcrLang: 'Langue du scan',
+    trTitle: 'Essayez gratuitement la version complète',
+    trBody: 'Tout est débloqué sur {docs} documents pendant {days} jours : sans limite de pages ni filigrane.',
+    trNote: 'La période commence à la première utilisation de la version complète.',
+    trWhyPages: 'La démo ne modifie que les 3 premières pages.',
+    trWhySave: 'La démo ajoute un filigrane aux fichiers enregistrés.',
+    trWhyFeature: 'Cette fonction fait partie de la version complète.',
+    trUse: 'Utiliser la version complète sur ce document',
+    trDemo: 'Continuer avec la démo',
+    trCancel: 'Annuler',
+    trBuy: 'Acheter',
+    trUsedToast: 'Version complète activée pour ce document · reste {docs} documents, {days} jours',
+    trChipAvail: '🎁 Essai gratuit de la version complète : {docs} documents · {days} jours',
+    trChipActive: '✔ Ce document utilise la version complète · reste {docs} documents, {days} jours',
+    trChipEnded: 'L\'essai de la version complète est terminé',
     ocrLangHelp: 'Langue du texte des documents numérisés',
     ocrLangAuto: 'Automatique (langue du logiciel)',
     ocrLangSet: 'Langue du scan',
@@ -3027,6 +3113,20 @@ const LANGS = {
     ocrBusy: 'Riconoscimento del testo della pagina scansionata…',
     rbCleanBg: 'Pulisci sfondo',
     rbOcrLang: 'Lingua scansione',
+    trTitle: 'Prova gratis la versione completa',
+    trBody: 'Tutto sbloccato su {docs} documenti per {days} giorni: nessun limite di pagine, nessuna filigrana.',
+    trNote: 'Il periodo inizia quando usi la versione completa per la prima volta.',
+    trWhyPages: 'La demo modifica solo le prime 3 pagine.',
+    trWhySave: 'La demo aggiunge una filigrana ai file salvati.',
+    trWhyFeature: 'Questa funzione fa parte della versione completa.',
+    trUse: 'Usa la versione completa su questo documento',
+    trDemo: 'Continua con la demo',
+    trCancel: 'Annulla',
+    trBuy: 'Acquista',
+    trUsedToast: 'Versione completa attiva su questo documento · restano {docs} documenti, {days} giorni',
+    trChipAvail: '🎁 Prova gratuita della versione completa: {docs} documenti · {days} giorni',
+    trChipActive: '✔ Questo documento usa la versione completa · restano {docs} documenti, {days} giorni',
+    trChipEnded: 'Prova della versione completa terminata',
     ocrLangHelp: 'Lingua del testo nei documenti scansionati',
     ocrLangAuto: 'Automatica (lingua del programma)',
     ocrLangSet: 'Lingua scansione',
@@ -3189,6 +3289,20 @@ const LANGS = {
     ocrBusy: 'Reconhecendo o texto da página digitalizada…',
     rbCleanBg: 'Limpar fundo',
     rbOcrLang: 'Idioma da digitalização',
+    trTitle: 'Experimente a versão completa grátis',
+    trBody: 'Tudo liberado em {docs} documentos por {days} dias: sem limite de páginas e sem marca d’água.',
+    trNote: 'O período começa quando você usa a versão completa pela primeira vez.',
+    trWhyPages: 'A demo edita só as 3 primeiras páginas.',
+    trWhySave: 'A demo adiciona marca d’água aos arquivos salvos.',
+    trWhyFeature: 'Este recurso faz parte da versão completa.',
+    trUse: 'Usar a versão completa neste documento',
+    trDemo: 'Continuar com a demo',
+    trCancel: 'Cancelar',
+    trBuy: 'Comprar',
+    trUsedToast: 'Versão completa ativa neste documento · restam {docs} documentos, {days} dias',
+    trChipAvail: '🎁 Teste grátis da versão completa: {docs} documentos · {days} dias',
+    trChipActive: '✔ Este documento usa a versão completa · restam {docs} documentos, {days} dias',
+    trChipEnded: 'O teste da versão completa terminou',
     ocrLangHelp: 'Idioma do texto em documentos digitalizados',
     ocrLangAuto: 'Automático (idioma do programa)',
     ocrLangSet: 'Idioma da digitalização',
@@ -3351,6 +3465,20 @@ const LANGS = {
     ocrBusy: 'Распознавание текста отсканированной страницы…',
     rbCleanBg: 'Очистить фон',
     rbOcrLang: 'Язык скана',
+    trTitle: 'Попробуйте полную версию бесплатно',
+    trBody: 'Всё открыто для {docs} документов на {days} дней: без ограничения страниц и без водяного знака.',
+    trNote: 'Срок начинается при первом использовании полной версии.',
+    trWhyPages: 'В демоверсии редактируются только первые 3 страницы.',
+    trWhySave: 'Демоверсия добавляет водяной знак к сохранённым файлам.',
+    trWhyFeature: 'Эта функция входит в полную версию.',
+    trUse: 'Использовать полную версию для этого документа',
+    trDemo: 'Продолжить в демоверсии',
+    trCancel: 'Отмена',
+    trBuy: 'Купить',
+    trUsedToast: 'Полная версия включена для этого документа · осталось {docs} док., {days} дн.',
+    trChipAvail: '🎁 Бесплатная пробная полная версия: {docs} док. · {days} дн.',
+    trChipActive: '✔ Этот документ в полной версии · осталось {docs} док., {days} дн.',
+    trChipEnded: 'Пробный период полной версии закончился',
     ocrLangHelp: 'Язык текста в отсканированных документах',
     ocrLangAuto: 'Автоматически (язык программы)',
     ocrLangSet: 'Язык скана',
@@ -3429,6 +3557,7 @@ function setLang(code) {
   if (lbl) lbl.textContent = labels[code] || code.toUpperCase();
   document.getElementById('lang-menu').classList.remove('open');
   applyI18n();
+  if (typeof renderTrialChip === 'function') renderTrialChip();
   if (!S.pageCount) document.getElementById('tb-filename').textContent = t('noFile');
   trxApplyAll();
   if (typeof applyStorePrice === 'function') applyStorePrice();
@@ -3612,7 +3741,7 @@ function scanWarning() {
   });
 }
 
-async function doExport(format) {
+async function doExport(format, demoOk) {
   document.getElementById('export-menu').classList.remove('open');
   if (!S.pageCount) { toast(t('noDocErr'), 'err'); return; }
   if (!_scanWarned && ['docx', 'excel', 'txt'].includes(format)) {
@@ -3624,12 +3753,18 @@ async function doExport(format) {
   }
   spin(true);
   try {
-    const r = await fetch(`/api/export/${format}`);
+    const r = await fetch(`/api/export/${format}` + (demoOk ? '?demo_ok=1' : ''));
     const ct = r.headers.get('Content-Type') || '';
     if (ct.includes('json') || !r.ok) {
       const data = await r.json().catch(() => ({}));
       spin(false);
       if (data.code === 'no_calibre') { openModal('m-azw3'); return; }
+      if (data.demo_limit && !demoOk) {
+        const choice = await trialGate(data.watermark ? 'save' : 'feature', !data.watermark);
+        if (choice === 'use') return doExport(format);
+        if (choice === 'demo' && data.watermark) return doExport(format, true);
+        if (choice === 'buy') return;
+      }
       toast(data.error || t('exportErr'), 'err'); return;
     }
     const blob = await r.blob();
@@ -3700,13 +3835,74 @@ function clearLearnedFont() {
 
 // ── helpers ──────────────────────────────────────────────
 
-async function post(url, data) {
+async function _post(url, data) {
   const r = await fetch(url, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(data)
   });
   try { return await r.json(); } catch { return {ok: false, error: 'Sunucu hatası'}; }
+}
+
+// A demo limit hit while the full-version trial is available: offer the trial, then repeat the
+// request in the full version, or in the demo (watermark / first pages) if the user prefers
+async function post(url, data) {
+  const r = await _post(url, data);
+  if (!(r && r.demo_limit) || (data && data.demo_ok)) return r;
+  const wasSpinning = document.getElementById('spinner').classList.contains('show');
+  spin(false);
+  const lessInDemo = r.watermark || r.pages;
+  const choice = await trialGate(r.watermark ? 'save' : r.pages ? 'pages' : 'feature', !lessInDemo);
+  if (wasSpinning && (choice === 'use' || (choice === 'demo' && lessInDemo))) spin(true);
+  if (choice === 'use') return post(url, data);
+  if (choice === 'demo' && lessInDemo) return _post(url, {...(data || {}), demo_ok: true});
+  return {ok: false, error: choice === 'buy' ? '' : r.error, demo_declined: true};
+}
+
+// ── Full-version trial ─────────────────────────────────────────────────────
+let TR = null;
+function trialFmt(key, st) {
+  return t(key).replace('{docs}', st.docs_left).replace('{days}', st.days_left);
+}
+function renderTrialChip() {
+  const el = document.getElementById('trial-chip');
+  if (!el) return;
+  if (!TR || !TR.demo) { el.style.display = 'none'; return; }
+  el.textContent = TR.unlocked ? trialFmt('trChipActive', TR)
+                 : TR.available ? trialFmt('trChipAvail', TR) : t('trChipEnded');
+  el.style.display = '';
+}
+async function refreshTrial() {
+  TR = await fetch('/api/trial').then(x => x.json()).catch(() => null);
+  renderTrialChip();
+  return TR;
+}
+// Resolves to 'use' (the open document now runs the full version), 'demo' or 'buy'
+function trialGate(reason, demoIsCancel) {
+  return new Promise(async resolve => {
+    const st = await refreshTrial();
+    if (!st || !st.available) { resolve('demo'); return; }
+    document.getElementById('tr-reason').textContent =
+      t({pages: 'trWhyPages', save: 'trWhySave', feature: 'trWhyFeature'}[reason]);
+    document.getElementById('tr-body').textContent = trialFmt('trBody', st);
+    document.getElementById('tr-note').textContent = st.started ? '' : t('trNote');
+    document.getElementById('tr-demo').textContent = t(demoIsCancel ? 'trCancel' : 'trDemo');
+    const done = async choice => {
+      closeModal('m-trial');
+      if (choice === 'use') {
+        const u = await _post('/api/trial/use', {});
+        if (!u.ok) { resolve('demo'); return; }
+        TR = u; renderTrialChip();
+        toast(trialFmt('trUsedToast', u), 'ok');
+      }
+      if (choice === 'buy') buyFull();
+      resolve(choice);
+    };
+    document.getElementById('tr-use').onclick = () => done('use');
+    document.getElementById('tr-demo').onclick = () => done('demo');
+    document.getElementById('tr-buy').onclick = () => done('buy');
+    openModal('m-trial');
+  });
 }
 
 function spin(on) {
@@ -3860,6 +4056,7 @@ function applyOpenResult(r) {
   toast(`${r.name} açıldı (${r.pages} sayfa)`, 'ok');
 
   clearBanners();
+  refreshTrial();
   if (r.demo_truncated) {
     addBanner('info', '🎯', t('demoTruncated') || 'Demo: yalnızca ilk 3 sayfa açıldı.', null, null);
   }
@@ -4870,6 +5067,7 @@ async function pickOcrLang(code) {
   if (S.pageCount) loadTextBlocks(S.currentPage);     // read the page again in the new language
 }
 fetch('/api/ocr_lang').then(x => x.json()).then(r => { if (r.ok) _ocrPref = r.pref; }).catch(() => {});
+if (document.getElementById('trial-chip')) refreshTrial();
 
 function toggleShapeMenu(e) {
   e.stopPropagation();

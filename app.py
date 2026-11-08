@@ -38,6 +38,7 @@ SOURCE_URL = 'https://github.com/mkb-fcb/pdf-editor-pro'
 DEMO_MAX_PAGES = 3
 DEMO_LIMIT_MSG = (f'Demo sürümünde en fazla {DEMO_MAX_PAGES} sayfa desteklenir. '
                   'Tam sürüm için lisans anahtarı girin veya mkbsoft.net adresinden satın alın.')
+DEMO_WATERMARK_MSG = 'Demo sürümünde kaydedilen dosyalara filigran eklenir.'
 DEMO_FEATURE_MSG = ('Bu özellik yalnızca tam sürümde kullanılabilir. '
                     'Lisans anahtarı girin veya mkbsoft.net adresinden satın alın.')
 _licensed_cache = None
@@ -312,6 +313,7 @@ def _swap_doc(new_doc, path, name=None, reset_history=True):
     state['name'] = name or Path(path).name
     if reset_history:
         clear_history()
+        _trial_new_doc()
     if old is not None:
         try:
             old.close()
@@ -330,9 +332,152 @@ def is_demo() -> bool:
     return not _licensed_cache
 
 
+# ── Full-version trial ───────────────────────────────────────────────────────
+# A demo user may use the full version on TRIAL_DOCS documents within TRIAL_DAYS days, counted
+# from the first one. Viewing, printing and what the demo already allows cost nothing; a document
+# is spent when the user chooses the full version for it (longer than the demo limit, a save
+# without the watermark, a full-version feature). The record is kept in three places so that
+# reinstalling does not start over: the settings file and the registry (both removed with an
+# MSIX uninstall) and a hidden file in the user profile.
+TRIAL_DOCS = 3
+TRIAL_DAYS = 7
+_TRIAL_FILE = os.path.join(os.path.expanduser('~'), '.pdfeditorpro')
+_TRIAL_REG = r'Software\MKBSoft\PDFEditorPro'
+
+
+def _trial_read_all() -> list:
+    import json
+    found = [_prompts_load().get('trial')]
+    try:
+        with open(_TRIAL_FILE, encoding='utf-8') as f:
+            found.append(json.load(f))
+    except Exception:
+        pass
+    try:
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, _TRIAL_REG) as k:
+            found.append(json.loads(winreg.QueryValueEx(k, 'Trial')[0]))
+    except Exception:
+        pass
+    return [t for t in found if isinstance(t, dict)]
+
+
+def _trial_load() -> dict:
+    """{'start': first use (epoch s) or None, 'docs': documents spent} merged from all copies:
+    the earliest start and every document any copy knows."""
+    start, docs = None, []
+    for t in _trial_read_all():
+        if isinstance(t.get('start'), (int, float)):
+            start = t['start'] if start is None else min(start, t['start'])
+        for d in t.get('docs') or []:
+            if isinstance(d, str) and d not in docs:
+                docs.append(d)
+    return {'start': start, 'docs': docs}
+
+
+def _trial_save(t: dict):
+    import json
+    d = _prompts_load()
+    d['trial'] = t
+    _prompts_save(d)
+    data = json.dumps(t)
+    try:
+        if os.path.exists(_TRIAL_FILE):
+            os.chmod(_TRIAL_FILE, 0o666)
+        with open(_TRIAL_FILE, 'w', encoding='utf-8') as f:
+            f.write(data)
+        import ctypes
+        ctypes.windll.kernel32.SetFileAttributesW(_TRIAL_FILE, 0x2)     # hidden
+    except Exception:
+        pass
+    try:
+        import winreg
+        with winreg.CreateKey(winreg.HKEY_CURRENT_USER, _TRIAL_REG) as k:
+            winreg.SetValueEx(k, 'Trial', 0, winreg.REG_SZ, data)
+    except Exception:
+        pass
+
+
+def _trial_doc_key() -> str:
+    """Identifies the open document: its file, or its name and size when it has none of its own."""
+    doc, path = state.get('doc'), state.get('path') or ''
+    if path and not os.path.basename(path).startswith(('demo_', 'tmp')):
+        return os.path.normcase(os.path.abspath(path))
+    return f"{state.get('name') or ''}:{len(doc) if doc else 0}"
+
+
+def _trial_status() -> dict:
+    t = _trial_load()
+    left_days = TRIAL_DAYS
+    if t['start'] is not None:
+        left_days = max(0.0, TRIAL_DAYS - (time.time() - t['start']) / 86400)
+    expired = t['start'] is not None and left_days <= 0
+    left_docs = max(0, TRIAL_DOCS - len(t['docs']))
+    return {'demo': is_demo(), 'unlocked': bool(state.get('trial_doc')),
+            'available': is_demo() and not expired and left_docs > 0,
+            'started': t['start'] is not None, 'expired': expired,
+            'docs_left': left_docs, 'days_left': int(-(-left_days // 1)),     # whole days, rounded up
+            'docs_total': TRIAL_DOCS, 'days_total': TRIAL_DAYS}
+
+
+def _trial_new_doc():
+    """A document was opened: it runs in the demo unless the trial already covers it (reopening a
+    spent document within the period is free)."""
+    state['trial_doc'] = False
+    if not is_demo() or not state.get('doc'):
+        return
+    t = _trial_load()
+    if t['start'] is not None and time.time() - t['start'] < TRIAL_DAYS * 86400 \
+            and _trial_doc_key() in t['docs']:
+        state['trial_doc'] = True
+
+
+def _limited() -> bool:
+    """Demo limits apply to the open document: demo version and the trial not used on it."""
+    return is_demo() and not state.get('trial_doc')
+
+
+def _demo_block(msg, **extra):
+    """A demo limit was hit. While the trial is available the page offers it first
+    ('demo_limit'); otherwise it shows msg."""
+    return jsonify({'ok': False, 'error': msg, 'demo_limit': _trial_status()['available'], **extra})
+
+
+def _trial_offer() -> bool:
+    """For actions that work in the demo but with less (watermark, first pages): ask first while
+    the trial is available, unless the page already answered 'demo'."""
+    answered = (request.get_json(silent=True) or {}).get('demo_ok') or request.args.get('demo_ok')
+    return _limited() and not answered and _trial_status()['available']
+
+
+@app.route('/api/trial', methods=['GET'])
+def api_trial():
+    return jsonify({'ok': True, **_trial_status()})
+
+
+@app.route('/api/trial/use', methods=['POST'])
+def api_trial_use():
+    if not state.get('doc'):
+        return jsonify({'ok': False, 'error': 'Açık dosya yok'})
+    st = _trial_status()
+    if not st['demo'] or st['unlocked']:
+        return jsonify({'ok': True, **st})
+    if not st['available']:
+        return jsonify({'ok': False, **st})
+    t = _trial_load()
+    if t['start'] is None:
+        t['start'] = time.time()
+    key = _trial_doc_key()
+    if key not in t['docs']:
+        t['docs'].append(key)
+    _trial_save(t)
+    state['trial_doc'] = True
+    return jsonify({'ok': True, **_trial_status()})
+
+
 def _demo_truncate(doc) -> bool:
     """Demo modunda belgeyi ilk DEMO_MAX_PAGES sayfaya indir. Kırpıldıysa True."""
-    if is_demo() and len(doc) > DEMO_MAX_PAGES:
+    if _limited() and len(doc) > DEMO_MAX_PAGES:
         doc.select(list(range(DEMO_MAX_PAGES)))
         return True
     return False
@@ -341,7 +486,7 @@ def _demo_truncate(doc) -> bool:
 def _demo_over_limit() -> bool:
     """Demo modunda açık belge sayfa sınırını aşıyor mu (yalnızca okunabilir/yazdırılabilir)."""
     doc = state['doc']
-    return bool(doc) and is_demo() and len(doc) > DEMO_MAX_PAGES
+    return bool(doc) and _limited() and len(doc) > DEMO_MAX_PAGES
 
 
 # Demo modunda belgenin tamamı okunur ve yazdırılır; bunların dışındaki her API çağrısı
@@ -349,7 +494,8 @@ def _demo_over_limit() -> bool:
 _DEMO_FULL_DOC_ENDPOINTS = {
     'api_status', 'api_page_sizes', 'api_view', 'api_print_page', 'api_thumb',
     'api_open', 'api_upload', 'api_browse', 'api_ui_lang', 'api_ocr_lang', 'api_rate_prompt',
-    'api_activate', 'api_open_link', 'api_demo_edit',
+    'api_activate', 'api_open_link', 'api_demo_edit', 'api_trial', 'api_trial_use',
+    'api_store_price', 'api_scan_info',     # read-only; the price is fetched while a document opens
 }
 
 
@@ -366,6 +512,8 @@ def api_demo_edit():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Açık dosya yok'})
+    if len(doc) > DEMO_MAX_PAGES and _trial_offer():
+        return _demo_block(DEMO_LIMIT_MSG, pages=len(doc))
     truncated = _demo_truncate(doc)
     return jsonify({'ok': True, 'pages': len(doc), 'truncated': truncated})
 
@@ -972,6 +1120,7 @@ def demo_open():
         state['path'] = tf.name
         state['name'] = 'Demo_Report.pdf'
         clear_history()
+        _trial_new_doc()
         return jsonify({'ok': True, 'pages': len(state['doc']), 'name': 'Demo_Report.pdf'})
     except Exception as e:
         import traceback as _tb
@@ -2210,9 +2359,9 @@ def api_merge():
     pos = request.json.get('pos', 'end')
     try:
         src = fitz.open(path)
-        if is_demo() and len(doc) + len(src) > DEMO_MAX_PAGES:
+        if _limited() and len(doc) + len(src) > DEMO_MAX_PAGES:
             src.close()
-            return jsonify({'ok': False, 'error': DEMO_LIMIT_MSG})
+            return _demo_block(DEMO_LIMIT_MSG)
         push_history()
         if pos == 'end':
             doc.insert_pdf(src)
@@ -2234,10 +2383,12 @@ def api_split():
     path = request.json.get('path', '').strip().strip('"')
     if not path:
         path = _default_out(_sfx('range', a=start + 1, b=end + 1))
+    if _trial_offer():
+        return _demo_block(DEMO_WATERMARK_MSG, watermark=True)
     try:
         new_doc = fitz.open()
         new_doc.insert_pdf(doc, from_page=start, to_page=end)
-        if is_demo():
+        if _limited():
             _apply_demo_watermark(new_doc)
         new_doc.save(path, garbage=4, deflate=True)
         new_doc.close()
@@ -2254,8 +2405,10 @@ def api_save():
     path = request.json.get('path', '').strip().strip('"')
     if not path:
         path = _default_out(_sfx('edited'))
+    if _trial_offer():
+        return _demo_block(DEMO_WATERMARK_MSG, watermark=True)
     try:
-        if is_demo():
+        if _limited():
             _save_with_watermark(doc, path)
             return jsonify({'ok': True, 'path': path, 'stripped_signatures': 0})
         stripped = strip_signatures(doc)
@@ -2507,10 +2660,12 @@ def api_export_images():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
+    if _trial_offer():
+        return _demo_block(DEMO_WATERMARK_MSG, watermark=True)
     mat = fitz.Matrix(2.0, 2.0)
     stem = _doc_stem()
     src = doc
-    if is_demo():
+    if _limited():
         # Demo: dışa aktarılan görseller de filigranlı olsun
         src = fitz.open(stream=doc.tobytes(garbage=1), filetype='pdf')
         _apply_demo_watermark(src)
@@ -2596,8 +2751,8 @@ def api_export_epub():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
-    if is_demo():
-        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    if _limited():
+        return _demo_block(DEMO_FEATURE_MSG)
     return send_file(io.BytesIO(_epub_bytes(doc)), mimetype='application/epub+zip',
                      as_attachment=True, download_name=f'{_doc_stem()}.epub')
 
@@ -2607,8 +2762,8 @@ def api_export_azw3():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
-    if is_demo():
-        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    if _limited():
+        return _demo_block(DEMO_FEATURE_MSG)
     exe = _find_ebook_convert()
     if not exe:
         return jsonify({'ok': False, 'code': 'no_calibre',
@@ -2635,8 +2790,8 @@ def api_kindle_prepare():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
-    if is_demo():
-        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    if _limited():
+        return _demo_block(DEMO_FEATURE_MSG)
     path = _default_out('')[:-4] + '.epub'
     n = 2
     while os.path.exists(path):
@@ -2665,8 +2820,8 @@ def api_kindle_usb_send():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
-    if is_demo():
-        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    if _limited():
+        return _demo_block(DEMO_FEATURE_MSG)
     k = kindle_usb.find_kindle()
     if not k:
         return jsonify({'ok': False, 'code': 'no_kindle', 'error': 'Bağlı Kindle bulunamadı'})
@@ -3100,8 +3255,8 @@ def api_export_docx():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
-    if is_demo():
-        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    if _limited():
+        return _demo_block(DEMO_FEATURE_MSG)
     tmp_pdf = tempfile.mktemp(suffix='.pdf')
     tmp_docx = tempfile.mktemp(suffix='.docx')
     try:
@@ -3253,8 +3408,8 @@ def api_addblank():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False})
-    if is_demo() and len(doc) >= DEMO_MAX_PAGES:
-        return jsonify({'ok': False, 'error': DEMO_LIMIT_MSG})
+    if _limited() and len(doc) >= DEMO_MAX_PAGES:
+        return _demo_block(DEMO_LIMIT_MSG)
     pos = int(request.json.get('pos', len(doc)))
     pos = max(0, min(pos, len(doc)))
     push_history()
@@ -3535,6 +3690,8 @@ def api_compress():
         level = 'medium'
     if not path:
         path = _default_out(_sfx('compressed'))
+    if _trial_offer():
+        return _demo_block(DEMO_WATERMARK_MSG, watermark=True)
     try:
         orig_kb = None
         if state.get('path') and os.path.exists(state['path']):
@@ -3551,7 +3708,7 @@ def api_compress():
                     work.subset_fonts()
                 except Exception:
                     pass
-            if is_demo():
+            if _limited():
                 _save_with_watermark(work, path)
             else:
                 work.save(path, garbage=4, deflate=True, deflate_images=True,
@@ -3763,8 +3920,8 @@ def api_encrypt():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
-    if is_demo():
-        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    if _limited():
+        return _demo_block(DEMO_FEATURE_MSG)
     data = request.json or {}
     user_pw   = data.get('user_pw', '').strip()
     owner_pw  = data.get('owner_pw', '').strip()
@@ -3792,8 +3949,8 @@ def api_decrypt():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
-    if is_demo():
-        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    if _limited():
+        return _demo_block(DEMO_FEATURE_MSG)
     data = request.json or {}
     password = data.get('password', '').strip()
     out_path = _default_out(_sfx('unlocked'))
@@ -3812,8 +3969,8 @@ def api_export_excel():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
-    if is_demo():
-        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    if _limited():
+        return _demo_block(DEMO_FEATURE_MSG)
     try:
         import openpyxl
     except ImportError:
@@ -3850,8 +4007,8 @@ def api_export_pptx():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
-    if is_demo():
-        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    if _limited():
+        return _demo_block(DEMO_FEATURE_MSG)
     try:
         from pptx import Presentation
         from pptx.util import Emu
@@ -3888,8 +4045,8 @@ def api_export_jpg():
     doc = state['doc']
     if not doc:
         return jsonify({'ok': False, 'error': 'Dosya açık değil'})
-    if is_demo():
-        return jsonify({'ok': False, 'error': DEMO_FEATURE_MSG})
+    if _limited():
+        return _demo_block(DEMO_FEATURE_MSG)
     mat = fitz.Matrix(2.0, 2.0)
     stem = _doc_stem()
     if len(doc) == 1:
@@ -3967,6 +4124,7 @@ def api_convert_to_pdf():
         else:
             return jsonify({'ok': False, 'error': f'Desteklenmeyen format: {ext}'})
 
+        state['trial_doc'] = False      # a new document: the trial of the previous one does not carry over
         truncated = _demo_truncate(new_doc)
         push_history()
         new_doc = _swap_doc(new_doc, os.path.splitext(src)[0] + _sfx('converted') + '.pdf', reset_history=False)
@@ -4022,6 +4180,7 @@ if __name__ == '__main__':
                 doc = _make_writable(fitz.open(filepath))
                 state['doc'] = doc
                 state['path'] = filepath
+                _trial_new_doc()
             except Exception as e:
                 print(f'Dosya acilamadi: {e}')
 
