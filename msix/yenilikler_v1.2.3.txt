@@ -1,0 +1,73 @@
+Partner Center > Store listings > (her dil) > "What's new in this version" alanına yapıştırın.
+
+[TR]
+• 1.2.3: Ücretsiz tam sürüm denemesi. Lisans almadan önce 7 gün içinde 3 belgede programın tüm özelliklerini sınırsız kullanın: sayfa sınırı ve filigran yok. Okumak ve yazdırmak denemeden düşmez.
+• Taranmış belgeler 8 dilde okunuyor: Türkçe, İngilizce, Almanca, İspanyolca, Fransızca, İtalyanca, Portekizce ve Rusça. Dil otomatik seçilir; farklı dildeki bir tarama için Düzenle > Tarama Dili.
+• Taranmış PDF'ler düzenlenebiliyor: yazıları değiştirin, silin veya taşıyın. Yeni kelimeler taramanın kendi yazı tipi, boyu ve tonuyla yazılır.
+• Yerleşik metin tanıma (OCR): küçük, soluk ve nokta vuruşlu yazıcı çıktılarını doğru okur.
+• "Arka Planı Temizle" (Düzenle sekmesi): gri fotokopi tonunu, sararmış veya renkli kâğıdı ve gölgeleri beyaza çevirir.
+• Taranmış belgeler Word'e sayfa düzeni korunarak düzenlenebilir metin olarak aktarılır; Excel, metin dosyası ve "Metni Kopyala" da tanınan metni kullanır.
+• Büyük taramalar daha hızlı açılır ve daha az bellek kullanır.
+
+[EN]
+• 1.2.3: Free full-version trial. Before buying a licence, use every feature on 3 documents within 7 days: no page limit, no watermark. Reading and printing never count against the trial.
+• Scanned documents are read in 8 languages: English, Turkish, German, Spanish, French, Italian, Portuguese and Russian. The language is picked automatically; for a scan in another language use Edit > Scan Language.
+• Scanned PDFs can be edited: change, delete or move text. New words are drawn in the scan's own typeface, size and tone.
+• Built-in text recognition (OCR) reads small, faint and dot-matrix print accurately.
+• "Clean Background" (Edit tab) turns the grey copier tone, yellowed or coloured paper and shadows white.
+• Scanned documents export to Word as editable text laid out like the original page; Excel, text files and "Copy Text" use the recognised text too.
+• Large scans open faster and use less memory.
+
+[DE]
+• 1.2.3: Kostenlose Testphase der Vollversion. Nutzen Sie vor dem Kauf einer Lizenz alle Funktionen für 3 Dokumente innerhalb von 7 Tagen: ohne Seitenlimit, ohne Wasserzeichen. Lesen und Drucken zählen nie zur Testphase.
+• Gescannte Dokumente werden in 8 Sprachen gelesen: Deutsch, Englisch, Türkisch, Spanisch, Französisch, Italienisch, Portugiesisch und Russisch. Die Sprache wird automatisch gewählt; für Scans in einer anderen Sprache: Bearbeiten > Scan-Sprache.
+• Gescannte PDFs lassen sich bearbeiten: Text ändern, löschen oder verschieben. Neue Wörter erscheinen in Schrift, Größe und Farbton des Scans.
+• Integrierte Texterkennung (OCR) liest kleine, blasse und Nadeldrucker-Schrift zuverlässig.
+• „Hintergrund säubern“ (Registerkarte Bearbeiten) macht grauen Kopierton, vergilbtes oder farbiges Papier und Schatten weiß.
+• Gescannte Dokumente werden als bearbeitbarer Text im Layout der Originalseite nach Word exportiert; Excel, Textdatei und „Text kopieren“ nutzen ebenfalls den erkannten Text.
+• Große Scans öffnen schneller und brauchen weniger Speicher.
+
+[ES]
+• 1.2.3: Prueba gratuita de la versión completa. Antes de comprar una licencia, use todas las funciones en 3 documentos durante 7 días: sin límite de páginas ni marca de agua. Leer e imprimir nunca cuentan para la prueba.
+• Los documentos escaneados se leen en 8 idiomas: español, inglés, turco, alemán, francés, italiano, portugués y ruso. El idioma se elige automáticamente; para un escaneo en otro idioma use Editar > Idioma del escaneo.
+• Ahora se pueden editar PDF escaneados: cambie, borre o mueva el texto. Las palabras nuevas se dibujan con la tipografía, el tamaño y el tono del escaneo.
+• El reconocimiento de texto (OCR) integrado lee con precisión texto pequeño, tenue o de impresora matricial.
+• «Limpiar fondo» (pestaña Editar) vuelve blancos el gris de fotocopia, el papel amarillento o de color y las sombras.
+• Los documentos escaneados se exportan a Word como texto editable con el diseño original; Excel, archivos de texto y «Copiar texto» también usan el texto reconocido.
+• Los escaneos grandes se abren más rápido y usan menos memoria.
+
+[FR]
+• 1.2.3 : essai gratuit de la version complète. Avant d'acheter une licence, utilisez toutes les fonctions sur 3 documents pendant 7 jours : sans limite de pages ni filigrane. La lecture et l'impression ne comptent jamais dans l'essai.
+• Les documents numérisés sont lus en 8 langues : français, anglais, turc, allemand, espagnol, italien, portugais et russe. La langue est choisie automatiquement ; pour un scan dans une autre langue : Modifier > Langue du scan.
+• Les PDF numérisés sont modifiables : modifiez, supprimez ou déplacez le texte. Les nouveaux mots reprennent la police, la taille et le ton du scan.
+• La reconnaissance de texte (OCR) intégrée lit fidèlement le texte petit, pâle ou d'imprimante matricielle.
+• « Nettoyer le fond » (onglet Modifier) rend blancs le gris de photocopie, le papier jauni ou coloré et les ombres.
+• Les documents numérisés s'exportent vers Word en texte modifiable avec la mise en page d'origine ; Excel, les fichiers texte et « Copier le texte » utilisent aussi le texte reconnu.
+• Les grands scans s'ouvrent plus vite et consomment moins de mémoire.
+
+[IT]
+• 1.2.3: prova gratuita della versione completa. Prima di acquistare una licenza, usa tutte le funzioni su 3 documenti entro 7 giorni: nessun limite di pagine, nessuna filigrana. Lettura e stampa non contano mai per la prova.
+• I documenti scansionati vengono letti in 8 lingue: italiano, inglese, turco, tedesco, spagnolo, francese, portoghese e russo. La lingua viene scelta in automatico; per una scansione in un'altra lingua: Modifica > Lingua scansione.
+• I PDF scansionati si possono modificare: cambia, elimina o sposta il testo. Le nuove parole usano il carattere, la dimensione e il tono della scansione.
+• Il riconoscimento del testo (OCR) integrato legge con precisione testo piccolo, sbiadito o da stampante ad aghi.
+• «Pulisci sfondo» (scheda Modifica) rende bianchi il grigio da fotocopia, la carta ingiallita o colorata e le ombre.
+• I documenti scansionati si esportano in Word come testo modificabile con l'impaginazione originale; anche Excel, i file di testo e «Copia testo» usano il testo riconosciuto.
+• Le scansioni grandi si aprono più velocemente e usano meno memoria.
+
+[PT-BR]
+• 1.2.3: avaliação gratuita da versão completa. Antes de comprar uma licença, use todos os recursos em 3 documentos durante 7 dias: sem limite de páginas e sem marca d'água. Ler e imprimir nunca contam para a avaliação.
+• Documentos digitalizados são lidos em 8 idiomas: português, inglês, turco, alemão, espanhol, francês, italiano e russo. O idioma é escolhido automaticamente; para uma digitalização em outro idioma use Editar > Idioma da digitalização.
+• É possível editar PDFs digitalizados: altere, apague ou mova o texto. As palavras novas usam a fonte, o tamanho e o tom da própria digitalização.
+• O reconhecimento de texto (OCR) integrado lê com precisão texto pequeno, apagado ou de impressora matricial.
+• "Limpar fundo" (guia Editar) deixa brancos o cinza de fotocópia, o papel amarelado ou colorido e as sombras.
+• Documentos digitalizados são exportados para o Word como texto editável com o layout original; Excel, arquivos de texto e "Copiar texto" também usam o texto reconhecido.
+• Digitalizações grandes abrem mais rápido e usam menos memória.
+
+[RU]
+• 1.2.3: бесплатная пробная полная версия. До покупки лицензии используйте все функции для 3 документов в течение 7 дней: без ограничения страниц и без водяного знака. Чтение и печать не расходуют пробный период.
+• Отсканированные документы читаются на 8 языках: русском, английском, турецком, немецком, испанском, французском, итальянском и португальском. Язык выбирается автоматически; для скана на другом языке: «Правка» > «Язык скана».
+• Отсканированные PDF можно редактировать: изменяйте, удаляйте и перемещайте текст. Новые слова рисуются шрифтом, размером и оттенком самого скана.
+• Встроенное распознавание текста (OCR) точно читает мелкий, бледный и матричный шрифт.
+• «Очистить фон» (вкладка «Правка») делает белыми серый тон ксерокопии, пожелтевшую или цветную бумагу и тени.
+• Отсканированные документы экспортируются в Word как редактируемый текст с разметкой исходной страницы; Excel, текстовые файлы и «Копировать текст» тоже используют распознанный текст.
+• Большие сканы открываются быстрее и занимают меньше памяти.

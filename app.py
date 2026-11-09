@@ -31,7 +31,7 @@ import scan_ocr
 MAX_HISTORY = 15
 
 # Keep in sync with installer.iss / installer_demo.iss (MyAppVersion) and build_msix.py's argument
-APP_VERSION = '1.2.2'
+APP_VERSION = '1.2.3'
 SOURCE_URL = 'https://github.com/mkb-fcb/pdf-editor-pro'
 
 # Lisans girilmemişse uygulama demo modunda çalışır (3 sayfa, filigranlı kayıt)
