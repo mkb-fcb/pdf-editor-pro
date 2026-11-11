@@ -1,6 +1,6 @@
 # Microsoft Store Gönderimi — İlerleme Günlüğü
 
-Son güncelleme: 2026-10-09 (ara verildi)
+Son güncelleme: 2026-11-11 (güncel durum en altta)
 
 ## Ürün
 - Partner Center ürünü: **PDF Editor Pro - MKBSoft** (MSIX), Store ID **9PJJ019JKTP9**
@@ -8,7 +8,7 @@ Son güncelleme: 2026-10-09 (ara verildi)
 - Kimlik: Name `MKBSoft.PDFEditorPro-MKBSoft`, Publisher `CN=DD0C354B-7BDC-4028-90B6-AFBA79355DDA`, PublisherDisplayName `MKBSoft`
 - Yüklenecek paket: `installer_output\PDFEditorPro_Store_v1.0.2.msix` (v1.0.2.0, x64)
 - Metinler: `msix\store_metinleri.txt`
-- Sertifikasyon test lisansı: `BILIR-G5SP-XCRG-KDKM` (Cloudflare KV, corporate, 10 makine, 1'i test aktivasyonunda kullanıldı)
+- Sertifikasyon test lisansı: Cloudflare KV'de (corporate, 10 makine). Anahtar bu dosyaya yazılmaz; repo herkese açık.
 
 ## Partner Center adımları
 - [x] 1. Pricing and availability — Free, tüm pazarlar, public
@@ -60,3 +60,25 @@ Son güncelleme: 2026-10-09 (ara verildi)
 - [ ] Store: v1.0.4 onaylanınca Update → PDFEditorPro_Store_v1.0.6.msix (1.0.5 atlanır) + What's new (store_metinleri.txt)
 - [ ] Store: Add/remove languages → DE, ES, FR, IT, PT-BR, RU; metinler msix/store_metinleri_diller.txt, görseller images/site_shots/<dil>_*.png
 - [ ] Store listing açıklamalarındaki fiyatlar 9.99/29.99 (store_metinleri.txt EN/TR güncel)
+
+## 2026-10-25 → 2026-11-09 (özet)
+- 1.0.7 ve 1.0.8: GitHub release. 1.0.8 Store'da yayınlandı (2026-11-02 itibarıyla).
+- 1.1.0 (2026-11-03): AGPL-3.0 lisansı, okuma modu, uygulama içi yazdırma, Store eklentisi `pdfeditorpro_full`. Sertifikadan geçti; tag + GitHub release.
+- 1.1.1 (2026-11-06): .pdf dosya ilişkilendirmesi + metin düzenleme düzeltmeleri. Store'da yayında; tag + release.
+- Eklenti `pdfeditorpro_full` (Store ID 9PKZDN7GJPVH, $9.99) 2026-11-06'da yayında.
+- 1.2.0: sertifikadan kaldı (Tesseract imza hatası 0x800700C1). Düzeltilip 1.2.1 olarak gönderildi; hiç dağıtılmadı, etiketi yok.
+- 1.2.1 (2026-11-07): taranmış PDF düzenleme + Tesseract OCR. Store'da yayınlandı; 8 dilde tam açıklamalar girildi; tag + release.
+- 1.2.2: Store gönderimi iptal edildi, atlandı; dağıtılmadı, etiketi yok.
+- 1.2.3 (2026-11-09): demo kullanıcılarına deneme (7 gün içinde 3 belge) + 8 dilde tarama okuma. Sertifikadan geçti ("Update in publishing"). Tag v1.2.3, GitHub release (Kurulum + Demo, Latest), pad.xml, site ve Gumroad dosyası güncellendi.
+
+## 2026-11-11 (son durum)
+- Mevcut sürüm: 1.2.3 (app.py APP_VERSION, installer.iss, pad.xml). Son etiket: v1.2.3.
+- Store: 1.2.3 sertifikalandı. Yayında olduğu Partner Center'dan teyit edilmeli. Sertifikada bekleyen sürüm yok (bilinen).
+- Artifex 2026-11-11'de cevap verdi: OEM lisansı en az 5.000 $. Alınmadı; AGPL-3.0 ile devam.
+- [x] Store listeleri DE/ES/FR/IT/PT-BR/RU (1.2.0/1.2.1 güncellemesinde 8 dil girildi; metinler msix/store_metinleri_diller.txt)
+- [x] Store açıklamalarında fiyat 9,99 / 29,99 (dosyalarda eski fiyat yok)
+- [x] Gumroad kurulum dosyası → Kurulum_v1.2.3.exe (kullanıcı yaptı)
+- [ ] GitHub iki faktörlü doğrulama (son tarih 17 Kasım 2026)
+- [ ] Eski reddedilen EXE Store kaydı "PDF Editor Pro - MKBSoftware" silinecek
+- [ ] Bilgisayardaki exe kopyası (C:\Program Files\PDFEditorPro) kaldırılacak; yalnızca Store sürümü kalsın
+- [ ] Store 1.2.3'ü gösterince LinkedIn deneme sürümü gönderileri
